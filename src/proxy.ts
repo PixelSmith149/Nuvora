@@ -107,6 +107,8 @@ export async function proxy(request: NextRequest) {
 		pathname.startsWith("/api/auth") ||
 		pathname.startsWith("/api/st/domain/verify") ||
 		pathname.startsWith("/api/st/domain/instructions");
+		pathname.startsWith("/api/cron/fx-refresh");
+        pathname.startsWith("/api/cron/sync-orders");
 
 	if (!user && !isPublicRoute) {
 		url.pathname = "/login";
