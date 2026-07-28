@@ -61,7 +61,7 @@ export default async function SitePage({ params }: SitePageProps) {
         if (footer) {
           const attribution = document.createElement('div');
           attribution.style.cssText = 'text-align: center; padding: 10px; font-size: 12px; color: #71717a;';
-          attribution.innerHTML = 'Built with ❤️ on <a href="https://primeboostage.com" style="color: #10b981; text-decoration: none;">Prime Boostage</a>';
+          attribution.innerHTML = 'Built with ❤️ on <a href="https://nu-vora.com" style="color: #10b981; text-decoration: none;">Prime Boostage</a>';
           footer.appendChild(attribution);
         }
         document.addEventListener('submit', function(e) {

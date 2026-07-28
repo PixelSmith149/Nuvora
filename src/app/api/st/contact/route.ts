@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 			try {
 				await sendEmail({
 					to: siteOwnerEmail,
-					from: "noreply@primeboostage.com",
+					from: "noreply@nu-vora.com",
 					subject: `📩 New Contact Form Message from ${name} (${siteName || "Your Website"})`,
 					html: `
             <h2>New Contact Form Submission</h2>
@@ -93,11 +93,11 @@ export async function POST(req: NextRequest) {
             </p>
             <hr>
             <p style="color: #666; font-size: 12px;">
-              This message came from your website: ${siteName || "Prime Boostage Site"}
+              This message came from your website: ${siteName || "Nu-vora Site"}
             </p>
             <p style="color: #666; font-size: 12px;">
-              View all submissions: <a href="https://primeboostage.com/dashboard/messages">
-                primeboostage.com/dashboard/messages
+              View all submissions: <a href="https://nu-vora.com/dashboard/messages">
+                nu-vora.com/dashboard/messages
               </a>
             </p>
           `,
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
             Message:
             ${message}
 
-            This message came from your website: ${siteName || "Prime Boostage Site"}
+            This message came from your website: ${siteName || "Nu-vora Site"}
           `,
 				});
 			} catch (emailError) {
@@ -124,8 +124,8 @@ export async function POST(req: NextRequest) {
 		try {
 			await sendEmail({
 				to: email,
-				from: "noreply@primeboostage.com",
-				subject: `✅ We've received your message from ${siteName || "Prime Boostage"}`,
+				from: "noreply@nu-vora.com",
+				subject: `✅ We've received your message from ${siteName || "Nu-vora"}`,
 				html: `
           <h2>Thank you for reaching out! 🙏</h2>
           <p>Hi ${name},</p>
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
           </p>
           <hr>
           <p style="color: #666; font-size: 12px;">
-            This is an automated confirmation from ${siteName || "Prime Boostage"}.
+            This is an automated confirmation from ${siteName || "Nu-vora"}.
           </p>
         `,
 				text: `
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
           Your message:
           ${message}
 
-          This is an automated confirmation from ${siteName || "Prime Boostage"}.
+          This is an automated confirmation from ${siteName || "Nu-vora"}.
         `,
 			});
 		} catch (emailError) {

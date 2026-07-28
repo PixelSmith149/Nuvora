@@ -98,7 +98,7 @@ export default function SignupForm() {
 						<Rocket className="h-8 w-8 text-white" />
 					</div>
 
-					<h1 className="text-3xl font-bold text-white">Prime Boostage</h1>
+					<h1 className="text-3xl font-bold text-white">Nu-vora</h1>
 					<p className="text-sm text-purple-400 font-medium">Elite Platform</p>
 					<p className="mt-3 text-zinc-400">
 						{mode === "signup"

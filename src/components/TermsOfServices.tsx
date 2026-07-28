@@ -36,7 +36,7 @@ export function TermsOfService({
 					<h1 className="text-2xl font-bold text-white">Terms of Service</h1>
 				</div>
 				<p className="text-sm text-zinc-400 max-w-2xl mx-auto">
-					Prime Boostage | Elite Home — Last Updated:{" "}
+					Nu-vora | Elite Home — Last Updated:{" "}
 					{new Date().toLocaleDateString("en-US", {
 						month: "long",
 						year: "numeric",
@@ -52,7 +52,7 @@ export function TermsOfService({
 			<div className="py-8 space-y-4">
 				<h2 className="text-xl font-bold text-white">Introduction</h2>
 				<p className="text-sm text-zinc-300 leading-relaxed">
-					Welcome to Prime Boostage | Elite Home. These Terms of Service govern
+					Welcome to Nu-vora | Elite Home. These Terms of Service govern
 					your use of our platform, which includes three integrated services:
 					the Global Market (digital asset marketplace), the SMM Panel (social
 					media marketing services), and the Social Tenant (website builder and
@@ -62,7 +62,7 @@ export function TermsOfService({
 				</p>
 				<p className="text-sm text-zinc-300 leading-relaxed">
 					Throughout this document, "we," "us," "our," and "platform" refer to
-					Prime Boostage | Elite Home. "You" and "user" refer to any individual
+					Nuvora | Elite Home. "You" and "user" refer to any individual
 					or entity using our services. "Seller" refers to users who list assets
 					or services for sale. "Buyer" refers to users who purchase assets or
 					services. "Service Provider" refers to users who provide SMM services
@@ -1383,7 +1383,7 @@ export function TermsOfService({
 				<h2 className="text-xl font-bold text-white">Conclusion</h2>
 				<p className="text-sm text-zinc-300 leading-relaxed">
 					These Terms of Service are designed to protect you, the platform, and
-					our community. By using Prime Boostage | Elite Home, you agree to be
+					our community. By using Nu-vora | Elite Home, you agree to be
 					bound by these terms. We are committed to providing a safe, secure,
 					and trustworthy platform for all users. If you have any questions or
 					concerns, please don't hesitate to contact our support team.
@@ -1413,7 +1413,7 @@ export function TermsOfService({
 						<span className="text-white font-medium">Terms of Service</span> for
 						<span className="text-emerald-400 font-medium">
 							{" "}
-							Prime Boostage | Elite Home
+							Nu-vora | Elite Home
 						</span>
 						. I understand that a{" "}
 						<span className="text-emerald-400 font-medium">

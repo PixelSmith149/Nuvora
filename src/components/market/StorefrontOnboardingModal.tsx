@@ -735,7 +735,7 @@ export function StorefrontOnboardingModal({
 							transition: { duration: 4, repeat: Infinity, ease: "linear" },
 						}}
 					>
-						Prime Boostage | Elite Home
+						Nu-vora | Elite Home
 					</motion.span>
 				</motion.div>
 
@@ -1461,7 +1461,7 @@ export function StorefrontOnboardingModal({
 				>
 					Your store is now live on{" "}
 					<span className="text-emerald-400 font-medium">
-						Prime Boostage | Elite Home
+						Nu-vora | Elite Home
 					</span>
 				</motion.p>
 			</motion.div>

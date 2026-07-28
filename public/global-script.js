@@ -1,15 +1,15 @@
 // public/global-script.js
 
 /**
- * Prime Boostage | Elite Home - Global Site Script
+ * Nu-vora | Elite Home - Global Site Script
  * This script is injected into every generated website for interactivity
  */
 
 (() => {
 	// ─── Configuration ──────────────────────────────────────────
 	const CONFIG = {
-		PLATFORM_NAME: "Prime Boostage",
-		PLATFORM_URL: "https://primeboostage.com",
+		PLATFORM_NAME: "Nu-vora",
+		PLATFORM_URL: "https://nu-vora.com",
 		CONTACT_API: "/api/st/contact",
 		ATTRACTION_ENABLED: true,
 	};

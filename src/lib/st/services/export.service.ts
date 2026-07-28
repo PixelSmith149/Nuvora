@@ -133,7 +133,7 @@ export async function exportTemplateAsZip(
 		"README.md",
 		`# ${template.name}
 
-${template.description || "Template exported from Prime Boostage | Elite Home"}
+${template.description || "Template exported from Nu-vora | Elite Home"}
 
 ## Files
 - index.html - Main HTML file

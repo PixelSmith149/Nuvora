@@ -73,7 +73,7 @@ export function PrivacyPolicy({
 				<div className="space-y-3 text-sm text-zinc-300">
 					<p className="font-semibold text-white">Who We Are:</p>
 					<p className="text-zinc-400 leading-relaxed">
-						Prime Boostage | Elite Home is a comprehensive digital ecosystem
+						Nu-vora | Elite Home is a comprehensive digital ecosystem
 						offering three integrated services:
 					</p>
 					<ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
@@ -97,7 +97,7 @@ export function PrivacyPolicy({
 					<p className="text-zinc-400 leading-relaxed">
 						This Privacy Policy explains how we collect, use, store, share, and
 						protect your personal information across all phases of our platform.
-						It covers every interaction you have with Prime Boostage | Elite
+						It covers every interaction you have with Nu-vora | Elite
 						Home.
 					</p>
 
@@ -130,7 +130,7 @@ export function PrivacyPolicy({
 						</p>
 						<p className="text-xs text-zinc-500 mt-1">
 							<span className="text-emerald-400">📧 Privacy Team:</span>{" "}
-							privacy@primeboostage.com
+							privacy@nu-vora.com
 						</p>
 					</div>
 				</div>
@@ -627,7 +627,7 @@ export function PrivacyPolicy({
 							<Mail className="h-5 w-5 text-emerald-400 mx-auto mb-1" />
 							<p className="text-[10px] text-zinc-400">Submit Requests To:</p>
 							<p className="text-xs text-white font-medium">
-								privacy@primeboostage.com
+								privacy@nu-vora.com
 							</p>
 						</div>
 						<div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5 text-center">
@@ -858,7 +858,7 @@ export function PrivacyPolicy({
 							If you believe a minor is using our platform, please report it to:
 							<span className="text-white font-medium">
 								{" "}
-								support@primeboostage.com
+								support@nu-vora.com
 							</span>
 						</p>
 					</div>
@@ -915,7 +915,7 @@ export function PrivacyPolicy({
 							<span className="text-white">🌍 Data Protection Officer:</span>{" "}
 							Our DPO ensures compliance with international data protection
 							laws. Contact:{" "}
-							<span className="text-emerald-400">dpo@primeboostage.com</span>
+							<span className="text-emerald-400">dpo@nu-vora.com</span>
 						</p>
 					</div>
 				</div>
@@ -1069,7 +1069,7 @@ export function PrivacyPolicy({
 							If you discover a security vulnerability, please report it
 							immediately to:{" "}
 							<span className="text-emerald-400">
-								security@primeboostage.com
+								security@nu-vora.com
 							</span>
 						</p>
 					</div>
@@ -1143,7 +1143,7 @@ export function PrivacyPolicy({
 							<span className="text-white">Name:</span> Data Protection Officer
 						</li>
 						<li>
-							<span className="text-white">Email:</span> dpo@primeboostage.com
+							<span className="text-white">Email:</span> dpo@nu-vora.com
 						</li>
 						<li>
 							<span className="text-white">Response Time:</span> Within 48 hours
@@ -1154,11 +1154,11 @@ export function PrivacyPolicy({
 					<ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
 						<li>
 							<span className="text-white">Email:</span>{" "}
-							privacy@primeboostage.com
+							privacy@nu-vora.com
 						</li>
 						<li>
 							<span className="text-white">Support:</span>{" "}
-							support@primeboostage.com
+							support@nu-vora.com
 						</li>
 						<li>
 							<span className="text-white">Response Time:</span> Within 24-48
@@ -1168,7 +1168,7 @@ export function PrivacyPolicy({
 
 					<p className="font-semibold text-white mt-4">Mailing Address:</p>
 					<ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-						<li>Prime Boostage | Elite Home</li>
+						<li>Nu-vora | Elite Home</li>
 						<li>Privacy Department</li>
 						<li>Available upon request</li>
 					</ul>
@@ -1179,7 +1179,7 @@ export function PrivacyPolicy({
 								📧 Privacy Inquiries
 							</p>
 							<p className="text-xs text-zinc-400 mt-1">
-								privacy@primeboostage.com
+								privacy@nu-vora.com
 							</p>
 							<p className="text-[10px] text-zinc-500">
 								For data-related questions
@@ -1190,7 +1190,7 @@ export function PrivacyPolicy({
 								🔒 Security Reports
 							</p>
 							<p className="text-xs text-zinc-400 mt-1">
-								security@primeboostage.com
+								security@nu-vora.com
 							</p>
 							<p className="text-[10px] text-zinc-500">
 								For vulnerability reports
@@ -1300,7 +1300,7 @@ export function PrivacyPolicy({
 					<ShieldCheck className="h-6 w-6 text-emerald-400" />
 					<h2 className="text-xl font-bold text-white">Privacy Policy</h2>
 					<span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-						Prime Boostage | Elite Home
+						Nu-vora | Elite Home
 					</span>
 				</div>
 				<p className="text-xs text-zinc-400">
@@ -1398,7 +1398,7 @@ export function PrivacyPolicy({
 						<span className="text-white font-medium">Privacy Policy</span> for
 						<span className="text-emerald-400 font-medium">
 							{" "}
-							Prime Boostage | Elite Home
+							Nu-vora | Elite Home
 						</span>
 						. I understand how my data is collected, used, and protected.
 					</label>

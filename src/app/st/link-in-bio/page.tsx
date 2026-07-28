@@ -137,7 +137,7 @@ export default async function LinkInBioLanding() {
 
 				{/* ─── Footer ──────────────────────────────────────────── */}
 				<div className="mt-12 text-center text-xs text-zinc-600 border-t border-white/5 pt-6">
-					<p>Prime Boostage | Elite Home — Link-in-Bio</p>
+					<p>Nu-vora | Elite Home — Link-in-Bio</p>
 				</div>
 			</div>
 		</div>

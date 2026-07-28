@@ -93,7 +93,7 @@ export async function publishToGlobalMarket(
 				title: template.name,
 				description:
 					template.description ||
-					"Template created with Prime Boostage | Elite Home",
+					"Template created with Nu-vora | Elite Home",
 				display_pic_url: template.preview_image || null,
 				price: 0,
 				tab_category: "digital_tool",

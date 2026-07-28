@@ -41,7 +41,7 @@ export async function generateMetadata({
 			title: profile.display_name || profile.username,
 			description: profile.bio || "Link-in-Bio page on Prime Boostage",
 			images: profile.avatar_url ? [{ url: profile.avatar_url }] : [],
-			url: `https://primeboostage.com/u/${username}`,
+			url: `https://nuvora.com/u/${username}`,
 		},
 		twitter: {
 			card: "summary",

@@ -53,14 +53,14 @@ interface BlogsPageProps {
 const samplePosts: BlogPost[] = [
 	{
 		id: "1",
-		title: "Getting Started on Prime Boostage: Your Complete Guide",
+		title: "Getting Started on Nu-vora: Your Complete Guide",
 		slug: "getting-started-prime-boostage",
 		excerpt:
-			"New to Prime Boostage? This comprehensive guide walks you through everything you need to know to start buying, selling, and growing on our platform.",
+			"New to Nu-vora? This comprehensive guide walks you through everything you need to know to start buying, selling, and growing on our platform.",
 		content: "",
 		featured_image: null,
 		category: "platform",
-		author_name: "Prime Boostage Team",
+		author_name: "Nu-vora Team",
 		author_avatar: null,
 		published_at: "2024-01-15T10:00:00Z",
 		read_time: 8,
@@ -179,7 +179,7 @@ const samplePosts: BlogPost[] = [
 		content: "",
 		featured_image: null,
 		category: "platform",
-		author_name: "Prime Boostage Team",
+		author_name: "Nu-vora Team",
 		author_avatar: null,
 		published_at: "2023-12-28T08:45:00Z",
 		read_time: 6,
@@ -407,11 +407,11 @@ export function BlogsPage({
 					<div className="flex items-center justify-center gap-3">
 						<BookOpen className="h-8 w-8 text-emerald-400" />
 						<h1 className="text-2xl sm:text-3xl font-bold text-white">
-							Prime Boostage Blog
+							Nu-vora Blog
 						</h1>
 					</div>
 					<p className="text-sm text-zinc-400 max-w-2xl mx-auto">
-						Insights, guides, and stories from the Prime Boostage community.
+						Insights, guides, and stories from the Nu-vora community.
 						Stay updated on the latest trends in digital assets, social media
 						marketing, and AI-powered design.
 					</p>

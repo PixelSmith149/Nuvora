@@ -149,7 +149,7 @@ export function SupportPage() {
 							label: "How do I buy an asset?",
 							solutionType: "guide",
 							guideContent: {
-								title: "🛒 How to Buy an Asset on Prime Boostage",
+								title: "🛒 How to Buy an Asset on Nu-vora",
 								steps: [
 									"1. Browse or search for the asset you want",
 									"2. Click the asset card to view full details",
@@ -234,7 +234,7 @@ export function SupportPage() {
 							label: "How do I list an asset for sale?",
 							solutionType: "guide",
 							guideContent: {
-								title: "💰 How to List an Asset on Prime Boostage",
+								title: "💰 How to List an Asset on Nu-vora",
 								steps: [
 									"1. Complete your storefront verification",
 									"2. Go to your seller dashboard",
@@ -957,7 +957,7 @@ export function SupportPage() {
 				</button>
 				<button
 					onClick={() =>
-						(window.location.href = "mailto:support@primeboostage.com")
+						(window.location.href = "mailto:support@nu-vora.com")
 					}
 					className="flex-1 bg-zinc-900/50 border border-white/10 hover:bg-zinc-800 text-white rounded-xl p-3 text-xs font-bold flex items-center justify-center gap-2 transition-all"
 				>
@@ -1172,7 +1172,7 @@ export function SupportPage() {
 				</button>
 				<button
 					onClick={() =>
-						(window.location.href = "mailto:support@primeboostage.com")
+						(window.location.href = "mailto:support@nu-vora.com")
 					}
 					className="flex-1 bg-zinc-900/50 border border-white/10 hover:bg-zinc-800 text-white rounded-xl p-3 text-xs font-bold flex items-center justify-center gap-2 transition-all"
 				>
@@ -1334,7 +1334,7 @@ export function SupportPage() {
 			<div className="flex gap-3">
 				<button
 					onClick={() =>
-						(window.location.href = "mailto:support@primeboostage.com")
+						(window.location.href = "mailto:support@nu-vora.com")
 					}
 					className="flex-1 bg-zinc-900/50 border border-white/10 hover:bg-zinc-800 text-white rounded-xl p-3 text-xs font-bold flex items-center justify-center gap-2 transition-all"
 				>
@@ -1602,10 +1602,10 @@ export function SupportPage() {
 							<br />
 							Or email us at{" "}
 							<a
-								href="mailto:support@primeboostage.com"
+								href="mailto:support@nu-vora.com"
 								className="text-emerald-400 hover:underline"
 							>
-								support@primeboostage.com
+								support@nu-vora.com
 							</a>
 						</p>
 					</div>

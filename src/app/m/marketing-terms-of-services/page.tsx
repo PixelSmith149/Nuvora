@@ -138,7 +138,7 @@ export default function MarketingTermsPage() {
 						<div className="flex items-center gap-2">
 							<Store className="h-5 w-5 text-emerald-400" />
 							<span className="text-sm font-bold text-white">
-								Prime Boostage
+								Nu-vora
 							</span>
 						</div>
 					</div>
@@ -151,7 +151,7 @@ export default function MarketingTermsPage() {
 					{/* Welcome Banner */}
 					<div className="mb-6 p-4 bg-gradient-to-r from-emerald-900/20 via-zinc-900/20 to-teal-900/20 rounded-xl border border-white/5">
 						<h1 className="text-xl font-bold text-white">
-							Welcome to Prime Boostage, {displayName}! 👋
+							Welcome to Nu-vora, {displayName}! 👋
 						</h1>
 						<p className="text-sm text-zinc-400 mt-1">
 							Before you start selling on{" "}
@@ -172,7 +172,7 @@ export default function MarketingTermsPage() {
 					{/* Footer */}
 					<div className="mt-6 pt-4 border-t border-white/5 text-center">
 						<p className="text-[10px] text-zinc-600">
-							Prime Boostage | Elite Home — Secure Digital Asset Marketplace
+							Nu-vora | Elite Home — Secure Digital Asset Marketplace
 							<br />
 							Need help?{" "}
 							<a href="/support" className="text-emerald-400 hover:underline">

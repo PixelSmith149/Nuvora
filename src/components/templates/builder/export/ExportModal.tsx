@@ -137,7 +137,7 @@ export function ExportModal({
 				zip.file("script.js", templateData.jsCode || "");
 				zip.file(
 					"README.md",
-					`# ${name}\n\n${templateData.description || ""}\n\n## Files\n- index.html\n- style.css\n- script.js\n\n## Category\n${category}\n\nExported from Prime Boostage | Elite Home`,
+					`# ${name}\n\n${templateData.description || ""}\n\n## Files\n- index.html\n- style.css\n- script.js\n\n## Category\n${category}\n\nExported from Nu-vora | Elite Home`,
 				);
 
 				const zipBuffer = await zip.generateAsync({
@@ -176,7 +176,7 @@ export function ExportModal({
 					isPublished,
 					isPublic,
 					exportedAt: new Date().toISOString(),
-					platform: "Prime Boostage | Elite Home",
+					platform: "Nu-vora | Elite Home",
 				};
 
 				const json = JSON.stringify(jsonData, null, 2);

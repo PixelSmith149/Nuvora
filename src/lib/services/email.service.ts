@@ -30,7 +30,7 @@ export interface EmailResponse {
 
 // ─── Default "From" Address ──────────────────────────────────────
 const DEFAULT_FROM =
-	process.env.RESEND_FROM_EMAIL || "noreply@primeboostage.com";
+	process.env.RESEND_FROM_EMAIL || "noreply@nu-vora.com";
 
 // ─── Main Email Sending Function ────────────────────────────────
 export async function sendEmail(options: EmailOptions): Promise<EmailResponse> {
@@ -105,7 +105,7 @@ export function buildSiteOwnerContactEmail(params: {
 		params;
 
 	const siteUrl = siteId
-		? `https://primeboostage.com/st/settings/${siteId}`
+		? `https://nu-vora.com/st/settings/${siteId}`
 		: "#";
 
 	return {
@@ -149,7 +149,7 @@ export function buildSiteOwnerContactEmail(params: {
           </div>
           <div class="footer">
             <p>This message came from your website: <strong>${siteName}</strong></p>
-            <p>Prime Boostage | Elite Home — <a href="https://primeboostage.com">primeboostage.com</a></p>
+            <p>Nu-vora | Elite Home — <a href="https://nu-vora.com">nu-vora.com</a></p>
           </div>
         </div>
       </body>
@@ -167,7 +167,7 @@ export function buildSiteOwnerContactEmail(params: {
 
       ---
       This message came from your website: ${siteName}
-      Prime Boostage | Elite Home
+      Nu-vora | Elite Home
     `,
 	};
 }
@@ -214,7 +214,7 @@ export function buildVisitorConfirmationEmail(params: {
             </p>
           </div>
           <div class="footer">
-            <p>Prime Boostage | Elite Home — <a href="https://primeboostage.com">primeboostage.com</a></p>
+            <p>Nu-vora | Elite Home — <a href="https://nu-vora.com">nu-vora.com</a></p>
           </div>
         </div>
       </body>
@@ -232,7 +232,7 @@ export function buildVisitorConfirmationEmail(params: {
 
       ---
       This is an automated confirmation. Please don't reply to this email.
-      Prime Boostage | Elite Home
+      Nu-vora | Elite Home
     `,
 	};
 }
@@ -247,7 +247,7 @@ export function buildWelcomeEmail(params: {
 
 	return {
 		to: "", // Will be filled by caller
-		subject: "🎉 Welcome to Prime Boostage | Elite Home!",
+		subject: "🎉 Welcome to Nu-vora | Elite Home!",
 		html: `
       <!DOCTYPE html>
       <html>
@@ -267,7 +267,7 @@ export function buildWelcomeEmail(params: {
             <h1 style="margin: 0;">🎉 Welcome, ${name}!</h1>
           </div>
           <div class="content">
-            <p>Welcome to <strong>Prime Boostage | Elite Home</strong>! 🚀</p>
+            <p>Welcome to <strong>Nu-vora | Elite Home</strong>! 🚀</p>
             <p>You're now part of a premium digital ecosystem where you can:</p>
             <ul>
               <li>🌍 Build stunning websites with AI</li>
@@ -276,11 +276,11 @@ export function buildWelcomeEmail(params: {
               <li>💰 Manage your wallet and payments</li>
             </ul>
             <p style="text-align: center; margin-top: 24px;">
-              <a href="https://primeboostage.com/st" class="cta-button">Start Building Now →</a>
+              <a href="https://nu-vora.com/st" class="cta-button">Start Building Now →</a>
             </p>
           </div>
           <div class="footer">
-            <p>Prime Boostage | Elite Home — <a href="https://primeboostage.com">primeboostage.com</a></p>
+            <p>Nu-vora | Elite Home — <a href="https://nu-vora.com">nu-vora.com</a></p>
           </div>
         </div>
       </body>
@@ -289,7 +289,7 @@ export function buildWelcomeEmail(params: {
 		text: `
       Welcome, ${name}!
 
-      Welcome to Prime Boostage | Elite Home! 🚀
+      Welcome to Nu-vora | Elite Home! 🚀
 
       You're now part of a premium digital ecosystem where you can:
       - Build stunning websites with AI
@@ -297,7 +297,7 @@ export function buildWelcomeEmail(params: {
       - Sell products and services
       - Manage your wallet and payments
 
-      Get started: https://primeboostage.com/st
+      Get started: https://nu-vora.com/st
     `,
 	};
 }
@@ -335,17 +335,17 @@ export function buildBuildConfirmationEmail(params: {
             <p>Hi <strong>${username}</strong>,</p>
             <p>Your website <strong>"${siteName}"</strong> has been successfully built and published! 🎉</p>
             <p style="text-align: center; margin-top: 16px;">
-              <a href="https://primeboostage.com/s/${siteSlug}" class="cta-button">View Your Website →</a>
+              <a href="https://nu-vora.com/s/${siteSlug}" class="cta-button">View Your Website →</a>
             </p>
             <p style="font-size: 14px; color: #6b7280;">
               💡 You can edit your website anytime from your dashboard.
             </p>
             <p style="font-size: 14px; color: #6b7280;">
-              🔗 Share your link: <strong>primeboostage.com/s/${siteSlug}</strong>
+              🔗 Share your link: <strong>nu-vora.com/s/${siteSlug}</strong>
             </p>
           </div>
           <div class="footer">
-            <p>Prime Boostage | Elite Home — <a href="https://primeboostage.com">primeboostage.com</a></p>
+            <p>Nu-vora | Elite Home — <a href="https://nu-vora.com">nu-vora.com</a></p>
           </div>
         </div>
       </body>
@@ -358,9 +358,9 @@ export function buildBuildConfirmationEmail(params: {
 
       Your website "${siteName}" has been successfully built and published! 🎉
 
-      View it: https://primeboostage.com/s/${siteSlug}
+      View it: https://nu-vora.com/s/${siteSlug}
 
-      Share your link: primeboostage.com/s/${siteSlug}
+      Share your link: nu-vora.com/s/${siteSlug}
 
       You can edit your website anytime from your dashboard.
     `,
@@ -403,11 +403,11 @@ export function buildSessionExpiringEmail(params: {
             <p>During an active session, you can make unlimited free edits to your website using our AI assistant.</p>
             <p>After the session expires, you'll need to start a new build to use the AI editor again.</p>
             <p style="text-align: center; margin-top: 16px;">
-              <a href="https://primeboostage.com/st/builder/${siteId}" class="cta-button">Continue Editing →</a>
+              <a href="https://nu-vora.com/st/builder/${siteId}" class="cta-button">Continue Editing →</a>
             </p>
           </div>
           <div class="footer">
-            <p>Prime Boostage | Elite Home — <a href="https://primeboostage.com">primeboostage.com</a></p>
+            <p>Nu-vora | Elite Home — <a href="https://nu-vora.com">nu-vora.com</a></p>
           </div>
         </div>
       </body>
@@ -422,7 +422,7 @@ export function buildSessionExpiringEmail(params: {
 
       During an active session, you can make unlimited free edits to your website using our AI assistant.
 
-      Continue editing: https://primeboostage.com/st/builder/${siteId}
+      Continue editing: https://nu-vora.com/st/builder/${siteId}
     `,
 	};
 }

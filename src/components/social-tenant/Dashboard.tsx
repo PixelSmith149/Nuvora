@@ -227,7 +227,7 @@ export function Dashboard({ userId, username }: DashboardProps) {
 
 									<div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/60 px-3">
 										<span className="text-xs whitespace-nowrap text-zinc-500">
-											primeboostage.com/s/
+											nu-vora.com/s/
 										</span>
 
 										<Input
@@ -530,7 +530,7 @@ export function Dashboard({ userId, username }: DashboardProps) {
 							</Label>
 							<div className="flex items-center gap-2">
 								<span className="text-xs text-zinc-500 whitespace-nowrap">
-									primeboostage.com/s/
+									nu-vora.com/s/
 								</span>
 								<Input
 									value={siteSlug}

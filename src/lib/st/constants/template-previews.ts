@@ -32,7 +32,7 @@ function generateMinimalPreview(): string {
       <rect x="40" y="220" width="220" height="44" rx="22" fill="#f3f4f6" stroke="#e5e7eb"/>
       <rect x="40" y="280" width="220" height="44" rx="22" fill="#f3f4f6" stroke="#e5e7eb"/>
       <rect x="40" y="340" width="220" height="44" rx="22" fill="#10b981" opacity="0.2"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -53,7 +53,7 @@ function generateDarkLuxePreview(): string {
       <rect x="40" y="220" width="220" height="44" rx="22" fill="#1f2937" stroke="#f59e0b" stroke-width="1"/>
       <rect x="40" y="280" width="220" height="44" rx="22" fill="#1f2937" stroke="#f59e0b" stroke-width="1"/>
       <rect x="40" y="340" width="220" height="44" rx="22" fill="#f59e0b" opacity="0.3"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#6b7280">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#6b7280">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -76,7 +76,7 @@ function generateGlassPreview(): string {
       <rect x="50" y="190" width="200" height="40" rx="20" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.1)"/>
       <rect x="50" y="245" width="200" height="40" rx="20" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.1)"/>
       <rect x="50" y="300" width="200" height="40" rx="20" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.1)"/>
-      <text x="150" y="368" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="368" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -98,7 +98,7 @@ function generateGradientPreview(): string {
       <rect x="40" y="220" width="220" height="44" rx="22" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.2)"/>
       <rect x="40" y="280" width="220" height="44" rx="22" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.2)"/>
       <rect x="40" y="340" width="220" height="44" rx="22" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.4)"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.4)">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.4)">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -114,7 +114,7 @@ function generateBoldPreview(): string {
       <rect x="40" y="220" width="220" height="48" rx="24" fill="#10b981"/>
       <rect x="40" y="280" width="220" height="48" rx="24" fill="#1a1a1a" stroke="#10b981" stroke-width="2"/>
       <rect x="40" y="340" width="220" height="48" rx="24" fill="#1a1a1a" stroke="#10b981" stroke-width="2"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#3f3f46">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#3f3f46">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -135,7 +135,7 @@ function generateElegantPreview(): string {
       <rect x="40" y="220" width="220" height="44" rx="22" fill="#ffffff" stroke="#fce7f3"/>
       <rect x="40" y="280" width="220" height="44" rx="22" fill="#ffffff" stroke="#fce7f3"/>
       <rect x="40" y="340" width="220" height="44" rx="22" fill="#f43f5e" opacity="0.1" stroke="#f43f5e" stroke-width="1"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -152,7 +152,7 @@ function generateNeonPreview(): string {
       <rect x="40" y="190" width="220" height="40" rx="20" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
       <rect x="40" y="245" width="220" height="40" rx="20" fill="none" stroke="#8b5cf6" stroke-width="1.5"/>
       <rect x="40" y="300" width="220" height="40" rx="20" fill="none" stroke="#ec4899" stroke-width="1.5"/>
-      <text x="150" y="368" text-anchor="middle" font-size="8" fill="#3f3f46">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="368" text-anchor="middle" font-size="8" fill="#3f3f46">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -173,7 +173,7 @@ function generateNaturePreview(): string {
       <rect x="40" y="220" width="220" height="48" rx="24" fill="#ffffff" stroke="#a7f3d0"/>
       <rect x="40" y="280" width="220" height="48" rx="24" fill="#ffffff" stroke="#a7f3d0"/>
       <rect x="40" y="340" width="220" height="48" rx="24" fill="#059669" opacity="0.1" stroke="#059669" stroke-width="1"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -189,7 +189,7 @@ function generateProfessionalPreview(): string {
       <rect x="40" y="220" width="220" height="44" rx="22" fill="#2563eb"/>
       <rect x="40" y="280" width="220" height="44" rx="22" fill="#ffffff" stroke="#e2e8f0"/>
       <rect x="40" y="340" width="220" height="44" rx="22" fill="#ffffff" stroke="#e2e8f0"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#94a3b8">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#94a3b8">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }
@@ -211,7 +211,7 @@ function generatePlayfulPreview(): string {
       <rect x="40" y="220" width="220" height="48" rx="24" fill="#fcd34d"/>
       <rect x="40" y="280" width="220" height="48" rx="24" fill="#f472b6"/>
       <rect x="40" y="340" width="220" height="48" rx="24" fill="#60a5fa"/>
-      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Prime Boostage</text>
+      <text x="150" y="398" text-anchor="middle" font-size="8" fill="#9ca3af">Built with ❤️ on Nu-vora</text>
     </svg>
   `;
 }

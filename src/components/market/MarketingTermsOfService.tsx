@@ -122,7 +122,7 @@ export function MarketingTermsOfService({
 						the asset.
 					</p>
 					<p>
-						You grant Prime Boostage license to{" "}
+						You grant Nu-vora license to{" "}
 						<span className="font-bold text-emerald-400">
 							display, package, and deliver
 						</span>{" "}
@@ -209,7 +209,7 @@ export function MarketingTermsOfService({
 						Seller Marketing Terms
 					</h2>
 					<span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-						Prime Boostage | Elite Home
+						Nu-vora | Elite Home
 					</span>
 				</div>
 				<p className="text-xs text-zinc-400">
@@ -304,7 +304,7 @@ export function MarketingTermsOfService({
 						for
 						<span className="text-emerald-400 font-medium">
 							{" "}
-							Prime Boostage | Elite Home
+							Nu-vora | Elite Home
 						</span>
 						. I understand that a{" "}
 						<span className="text-emerald-400 font-medium">

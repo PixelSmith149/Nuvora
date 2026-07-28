@@ -1285,7 +1285,7 @@ export function LinkInBioEditor({
 
 												{/* ─── Footer ────────────────────────────── */}
 												<div className="text-center text-[8px] text-white/30 pt-2 border-t border-white/5">
-													Built with ❤️ on Prime Boostage
+													Built with ❤️ on Nu-vora
 												</div>
 											</div>
 										</div>

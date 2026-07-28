@@ -44,7 +44,7 @@ export function DomainGuide({
 				"Log in to Cloudflare at https://dash.cloudflare.com",
 				`Select your domain: ${domain}`,
 				'Click the "DNS" tab in the left sidebar',
-				"Add CNAME record: Name: www, Target: primeboostage.com, Proxy: OFF",
+				"Add CNAME record: Name: www, Target: nu-vora.com, Proxy: OFF",
 				"Add A record: Name: @, IPv4: 76.76.21.21, Proxy: OFF",
 				'Click "Save" for each record',
 			],
@@ -54,7 +54,7 @@ export function DomainGuide({
 			steps: [
 				"Log in to Namecheap",
 				`Go to Domain List → ${domain} → Manage → Advanced DNS`,
-				"Add CNAME record: Host: www, Value: primeboostage.com, TTL: 300",
+				"Add CNAME record: Host: www, Value: nu-vora.com, TTL: 300",
 				"Add A record: Host: @, Value: 76.76.21.21, TTL: 300",
 				"Click the checkmark to save each record",
 			],
@@ -65,7 +65,7 @@ export function DomainGuide({
 				"Log in to GoDaddy",
 				`Go to My Products → ${domain} → DNS`,
 				'Click "Add New Record"',
-				"Add CNAME: Type: CNAME, Name: www, Value: primeboostage.com, TTL: 1 Hour",
+				"Add CNAME: Type: CNAME, Name: www, Value: nu-vora.com, TTL: 1 Hour",
 				"Add A: Type: A, Name: @, Value: 76.76.21.21, TTL: 1 Hour",
 				'Click "Save"',
 			],
@@ -76,7 +76,7 @@ export function DomainGuide({
 				"Log in to Google Domains",
 				`Select ${domain}`,
 				"Go to DNS → Custom resource records",
-				"Add CNAME: Name: www, Data: primeboostage.com, TTL: 300",
+				"Add CNAME: Name: www, Data: nu-vora.com, TTL: 300",
 				"Add A: Name: @, Data: 76.76.21.21, TTL: 300",
 				'Click "Save"',
 			],
@@ -88,7 +88,7 @@ export function DomainGuide({
 				"Go to Route 53 → Hosted Zones",
 				`Select ${domain}`,
 				'Click "Create Record"',
-				"Add CNAME: Record name: www, Record type: CNAME, Value: primeboostage.com",
+				"Add CNAME: Record name: www, Record type: CNAME, Value: nu-vora.com",
 				"Add A: Record name: @, Record type: A, Value: 76.76.21.21",
 				'Click "Create"',
 			],
@@ -100,7 +100,7 @@ export function DomainGuide({
 				"Go to DNS Zones",
 				`Select ${domain}`,
 				'Click "+ Record Set"',
-				"Add CNAME: Name: www, Type: CNAME, Value: primeboostage.com, TTL: 300",
+				"Add CNAME: Name: www, Type: CNAME, Value: nu-vora.com, TTL: 300",
 				"Add A: Name: @, Type: A, Value: 76.76.21.21, TTL: 300",
 				'Click "OK"',
 			],
@@ -110,7 +110,7 @@ export function DomainGuide({
 			steps: [
 				"Log in to your DNS provider or domain registrar",
 				`Find the DNS management section for ${domain}`,
-				"Add a CNAME record: Name: www, Points to: primeboostage.com",
+				"Add a CNAME record: Name: www, Points to: nu-vora.com",
 				"Add an A record: Name: @, Points to: 76.76.21.21",
 				"Save your changes and wait 5-30 minutes for propagation",
 				'Return here and click "Verify Domain"',
@@ -232,7 +232,7 @@ export function DomainGuide({
 						<button
 							onClick={() => {
 								const subject = `DNS Configuration for ${domain}`;
-								const body = `Here are the DNS records to add for ${domain}:\n\nCNAME: www → primeboostage.com\nA: @ → 76.76.21.21\n\nProvider: ${providerInfo.title}\n\nFull guide: ${window.location.href}`;
+								const body = `Here are the DNS records to add for ${domain}:\n\nCNAME: www → nu-vora.com\nA: @ → 76.76.21.21\n\nProvider: ${providerInfo.title}\n\nFull guide: ${window.location.href}`;
 								window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 							}}
 							className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1.5"
