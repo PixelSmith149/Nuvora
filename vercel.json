@@ -1,0 +1,12 @@
+{
+	"crons": [
+		{
+			"path": "/api/cron/fx-refresh",
+			"schedule": "*/10 * * * *"
+		},
+		{
+			"path": "/api/cron/sync-orders",
+			"schedule": "*/5 * * * *"
+		}
+	]
+}
