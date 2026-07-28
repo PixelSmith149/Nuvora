@@ -100,6 +100,7 @@ export async function proxy(request: NextRequest) {
 	const isGoingToAdmin = pathSegments.includes("admin-dashboard");
 
 	const isPublicRoute =
+<<<<<<< HEAD
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
@@ -109,6 +110,17 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/api/st/domain/instructions") ||
     pathname.startsWith("/api/cron/fx-refresh") ||
     pathname.startsWith("/api/cron/sync-orders");
+=======
+		pathname === "/" ||
+		pathname.startsWith("/login") ||
+		pathname.startsWith("/signup") ||
+		pathname.startsWith("/auth") ||
+		pathname.startsWith("/api/auth") ||
+		pathname.startsWith("/api/st/domain/verify") ||
+		pathname.startsWith("/api/st/domain/instructions");
+	    pathname.startsWith("/api/cron/fx-refresh");
+        pathname.startsWith("/api/cron/sync-orders");
+>>>>>>> f8495c9f54a41699fa0cec31ca0f3fb8a37ab7c0
 
 if (!user && !isPublicRoute) {
     url.pathname = "/login";
