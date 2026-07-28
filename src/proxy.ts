@@ -100,21 +100,21 @@ export async function proxy(request: NextRequest) {
 	const isGoingToAdmin = pathSegments.includes("admin-dashboard");
 
 	const isPublicRoute =
-		pathname === "/" ||
-		pathname.startsWith("/login") ||
-		pathname.startsWith("/signup") ||
-		pathname.startsWith("/auth") ||
-		pathname.startsWith("/api/auth") ||
-		pathname.startsWith("/api/st/domain/verify") ||
-		pathname.startsWith("/api/st/domain/instructions");
-		pathname.startsWith("/api/cron/fx-refresh");
-        pathname.startsWith("/api/cron/sync-orders");
+    pathname === "/" ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/st/domain/verify") ||
+    pathname.startsWith("/api/st/domain/instructions") ||
+    pathname.startsWith("/api/cron/fx-refresh") ||
+    pathname.startsWith("/api/cron/sync-orders");
 
-	if (!user && !isPublicRoute) {
-		url.pathname = "/login";
-		url.searchParams.set("next", pathname);
-		return NextResponse.redirect(url);
-	}
+if (!user && !isPublicRoute) {
+    url.pathname = "/login";
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+}
 
 	if (user && isGoingToAdmin) {
 		const adminHandshakeCookie = request.cookies.get(
