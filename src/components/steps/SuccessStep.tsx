@@ -70,7 +70,9 @@ export function SuccessStep({
           transition={{ delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
           Your store is now live on{' '}
-          <span className="text-emerald-400 font-medium">Prime Boostage | Elite Home</span>
+         <span className="flex-none whitespace-nowrap text-emerald-400 font-medium">
+           NuVora | Elite Home
+         </span>
         </motion.p>
       </motion.div>
 
