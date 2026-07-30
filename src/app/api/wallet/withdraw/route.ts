@@ -1,4 +1,3 @@
-// src/app/api/wallet/withdraw/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { processWithdraw } from "@/lib/wallet/withdraw/withdraw.engine";
@@ -17,7 +16,15 @@ export async function POST(req: Request) {
 		}
 
 		// 2. Extract input parameters transmitted from the client UI
-		const body = await req.json();
+		let body: any;
+		try {
+			body = await req.json();
+		} catch {
+			return NextResponse.json(
+				{ error: "Invalid JSON request payload." },
+				{ status: 400 }
+			);
+		}
 
 		const amountUsd = Number(body.amount);
 		const {
@@ -45,6 +52,14 @@ export async function POST(req: Request) {
 						"Missing essential data payload routing coordinates (Destination, Currency, Method, or Country).",
 				},
 				{ status: 400 },
+			);
+		}
+
+		// Additional Guard: Bank transfers require a valid bank code
+		if (method === "bank" && !bank_code) {
+			return NextResponse.json(
+				{ error: "Bank code is required for bank settlement transfers." },
+				{ status: 400 }
 			);
 		}
 
@@ -90,7 +105,9 @@ export async function POST(req: Request) {
 		// 7. Success context return payload
 		return NextResponse.json({
 			success: true,
+			status: result.status,
 			wallet_id: result.wallet_id,
+			transaction_id: result.transaction_id,
 		});
 	} catch (err: any) {
 		console.error(

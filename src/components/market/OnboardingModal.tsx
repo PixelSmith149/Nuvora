@@ -13,7 +13,7 @@ import { BiometricStep } from '../steps/BiometricStep';
 import { TermsStep } from '../steps/TermsStep';
 import { SuccessStep } from '../steps/SuccessStep';
 import { Step, OnboardingState, BiometricState } from '@/types';
-import { OnboardingService } from '@/services/onboardingService'; // Ensure this import path matches your project layout
+import { OnboardingService } from '@/services/onboardingService';
 
 interface OnboardingModalProps {
   username: string;
@@ -132,7 +132,7 @@ export function OnboardingModal({
         type: baseType || 'video/webm',
       });
 
-      // 4. Upload to Supabase
+      
       publicVideoUrl = await OnboardingService.uploadVerificationVideo(user.id, file);
     }
 

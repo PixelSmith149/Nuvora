@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { GLOBAL_SUPPORTED_CURRENCIES } from "@/lib/wallet/currency/constants";
 import type { Currency } from "@/lib/wallet/currency/convert";
 
 export async function POST(req: Request) {
+	const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+
+	if (!paystackSecret) {
+		return NextResponse.json(
+			{ error: "Server payment configuration missing" },
+			{ status: 500 }
+		);
+	}
+
 	const supabase = await createClient();
 
 	const {
@@ -13,20 +23,33 @@ export async function POST(req: Request) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
-	// 🎯 FIXED: Accept explicit configuration contract from frontend
-	const { amount, currency } = (await req.json()) as {
-		amount: number;
-		currency: Currency;
-	};
-
-	if (!amount || amount <= 0) {
-		return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+	// 1. Parse and validate input payload
+	let body: { amount?: number; currency?: Currency };
+	try {
+		body = await req.json();
+	} catch {
+		return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
 	}
 
-	const selectedCurrency = currency || "USD";
-	const paystackSecret = process.env.PAYSTACK_SECRET_KEY!;
+	const rawAmount = Number(body.amount);
+	if (isNaN(rawAmount) || rawAmount <= 0) {
+		return NextResponse.json({ error: "Invalid top-up amount" }, { status: 400 });
+	}
 
-	// 1. Get user's wallet profile metadata mapping link
+	const selectedCurrency = (body.currency || "USD").toUpperCase() as Currency;
+
+	// Verify currency capability
+	const isSupported = GLOBAL_SUPPORTED_CURRENCIES.some(
+		(c) => c.code.toUpperCase() === selectedCurrency
+	);
+	if (!isSupported) {
+		return NextResponse.json(
+			{ error: `Currency ${selectedCurrency} is not supported` },
+			{ status: 400 }
+		);
+	}
+
+	// 2. Fetch user's wallet
 	const { data: wallet, error: walletError } = await supabase
 		.from("wallet_balances")
 		.select("wallet_id")
@@ -36,64 +59,91 @@ export async function POST(req: Request) {
 	if (walletError || !wallet) {
 		return NextResponse.json(
 			{ error: "Wallet lookup failed" },
-			{ status: 404 },
+			{ status: 404 }
 		);
 	}
 
-	// Generate a distinct transaction reference signature
 	const reference = `pb-${crypto.randomUUID()}`;
+	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-	// 🎯 2. Hit Paystack initialize engine with precise parameters
-	const res = await fetch("https://api.paystack.co/transaction/initialize", {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${paystackSecret}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			email: user.email,
-			amount: Math.round(amount * 100), // Secure tracking against float sub-units
-			currency: selectedCurrency, // 🎯 FIXED: Forcing Paystack to charge in user selection
+	// 🎯 FIX: Step 3: Record pending transaction inside DB BEFORE calling Paystack
+	// Prevents orphaned Paystack charges if database write fails later.
+	const { data: pendingTx, error: dbError } = await supabase
+		.from("wallet_transactions")
+		.insert({
+			wallet_id: wallet.wallet_id,
 			reference: reference,
-			callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/account/wallet`,
-			metadata: {
+			amount: rawAmount,
+			status: "pending",
+			provider: "paystack",
+			meta: {
+				currency: selectedCurrency,
 				user_id: user.id,
-				wallet_id: wallet.wallet_id,
-				intended_currency: selectedCurrency,
+				initiated_at: new Date().toISOString(),
 			},
-		}),
-	});
+		})
+		.select("id")
+		.single();
 
-	const data = await res.json();
-
-	if (!data.status) {
+	if (dbError || !pendingTx) {
 		return NextResponse.json(
-			{ error: data.message || "Payment initialization failed" },
-			{ status: 400 },
+			{ error: "Failed to create payment audit record" },
+			{ status: 500 }
 		);
 	}
 
-	// 🎯 3. Save standard pending ledger baseline block reference inside database
-	const { error: dbError } = await supabase.from("wallet_transactions").insert({
-		wallet_id: wallet.wallet_id,
-		reference: reference,
-		amount: amount, // Log target unit sizing trace context
-		status: "pending",
-		provider: "paystack",
-		meta: {
-			currency: selectedCurrency,
-		},
-	});
+	// 4. Initialize Paystack Checkout Session
+	try {
+		const res = await fetch("https://api.paystack.co/transaction/initialize", {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${paystackSecret}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				email: user.email,
+				amount: Math.round(rawAmount * 100), // Minor unit conversion (kobo/pesewas/cents)
+				currency: selectedCurrency,
+				reference: reference,
+				callback_url: `${siteUrl}/account/wallet`,
+				metadata: {
+					user_id: user.id,
+					wallet_id: wallet.wallet_id,
+					transaction_id: pendingTx.id,
+					intended_currency: selectedCurrency,
+				},
+			}),
+		});
 
-	if (dbError) {
+		const data = await res.json();
+
+		if (!res.ok || !data.status) {
+			// Mark transaction as failed if initialization was rejected
+			await supabase
+				.from("wallet_transactions")
+				.update({ status: "failed", meta: { error: data.message } })
+				.eq("id", pendingTx.id);
+
+			return NextResponse.json(
+				{ error: data.message || "Payment initialization rejected" },
+				{ status: 400 }
+			);
+		}
+
+		return NextResponse.json({
+			authorization_url: data.data.authorization_url,
+			reference: reference,
+		});
+	} catch (error) {
+		// Clean up pending transaction on connection failure
+		await supabase
+			.from("wallet_transactions")
+			.update({ status: "failed", meta: { error: "Network error during setup" } })
+			.eq("id", pendingTx.id);
+
 		return NextResponse.json(
-			{ error: "Failed to record transaction audit tracking" },
-			{ status: 500 },
+			{ error: "Failed to communicate with Paystack payment gateway" },
+			{ status: 502 }
 		);
 	}
-
-	return NextResponse.json({
-		authorization_url: data.data.authorization_url,
-		reference: reference,
-	});
 }
