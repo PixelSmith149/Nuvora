@@ -104,35 +104,46 @@ export function OnboardingModal({
   };
 
   const handleFinalSubmit = async () => {
-    if (!state.termsAccepted || state.isSubmitting) return;
+  if (!state.termsAccepted || state.isSubmitting) return;
 
-    try {
-      updateState({ isSubmitting: true });
+  try {
+    updateState({ isSubmitting: true });
 
-      let publicVideoUrl = 'verified';
+    let publicVideoUrl = 'verified';
 
-      // 1. Check if we have a recorded biometric video blob from the BiometricStep
-      if (biometricState.videoBlob && user?.id) {
-        const fileExtension = biometricState.videoBlob.type.includes('mp4') ? 'mp4' : 'webm';
-        const file = new File(
-          [biometricState.videoBlob],
-          `verification_${user.id}_${Date.now()}.${fileExtension}`,
-          { type: biometricState.videoBlob.type || 'video/webm' }
-        );
+    if (biometricState.videoBlob && user?.id) {
+      // 1. Detect actual MIME type from the recording blob
+      const rawType = biometricState.videoBlob.type || 'video/webm';
+      
+      // Extract the base container (e.g., 'video/webm' or 'video/mp4' without codec parameters)
+      const baseType = rawType.split(';')[0].toLowerCase();
 
-        // 2. Upload to Supabase Storage Bucket ('global_market_stores')
-        publicVideoUrl = await OnboardingService.uploadVerificationVideo(user.id, file);
+      // 2. Map extension based on real content
+      let extension = 'webm';
+      if (baseType.includes('mp4') || baseType.includes('quicktime')) {
+        extension = 'mp4';
+      } else if (baseType.includes('ogg')) {
+        extension = 'ogv';
       }
 
-      // 3. Pass the permanent Supabase HTTP URL to onComplete (updates 'verification_video_url' column)
-      await onComplete(publicVideoUrl);
-    } catch (error) {
-      console.error('Failed to upload verification video or finish onboarding:', error);
-      onResetError();
-    } finally {
-      updateState({ isSubmitting: false });
+      // 3. Construct File keeping the original MIME type intact
+      const fileName = `verification_${user.id}_${Date.now()}.${extension}`;
+      const file = new File([biometricState.videoBlob], fileName, {
+        type: baseType || 'video/webm',
+      });
+
+      // 4. Upload to Supabase
+      publicVideoUrl = await OnboardingService.uploadVerificationVideo(user.id, file);
     }
-  };
+
+    await onComplete(publicVideoUrl);
+  } catch (error) {
+    console.error('Failed to upload verification video or finish onboarding:', error);
+    onResetError();
+  } finally {
+    updateState({ isSubmitting: false });
+  }
+};
 
   return (
     <div
