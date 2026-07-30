@@ -8,7 +8,7 @@ import WithdrawBalanceCard from "@/components/wallet/withdraw/WithdrawBalanceCar
 import WithdrawMethodPicker from "@/components/wallet/withdraw/WithdrawMethodPicker";
 import WithdrawRecipientForm from "@/components/wallet/withdraw/WithdrawRecipientForm";
 import WithdrawReviewPanel from "@/components/wallet/withdraw/WithdrawReviewPanel";
-import type { WithdrawDraft } from "@/lib/wallet/types"; // 🎯 Clean Centralized Import
+import type { WithdrawDraft } from "@/lib/wallet/types";
 
 type Step = "method" | "recipient" | "amount" | "review";
 
