@@ -19,7 +19,7 @@ interface Shortcut {
 
 const QUICK_ACCESS_SHORTCUTS: Shortcut[] = [
   {
-    label: 'Dashboard',
+    label: 'Build Your Web',
     href: '/st',
     icon: LayoutDashboard,
   },

@@ -446,115 +446,161 @@ export default function PublicGalleryPage() {
 	const currentTemplate = templates[currentIndex];
 
 	return (
-		<div className="min-h-screen bg-black text-white overflow-hidden">
-			{/* ─── Top Navigation Bar ─────────────────────────────────────── */}
-			<div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent p-4">
-				<div className="max-w-7xl mx-auto flex items-center justify-between">
-					<div className="flex items-center gap-3">
-						<Globe className="h-6 w-6 text-emerald-400" />
-						<span className="text-sm font-bold text-white hidden sm:inline">
-							Public Gallery
-						</span>
-						<span className="text-xs text-zinc-400 hidden md:inline">
-							{templates.length} template{templates.length !== 1 ? "s" : ""}
-						</span>
+	<div className="min-h-dvh bg-black text-white overflow-hidden">
+		{/* ───────────────────── Top Navigation ───────────────────── */}
+		<div className="fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)]">
+			<div className="bg-gradient-to-b from-black/70 via-black/30 to-transparent backdrop-blur-xl">
+				<div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-3 sm:px-5">
+
+					{/* Left */}
+					<div className="min-w-0 flex flex-1 items-center gap-3">
+						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+							<Globe className="h-5 w-5 text-emerald-400" />
+						</div>
+
+						<div className="min-w-0">
+							<h1 className="truncate text-sm font-semibold text-white">
+								Public Gallery
+							</h1>
+
+							<p className="truncate text-[11px] text-zinc-400">
+								{templates.length} template{templates.length !== 1 ? "s" : ""}
+							</p>
+						</div>
 					</div>
 
-					<div className="flex items-center gap-2">
-						{/* ─── Upload Button ────────────────────────────────────── */}
+					{/* Right */}
+					<div className="ml-3 flex shrink-0 items-center gap-2">
+
 						<button
 							onClick={handleUpload}
-							className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors"
+							className="flex h-10 items-center gap-2 rounded-xl bg-emerald-600 px-3 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-500 active:scale-95"
 						>
-							<Upload className="h-3.5 w-3.5" />
-							<span className="hidden sm:inline">Publish Template</span>
+							<Upload className="h-4 w-4 shrink-0" />
+							<span className="hidden md:inline">
+								Publish
+							</span>
 						</button>
 
-						{/* ─── Dashboard Button ──────────────────────────────────── */}
 						<button
 							onClick={() => router.push("/social-tenant/t-a")}
-							className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-colors"
+							className="flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3 text-xs font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/20 active:scale-95"
 						>
-							<LayoutDashboard className="h-3.5 w-3.5" />
-							<span className="hidden sm:inline">Your Dashboard</span>
+							<LayoutDashboard className="h-4 w-4 shrink-0" />
+							<span className="hidden lg:inline">
+								Dashboard
+							</span>
 						</button>
+
 					</div>
+
 				</div>
 			</div>
-
-			{/* ─── Main Viewer ────────────────────────────────────────────── */}
-			<div
-				ref={containerRef}
-				className="w-full h-screen relative overflow-hidden"
-				onTouchStart={handleTouchStart}
-				onTouchMove={handleTouchMove}
-				onTouchEnd={handleTouchEnd}
-			>
-				{/* ─── Templates ────────────────────────────────────────────── */}
-				{templates.map((template, index) =>
-					renderTemplateContent(template, index),
-				)}
-
-				{/* ─── Progress Indicator ────────────────────────────────────── */}
-				<div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-					{templates.map((_, index) => (
-						<button
-							key={index}
-							onClick={() => {
-								if (!isTransitioning) {
-									setIsTransitioning(true);
-									setCurrentIndex(index);
-									setTimeout(() => setIsTransitioning(false), 400);
-								}
-							}}
-							className={`h-1.5 rounded-full transition-all ${
-								index === currentIndex
-									? "w-8 bg-white"
-									: "w-4 bg-white/30 hover:bg-white/50"
-							}`}
-						/>
-					))}
-				</div>
-
-				{/* ─── Navigation Arrows (Desktop) ───────────────────────────── */}
-				<div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between z-20 pointer-events-none">
-					<button
-						onClick={goToPrevious}
-						className="pointer-events-auto p-2 ml-4 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white transition-all hover:scale-110 opacity-0 group-hover:opacity-100 md:opacity-100"
-						aria-label="Previous template"
-					>
-						<ChevronLeft className="h-8 w-8" />
-					</button>
-					<button
-						onClick={goToNext}
-						className="pointer-events-auto p-2 mr-4 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white transition-all hover:scale-110 opacity-0 group-hover:opacity-100 md:opacity-100"
-						aria-label="Next template"
-					>
-						<ChevronRight className="h-8 w-8" />
-					</button>
-				</div>
-
-				{/* ─── Template Counter ──────────────────────────────────────── */}
-				<div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 mt-4 text-xs text-zinc-500">
-					{currentIndex + 1} / {templates.length}
-				</div>
-
-				{/* ─── Keyboard Hint ──────────────────────────────────────────── */}
-				<div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 text-[10px] text-zinc-600 hidden md:block">
-					← → or swipe to navigate • Space to play/pause
-				</div>
-			</div>
-
-			{/* ─── Clone Modal ─────────────────────────────────────────────── */}
-			{cloneModal.isOpen && cloneModal.template && (
-				<CloneModal
-					isOpen={cloneModal.isOpen}
-					onClose={() => setCloneModal({ isOpen: false, template: null })}
-					onConfirm={handleCloneConfirm}
-					template={cloneModal.template}
-					isCloning={isCloning}
-				/>
-			)}
 		</div>
-	);
+
+		{/* ───────────────────── Main Viewer ───────────────────── */}
+		<div
+			ref={containerRef}
+			className="relative min-h-dvh w-full overflow-hidden touch-pan-y"
+			onTouchStart={handleTouchStart}
+			onTouchMove={handleTouchMove}
+			onTouchEnd={handleTouchEnd}
+		>
+			{/* Templates */}
+			{templates.map((template, index) =>
+				renderTemplateContent(template, index)
+			)}
+
+			{/* Desktop Arrows */}
+			<div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 hidden md:flex items-center justify-between px-6">
+
+				<button
+					onClick={goToPrevious}
+					className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-xl transition-all hover:scale-110 hover:bg-black/60"
+					aria-label="Previous template"
+				>
+					<ChevronLeft className="h-7 w-7 text-white" />
+				</button>
+
+				<button
+					onClick={goToNext}
+					className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-xl transition-all hover:scale-110 hover:bg-black/60"
+					aria-label="Next template"
+				>
+					<ChevronRight className="h-7 w-7 text-white" />
+				</button>
+
+			</div>
+
+			{/* Bottom Controls */}
+			<div
+				className="absolute inset-x-0 z-20 flex flex-col items-center gap-3 px-4"
+				style={{
+					bottom: "calc(1rem + env(safe-area-inset-bottom))",
+				}}
+			>
+
+				{/* Progress */}
+				<div className="rounded-full border border-white/10 bg-black/40 px-2 py-1.5 backdrop-blur-xl">
+
+					<div className="flex items-center">
+
+						{templates.map((_, index) => (
+							<button
+								key={index}
+								onClick={() => {
+									if (!isTransitioning) {
+										setIsTransitioning(true);
+										setCurrentIndex(index);
+										setTimeout(() => setIsTransitioning(false), 400);
+									}
+								}}
+								className="flex h-8 w-8 items-center justify-center"
+							>
+								<span
+									className={`block h-1.5 rounded-full transition-all duration-300 ${
+										index === currentIndex
+											? "w-7 bg-white"
+											: "w-3 bg-white/30 hover:bg-white/50"
+									}`}
+								/>
+							</button>
+						))}
+
+					</div>
+
+				</div>
+
+				{/* Counter */}
+				<div className="rounded-full border border-white/10 bg-black/40 px-3 py-1 backdrop-blur-xl">
+					<p className="text-[11px] font-medium tracking-wide text-zinc-300">
+						{currentIndex + 1} / {templates.length}
+					</p>
+				</div>
+
+				{/* Desktop Hint */}
+				<div className="hidden md:block text-[11px] text-zinc-500">
+					← → or swipe to navigate • Space to play / pause
+				</div>
+
+			</div>
+		</div>
+
+		{/* ───────────────────── Clone Modal ───────────────────── */}
+		{cloneModal.isOpen && cloneModal.template && (
+			<CloneModal
+				isOpen={cloneModal.isOpen}
+				onClose={() =>
+					setCloneModal({
+						isOpen: false,
+						template: null,
+					})
+				}
+				onConfirm={handleCloneConfirm}
+				template={cloneModal.template}
+				isCloning={isCloning}
+			/>
+		)}
+	</div>
+);
 }

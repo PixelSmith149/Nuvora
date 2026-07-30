@@ -246,25 +246,26 @@ export default function TemplatesPage() {
 	return (
 		<div className="min-h-screen bg-black text-white p-4 md:p-6">
 			<div className="max-w-7xl mx-auto space-y-6">
-				{/* ─── Header ────────────────────────────────────────────────── */}
-				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-					<div>
-						<h1 className="text-2xl font-bold text-white flex items-center gap-2">
-							<LayoutTemplate className="h-6 w-6 text-emerald-400" />
-							Templates
-						</h1>
-						<p className="text-sm text-zinc-400">
-							{totalItems} template{totalItems !== 1 ? "s" : ""} in your library
-						</p>
-					</div>
-					<button
-						onClick={() => router.push("/social-tenant/t-a/templates/new")}
-						className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors"
-					>
-						<Plus className="h-4 w-4" />
-						New Template
-					</button>
-				</div>
+				<div className="flex items-center justify-between gap-4">
+  <div className="min-w-0 flex-1">
+    <h1 className="flex items-center gap-2 text-2xl font-bold text-white truncate">
+      <LayoutTemplate className="h-6 w-6 shrink-0 text-emerald-400" />
+      <span className="truncate">Templates</span>
+    </h1>
+
+    <p className="text-sm text-zinc-400 truncate">
+      {totalItems} template{totalItems !== 1 ? "s" : ""} in your library
+    </p>
+  </div>
+
+  <button
+    onClick={() => router.push("/social-tenant/t-a/templates/new")}
+    className="shrink-0 flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-500"
+  >
+    <Plus className="h-4 w-4" />
+    <span className="hidden xs:inline">New Template</span>
+  </button>
+</div>
 
 				{/* ─── Search & Filters ────────────────────────────────────────── */}
 				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">

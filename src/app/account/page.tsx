@@ -140,8 +140,8 @@ export default function AccountPage() {
 
             <Link
               href="/account/wallet"
-              className="inline-flex rounded-xl bg-white text-black px-6 py-3 text-sm font-semibold transition hover:bg-zinc-200 active:scale-[0.98]"
-            >
+              className="inline-flex rounded-xl bg-white/90 text-black px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white active:scale-[0.98]"
+                >
               {t("wallet.button")}
             </Link>
           </div>
@@ -156,8 +156,7 @@ export default function AccountPage() {
             </p>
             <Link
               href="/account/profile"
-              className="inline-flex rounded-xl bg-white text-black px-6 py-3 text-sm font-semibold transition hover:bg-zinc-200 active:scale-[0.98]"
-            >
+              className="inline-flex rounded-xl bg-white/90 text-black px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white active:scale-[0.98]"            >
               {t("profile.button")}
             </Link>
           </div>
@@ -172,8 +171,7 @@ export default function AccountPage() {
             </p>
             <Link
               href="/account/settings"
-              className="inline-flex items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 text-white px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] active:scale-[0.98]"
-            >
+              className="inline-flex rounded-xl bg-white/90 text-black px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white active:scale-[0.98]"    >
               <Settings className="h-4 w-4" />
               {t("settingsCard.button")}
             </Link>
