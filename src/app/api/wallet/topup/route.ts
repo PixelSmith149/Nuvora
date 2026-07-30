@@ -112,17 +112,26 @@ export async function POST(req: Request) {
 
   // amount = intended USD credit (ingest still uses paid GHS from webhook)
   const { data: pendingTx, error: dbError } = await supabase
-    .from("wallet_transactions")
-    .insert({
-      wallet_id: wallet.id,
-      reference,
-      amount: ledgerAmountUsd,
-      status: "pending",
-      provider: "paystack",
-      meta: initialMeta,
-    })
-    .select("id")
-    .single();
+  .from("wallet_transactions")
+  .insert({
+    wallet_id: wallet.id,
+    reference,
+    // Ledger intent (USD)
+    amount: ledgerAmountUsd,
+    currency: "USD",
+    ledger_currency: "USD",
+    // What Paystack will charge
+    charge_currency: "GHS",
+    charge_amount: chargeAmountGhs,
+    status: "pending",
+    provider: "paystack",
+    meta: {
+      ...initialMeta,
+      user_id: user.id,
+    },
+  })
+  .select("id")
+  .single();
 
   if (dbError || !pendingTx) {
     console.error("Paystack Audit Record Error:", dbError);
