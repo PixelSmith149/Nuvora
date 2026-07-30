@@ -19,15 +19,15 @@ export async function generateMetadata({
 
 	if (!site) {
 		return {
-			title: "Site Not Found | Prime Boostage",
+			title: "Site Not Found | Nuvora",
 		};
 	}
 
 	return {
-		title: site.site_name || "Website | Prime Boostage",
+		title: site.site_name || "Website | Nuvora",
 		description:
 			site.blueprint?.brand_tagline ||
-			`View ${site.site_name} on Prime Boostage | Elite Home`,
+			`View ${site.site_name} on Nuvora | Elite Home`,
 		robots: "index, follow",
 	};
 }
@@ -61,7 +61,7 @@ export default async function SitePage({ params }: SitePageProps) {
         if (footer) {
           const attribution = document.createElement('div');
           attribution.style.cssText = 'text-align: center; padding: 10px; font-size: 12px; color: #71717a;';
-          attribution.innerHTML = 'Built with ❤️ on <a href="https://nu-vora.com" style="color: #10b981; text-decoration: none;">Prime Boostage</a>';
+          attribution.innerHTML = 'Built with ❤️ on <a href="https://nu-vora.com" style="color: #10b981; text-decoration: none;">Nuvora</a>';
           footer.appendChild(attribution);
         }
         document.addEventListener('submit', function(e) {

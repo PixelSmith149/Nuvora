@@ -20,7 +20,6 @@ import supabase from "@/lib/supabase/client";
 import type { Profile } from "@/lib/types";
 import { useMarket } from "@/lib/use-market";
 import { toast } from "@/lib/use-toast";
-import { useWallet } from "@/lib/wallet/useWallet";
 import { AssetPurchaseLocker } from "./AssetPurchaseLocker";
 import { MarketAssetDetail } from "./MarketAssetDetail";
 // ─── Tab Components ──────────────────────────────────────────

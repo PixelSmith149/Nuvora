@@ -1,12 +1,15 @@
 {
-	"name": "primebooster",
+	"name": "nu-vora",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint"
+		"lint": "next lint",
+		"translate": "node scripts/translate.mjs",
+		"i18n-page": "node scripts/extract-page.mjs",
+		"i18n-all": "npm run i18n-page -- && npm run translate"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.111.0",
@@ -14,6 +17,7 @@
 		"@fortawesome/free-solid-svg-icons": "^7.3.0",
 		"@fortawesome/react-fontawesome": "^3.3.1",
 		"@hello-pangea/dnd": "^18.0.1",
+		"@otplib/preset-default": "^12.0.1",
 		"@radix-ui/react-accordion": "^1.2.16",
 		"@radix-ui/react-alert-dialog": "^1.1.19",
 		"@radix-ui/react-aspect-ratio": "^1.1.11",
@@ -41,6 +45,8 @@
 		"@radix-ui/react-toggle": "^1.1.14",
 		"@radix-ui/react-toggle-group": "^1.1.15",
 		"@radix-ui/react-tooltip": "^1.2.12",
+		"@simplewebauthn/browser": "^13.3.0",
+		"@simplewebauthn/server": "^13.3.2",
 		"@supabase/ssr": "^0.12.0",
 		"@supabase/supabase-js": "^2.108.2",
 		"@types/yauzl": "^3.4.0",
@@ -50,6 +56,7 @@
 		"clsx": "^2.1.1",
 		"cmdk": "^1.1.1",
 		"date-fns": "^4.4.0",
+		"deepl-node": "^1.27.0",
 		"embla-carousel-react": "^8.6.0",
 		"framer-motion": "^12.42.2",
 		"input-otp": "^1.4.2",
@@ -57,11 +64,15 @@
 		"jszip": "^3.10.1",
 		"lucide-react": "^1.23.0",
 		"next": "16.2.9",
+		"next-intl": "^4.13.4",
 		"next-themes": "^0.4.6",
 		"openai": "^6.47.0",
+		"otplib": "^12.0.1",
+		"pg": "^8.22.0",
 		"playwright": "^1.61.1",
 		"playwright-extra": "^4.3.6",
 		"puppeteer-extra-plugin-stealth": "^2.11.2",
+		"qrcode": "^1.5.4",
 		"react": "19.2.4",
 		"react-day-picker": "^10.0.1",
 		"react-dom": "19.2.4",
@@ -80,14 +91,21 @@
 		"yauzl": "^3.4.0"
 	},
 	"devDependencies": {
+		"@babel/generator": "^8.0.0",
+		"@babel/parser": "^8.0.4",
+		"@babel/traverse": "^8.0.4",
+		"@babel/types": "^8.0.4",
 		"@tailwindcss/postcss": "^4",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.43",
+		"@types/pg": "^8.20.0",
+		"@types/qrcode": "^1.5.6",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
 		"@types/recharts": "^1.8.29",
 		"@types/uuid": "^10.0.0",
 		"@types/whois-json": "^2.0.4",
+		"@vitalets/google-translate-api": "^9.2.1",
 		"autoprefixer": "^10.5.2",
 		"eslint": "^9",
 		"eslint-config-next": "16.2.9",
@@ -98,3 +116,4 @@
 		"typescript": "^5"
 	}
 }
+

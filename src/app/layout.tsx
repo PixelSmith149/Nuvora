@@ -1,4 +1,4 @@
-// app/layout.tsx
+﻿// app/layout.tsx
 
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Geist } from "next/font/google";
@@ -7,6 +7,7 @@ import type React from "react";
 import { SessionHydrator } from "@/components/market/SessionHydrator";
 import { NotificationWrapper } from "@/components/NotificationWrapper";
 import { Providers } from "./providers";
+import { AppLockProvider } from '@/components/auth/AppLockProvider';
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -25,7 +26,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-	title: "Prime Booster | Elite Platform",
+	title: "NuVora | Elite Platform",
 	description: "Elite Access to Services, Global Markets & Tenant Management",
 };
 
@@ -39,13 +40,16 @@ export default function RootLayout({
 			<body
 				className={`${inter.variable} ${playfair.variable} bg-black text-white antialiased`}
 			>
-				<Providers>
+		         <AppLockProvider leaveTimeoutMs={0} idleTimeoutMs={2 * 60 * 1000}>
+			      <Providers>
 					<SessionHydrator />
 					<div className="min-h-screen flex flex-col">
 						<NotificationWrapper>{children}</NotificationWrapper>
 					</div>
-				</Providers>
+				  </Providers>
+				 </AppLockProvider>
 			</body>
 		</html>
 	);
 }
+

@@ -1,8 +1,9 @@
-// app/[tech]/s/services/page.tsx
+﻿// app/[tech]/s/services/page.tsx
 
 import { ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { CatalogHeader } from "@/components/services/catalog-header";
+import { ServicesFilterCatalog } from "@/components/services/services-filter-catalog";
 import {
 	getMarketplacePlatforms,
 	getMarketplaceServices,
@@ -30,7 +31,7 @@ export default async function ServicesPage() {
 			<div className="mb-10">
 				<div className="flex items-start justify-between">
 					<div className="inline-flex items-center rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium tracking-wide text-cyan-400">
-						PRIME BOOSTER • ELITE PLATFORM
+						NuVora • ELITE PLATFORM
 					</div>
 
 					<Link
@@ -64,6 +65,11 @@ export default async function ServicesPage() {
 				totalServices={allServices.length}
 				totalCategories={computedMetrics.categoriesList.length}
 			/>
+			<ServicesFilterCatalog
+                platforms={platforms}
+                services={allServices}
+                categories={computedMetrics.categoriesList}
+            />
 
 			<div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
 				{platforms.map((platform) => {
@@ -103,3 +109,4 @@ export default async function ServicesPage() {
 		</div>
 	);
 }
+

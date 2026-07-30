@@ -1,4 +1,4 @@
-// middleware.ts
+// proxy.ts
 
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
@@ -100,7 +100,6 @@ export async function proxy(request: NextRequest) {
 	const isGoingToAdmin = pathSegments.includes("admin-dashboard");
 
 	const isPublicRoute =
-<<<<<<< HEAD
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
@@ -108,19 +107,9 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/st/domain/verify") ||
     pathname.startsWith("/api/st/domain/instructions") ||
+	pathname.startsWith("s/[siteId]") ||
     pathname.startsWith("/api/cron/fx-refresh") ||
     pathname.startsWith("/api/cron/sync-orders");
-=======
-		pathname === "/" ||
-		pathname.startsWith("/login") ||
-		pathname.startsWith("/signup") ||
-		pathname.startsWith("/auth") ||
-		pathname.startsWith("/api/auth") ||
-		pathname.startsWith("/api/st/domain/verify") ||
-		pathname.startsWith("/api/st/domain/instructions");
-	    pathname.startsWith("/api/cron/fx-refresh");
-        pathname.startsWith("/api/cron/sync-orders");
->>>>>>> f8495c9f54a41699fa0cec31ca0f3fb8a37ab7c0
 
 if (!user && !isPublicRoute) {
     url.pathname = "/login";
@@ -168,6 +157,21 @@ if (!user && !isPublicRoute) {
 			url.searchParams.set("status", "handshake_failed_reauth_required");
 			return NextResponse.redirect(url);
 		}
+	}
+
+	const appLocked = request.cookies.get("app_locked")?.value === "1";
+
+	const isLockExempt =
+		pathname.startsWith("/login") ||
+		pathname.startsWith("/signup") ||
+		pathname.startsWith("/auth") ||
+		pathname.startsWith("/api/auth") ||
+		pathname.startsWith("/api/account/2fa");
+
+	if (user && appLocked && !isPublicRoute && !isLockExempt) {
+		
+		url.pathname = "/auth/passkey-challenge";
+		return NextResponse.redirect(url);
 	}
 
 	return response;

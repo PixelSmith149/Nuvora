@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { Crown, Globe, Store, Zap } from "lucide-react";
@@ -32,7 +32,7 @@ const doors = [
 	},
 ];
 
-export default function PrimeBoosterLanding() {
+export default function primeboosterLanding() {
 	return (
 		<div className="min-h-screen bg-black text-white overflow-hidden relative">
 			{/* Background Effects */}
@@ -104,3 +104,4 @@ export default function PrimeBoosterLanding() {
 		</div>
 	);
 }
+

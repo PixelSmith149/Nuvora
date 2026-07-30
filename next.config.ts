@@ -52,25 +52,34 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-	reactStrictMode: true,
+  reactStrictMode: true,
 
-	images: {
-		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "lh3.googleusercontent.com",
-			},
-		],
-	},
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "warn"],
+          }
+        : false,
+  },
 
-	async headers() {
-		return [
-			{
-				source: "/:path*",
-				headers: securityHeaders,
-			},
-		];
-	},
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
+  },
+
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
