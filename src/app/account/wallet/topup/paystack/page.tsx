@@ -7,8 +7,7 @@ import { useUser } from "@/lib/useAuth";
 import {
 	GLOBAL_SUPPORTED_CURRENCIES,
 	GlobalCurrency,
-} from "@/lib/wallet/currency/constants"; // or copy array above locally
-
+} from "@/lib/wallet/currency/constants"; 
 export default function PaystackPage() {
 	const { user } = useUser();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
