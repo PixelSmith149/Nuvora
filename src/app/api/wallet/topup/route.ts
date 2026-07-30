@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { GLOBAL_SUPPORTED_CURRENCIES } from "@/lib/wallet/currency/constants";
-import type { Currency } from "@/lib/wallet/currency/convert";
+import {
+  convertToUSD,
+  convertFromUSD,
+  type Currency,
+} from "@/lib/wallet/currency/convert";
+
+const PAYSTACK_CHARGE_CURRENCY = "GHS" as const;
 
 export async function POST(req: Request) {
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
@@ -9,12 +15,11 @@ export async function POST(req: Request) {
   if (!paystackSecret) {
     return NextResponse.json(
       { error: "Server payment configuration missing" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -23,62 +28,95 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 1. Parse and validate input payload
-  let body: { amount?: number; currency?: Currency };
+  let body: { amount?: number; currency?: string };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const rawAmount = Number(body.amount);
-  if (isNaN(rawAmount) || rawAmount <= 0) {
+  const displayAmount = Number(body.amount);
+  if (!Number.isFinite(displayAmount) || displayAmount <= 0) {
     return NextResponse.json({ error: "Invalid top-up amount" }, { status: 400 });
   }
 
-  const selectedCurrency = (body.currency || "USD").toUpperCase() as Currency;
+  const displayCurrency = (body.currency || "USD").toUpperCase() as Currency;
 
-  // Verify currency capability
   const isSupported = GLOBAL_SUPPORTED_CURRENCIES.some(
-    (c) => c.code.toUpperCase() === selectedCurrency
+    (c) => c.code.toUpperCase() === displayCurrency,
   );
   if (!isSupported) {
     return NextResponse.json(
-      { error: `Currency ${selectedCurrency} is not supported` },
-      { status: 400 }
+      { error: `Currency ${displayCurrency} is not supported for entry` },
+      { status: 400 },
     );
   }
 
-  // 2. Fetch user's wallet
+  let ledgerAmountUsd: number;
+  let chargeAmountGhs: number;
+
+  try {
+    // Display → USD (wallet ledger)
+    ledgerAmountUsd = await convertToUSD(displayAmount, displayCurrency);
+
+    // USD → GHS (Paystack charge — Ghana merchant)
+    if (displayCurrency === "GHS") {
+      chargeAmountGhs = displayAmount;
+    } else {
+      const ghs = await convertFromUSD(ledgerAmountUsd, "GHS");
+      chargeAmountGhs = ghs.amount;
+    }
+  } catch (err) {
+    console.error("FX conversion failed:", err);
+    return NextResponse.json(
+      { error: "Unable to convert currency. Try again." },
+      { status: 502 },
+    );
+  }
+
+  if (!Number.isFinite(chargeAmountGhs) || chargeAmountGhs < 1) {
+    return NextResponse.json(
+      { error: "Amount is too small after conversion to GHS" },
+      { status: 400 },
+    );
+  }
+
+  if (!Number.isFinite(ledgerAmountUsd) || ledgerAmountUsd <= 0) {
+    return NextResponse.json({ error: "Invalid ledger amount" }, { status: 400 });
+  }
+
   const { data: wallet, error: walletError } = await supabase
-    .from("wallet_balances")
-    .select("wallet_id")
+    .from("wallets")
+    .select("id")
     .eq("user_id", user.id)
     .single();
 
   if (walletError || !wallet) {
-    return NextResponse.json(
-      { error: "Wallet lookup failed" },
-      { status: 404 }
-    );
+    console.error("Paystack Topup Wallet Error:", walletError);
+    return NextResponse.json({ error: "Wallet lookup failed" }, { status: 404 });
   }
 
   const reference = `pb-${crypto.randomUUID()}`;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-  // 3. Record pending transaction inside DB BEFORE calling Paystack
   const initialMeta = {
-    currency: selectedCurrency,
+    display_currency: displayCurrency,
+    display_amount: displayAmount,
+    charge_currency: PAYSTACK_CHARGE_CURRENCY,
+    charge_amount: chargeAmountGhs,
+    ledger_currency: "USD",
+    ledger_amount: ledgerAmountUsd,
     user_id: user.id,
     initiated_at: new Date().toISOString(),
   };
 
+  // amount = intended USD credit (ingest still uses paid GHS from webhook)
   const { data: pendingTx, error: dbError } = await supabase
     .from("wallet_transactions")
     .insert({
-      wallet_id: wallet.wallet_id,
-      reference: reference,
-      amount: rawAmount,
+      wallet_id: wallet.id,
+      reference,
+      amount: ledgerAmountUsd,
       status: "pending",
       provider: "paystack",
       meta: initialMeta,
@@ -87,13 +125,13 @@ export async function POST(req: Request) {
     .single();
 
   if (dbError || !pendingTx) {
+    console.error("Paystack Audit Record Error:", dbError);
     return NextResponse.json(
       { error: "Failed to create payment audit record" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
-  // 4. Initialize Paystack Checkout Session
   try {
     const res = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
@@ -103,15 +141,20 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         email: user.email,
-        amount: Math.round(rawAmount * 100), // Minor unit conversion (kobo/pesewas/cents)
-        currency: selectedCurrency,
-        reference: reference,
+        amount: Math.round(chargeAmountGhs * 100), // pesewas
+        currency: PAYSTACK_CHARGE_CURRENCY, // always GHS
+        reference,
         callback_url: `${siteUrl}/account/wallet`,
+        channels: ["card", "bank", "mobile_money", "bank_transfer"],
         metadata: {
           user_id: user.id,
-          wallet_id: wallet.wallet_id,
+          wallet_id: wallet.id,
           transaction_id: pendingTx.id,
-          intended_currency: selectedCurrency,
+          display_currency: displayCurrency,
+          display_amount: displayAmount,
+          charge_currency: PAYSTACK_CHARGE_CURRENCY,
+          charge_amount: chargeAmountGhs,
+          ledger_amount: ledgerAmountUsd,
         },
       }),
     });
@@ -119,30 +162,32 @@ export async function POST(req: Request) {
     const payload = await res.json();
 
     if (!res.ok || !payload.status) {
-      // Mark transaction as failed without wiping previous meta fields
       await supabase
         .from("wallet_transactions")
         .update({
           status: "failed",
-          meta: { ...initialMeta, error: payload.message || "Rejected by Paystack" },
+          meta: {
+            ...initialMeta,
+            error: payload.message || "Rejected by Paystack",
+          },
         })
         .eq("id", pendingTx.id);
 
       return NextResponse.json(
         { error: payload.message || "Payment initialization rejected" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // 🎯 MATCHES FRONTEND: Wrap inside `data` property
     return NextResponse.json({
-      data: {
-        authorization_url: payload.data.authorization_url,
-        reference: reference,
-      },
+      authorization_url: payload.data.authorization_url,
+      reference,
+      charge_currency: PAYSTACK_CHARGE_CURRENCY,
+      charge_amount: chargeAmountGhs,
+      ledger_amount: ledgerAmountUsd,
+      ledger_currency: "USD",
     });
-  } catch (error) {
-    // Clean up pending transaction on connection failure
+  } catch {
     await supabase
       .from("wallet_transactions")
       .update({
@@ -153,7 +198,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { error: "Failed to communicate with Paystack payment gateway" },
-      { status: 502 }
+      { status: 502 },
     );
   }
 }

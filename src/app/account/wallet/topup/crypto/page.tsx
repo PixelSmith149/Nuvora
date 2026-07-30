@@ -205,7 +205,7 @@ export default function CryptoPage() {
 						{SUPPORTED_ASSETS.map((asset) => (
 							<button
 								key={asset.id}
-								onClick={() => setSelectedAsset(asset)}
+							//	onClick={() => setSelectedAsset(asset)}//
 								className="w-full bg-zinc-950 border border-white/10 p-5 rounded-2xl hover:border-white/30 text-left transition-all duration-200 flex justify-between items-center group"
 							>
 								<div>

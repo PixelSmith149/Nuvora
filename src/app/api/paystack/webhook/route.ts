@@ -1,12 +1,9 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 
-import { createAdminClient } from "@/lib/supabase/admin"; // Use admin/service-role client
+import { createAdminClient } from "@/lib/supabase/admin";
 import { ingestDeposit } from "@/lib/wallet/deposit/ingestDeposit";
 
-/**
- * Safely compares two strings in constant time to prevent timing attacks.
- */
 function safeCompareSignatures(hash: string, signature: string | null): boolean {
     if (!signature) return false;
 
@@ -26,24 +23,23 @@ export async function POST(req: Request) {
     if (!secret) {
         return NextResponse.json(
             { error: "Missing Paystack secret configuration" },
-            { status: 500 },
+            { status: 500 }
         );
     }
 
     const rawBody = await req.text();
     const signature = req.headers.get("x-paystack-signature");
 
-    // 1. Generate local SHA512 hash
+    // 1. Signature Verification
     const hash = crypto
         .createHmac("sha512", secret)
         .update(rawBody)
         .digest("hex");
 
-    // 2. Timing Safe Signature Validation
     if (!safeCompareSignatures(hash, signature)) {
         return NextResponse.json(
             { error: "Invalid payload signature" },
-            { status: 401 },
+            { status: 401 }
         );
     }
 
@@ -51,7 +47,6 @@ export async function POST(req: Request) {
     const eventType: string = event.event;
     const eventData = event.data;
 
-    // Use Service Role / Admin Client to bypass RLS for background processing
     const supabase = createAdminClient();
 
     // ==========================================
@@ -60,7 +55,6 @@ export async function POST(req: Request) {
     if (eventType === "charge.success") {
         const reference: string = eventData.reference;
 
-        // Fetch transaction matching the payment reference
         const { data: transaction, error } = await supabase
             .from("wallet_transactions")
             .select("id, wallet_id, status, meta")
@@ -69,19 +63,21 @@ export async function POST(req: Request) {
 
         if (error || !transaction) {
             console.error("Paystack Webhook: Transaction lookup error or missing ref:", error || reference);
-            return NextResponse.json(
-                { error: "Transaction not found for reference" },
-                { status: 404 },
-            );
+            // Return HTTP 200 so Paystack does not retry perpetually
+            return NextResponse.json({ status: "ignored_missing_transaction" });
         }
 
         if (transaction.status === "success") {
             return NextResponse.json({ status: "already_processed" });
         }
 
-        const sourceCurrency = eventData.currency;
-        // Paystack amount is received in minor units (kobo, pesewas, cents)
-        const sourceAmountMajor = eventData.amount / 100;
+        const sourceCurrency = (eventData.currency || "USD").toUpperCase();
+        const ZERO_DECIMAL_CURRENCIES = ["XOF", "XAF", "GNF", "RWF", "UGX"];
+
+        // Handle minor unit conversion dynamically based on currency
+        const sourceAmountMajor = ZERO_DECIMAL_CURRENCIES.includes(sourceCurrency)
+            ? eventData.amount
+            : eventData.amount / 100;
 
         await ingestDeposit({
             wallet_id: transaction.wallet_id,
@@ -101,12 +97,10 @@ export async function POST(req: Request) {
         const reference: string = eventData.reference;
         const reason: string = eventData.reason || "Paystack transfer processing failed";
 
-        // Extract possible UUID if reference starts with prefix
         const possibleUuid = reference.startsWith("pb-tx-") 
             ? reference.replace("pb-tx-", "") 
             : reference;
 
-        // Check if string is a valid UUID before adding to postgres query filter
         const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(possibleUuid);
 
         let query = supabase.from("wallet_transactions").select("id, wallet_id, amount, status, meta");
@@ -121,13 +115,9 @@ export async function POST(req: Request) {
 
         if (error || !transaction) {
             console.error("Paystack Webhook: Failed transfer transaction lookup error:", error);
-            return NextResponse.json(
-                { error: "Withdrawal transaction not found" },
-                { status: 404 },
-            );
+            return NextResponse.json({ status: "ignored_missing_withdrawal" });
         }
 
-        // Idempotency check: Ignore if already marked failed or refunded
         if (transaction.status === "failed") {
             return NextResponse.json({ status: "already_refunded" });
         }
@@ -135,7 +125,6 @@ export async function POST(req: Request) {
         const meta = (transaction.meta as Record<string, any>) ?? {};
         const chargedFeeUsd = meta.charged_fee_usd ?? 0;
 
-        // Trigger DB atomic refund RPC
         const { error: refundError } = await supabase.rpc(
             "refund_failed_withdrawal",
             {
@@ -151,13 +140,12 @@ export async function POST(req: Request) {
             console.error("Webhook Refund Error:", refundError);
             return NextResponse.json(
                 { error: "Failed to process automatic refund RPC" },
-                { status: 500 },
+                { status: 500 }
             );
         }
 
         return NextResponse.json({ status: "transfer_refunded" });
     }
 
-    // Gracefully ignore all other unhandled events
     return NextResponse.json({ status: "ignored" });
 }
