@@ -28,6 +28,9 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
 	title: "NuVora | Elite Platform",
 	description: "Elite Access to Services, Global Markets & Tenant Management",
+	other: {
+    heleket: "7ed2630b",
+  },
 };
 
 export default function RootLayout({
