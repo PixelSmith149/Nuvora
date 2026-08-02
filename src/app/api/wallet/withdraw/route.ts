@@ -64,15 +64,16 @@ export async function POST(req: Request) {
 		}
 
 		// 4. Feature Availability Guard Layer (Crypto Protection Splitter)
-		if (method === "crypto") {
-			return NextResponse.json(
-				{
-					error:
-						"Crypto settlement processing engines are currently restricted to incoming deposits. Blockchain payouts are unavailable.",
-				},
-				{ status: 501 }, // 501 Not Implemented (Graceful rejection)
-			);
-		}
+		
+if (method === "crypto") {
+  return NextResponse.json(
+    {
+      error:
+        "Crypto withdrawals must be initiated via /api/wallet/withdraw/crypto",
+    },
+    { status: 400 },
+  );
+}
 
 		// 5. Normalization Layer: Translate Frontend Metaphors into Engine Types
 		let mappedRecipientType: "nuban" | "mobile_money";

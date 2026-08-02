@@ -1,212 +1,123 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
 interface OrderFiltersProps {
-	currentStatus?: string;
-	currentSearch?: string;
+    currentStatus?: string;
+    currentSearch?: string;
 }
 
 const STATUS_OPTIONS = [
-	{
-		value: "",
-		label: "All Statuses",
-	},
-	{
-		value: "pending",
-		label: "Pending",
-	},
-	{
-		value: "processing",
-		label: "Processing",
-	},
-	{
-		value: "completed",
-		label: "Completed",
-	},
-	{
-		value: "partial",
-		label: "Partial",
-	},
-	{
-		value: "cancelled",
-		label: "Cancelled",
-	},
-	{
-		value: "refunded",
-		label: "Refunded",
-	},
+    { value: "", label: "All Statuses" },
+    { value: "pending", label: "Pending" },
+    { value: "processing", label: "Processing" },
+    { value: "completed", label: "Completed" },
+    { value: "partial", label: "Partial" },
+    { value: "cancelled", label: "Cancelled" },
+    { value: "refunded", label: "Refunded" },
 ];
 
 export function OrderFilters({
-	currentStatus,
-	currentSearch,
+    currentStatus,
+    currentSearch,
 }: OrderFiltersProps) {
-	const router = useRouter();
-	const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname(); // FIX: Dynamically resolves current page path
+    const searchParams = useSearchParams();
 
-	const [isPending, startTransition] = useTransition();
+    const [isPending, startTransition] = useTransition();
+    const [search, setSearch] = useState(currentSearch ?? "");
+    const [status, setStatus] = useState(currentStatus ?? "");
 
-	const [search, setSearch] = useState(currentSearch ?? "");
+    function updateFilters(nextSearch: string, nextStatus: string) {
+        const params = new URLSearchParams(searchParams.toString());
 
-	const [status, setStatus] = useState(currentStatus ?? "");
+        if (nextSearch.trim()) {
+            params.set("search", nextSearch.trim());
+        } else {
+            params.delete("search");
+        }
 
-	function updateFilters(nextSearch: string, nextStatus: string) {
-		const params = new URLSearchParams(searchParams.toString());
+        if (nextStatus) {
+            params.set("status", nextStatus);
+        } else {
+            params.delete("status");
+        }
 
-		if (nextSearch.trim()) {
-			params.set("search", nextSearch.trim());
-		} else {
-			params.delete("search");
-		}
+        params.delete("page");
 
-		if (nextStatus) {
-			params.set("status", nextStatus);
-		} else {
-			params.delete("status");
-		}
+        const query = params.toString();
+        const url = query ? `${pathname}?${query}` : pathname;
 
-		params.delete("page");
+        startTransition(() => {
+            router.push(url);
+        });
+    }
 
-		startTransition(() => {
-			router.push(`/orders?${params.toString()}`);
-		});
-	}
+    function handleSearchSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        updateFilters(search, status);
+    }
 
-	function handleSearchSubmit(e: React.FormEvent) {
-		e.preventDefault();
+    function handleStatusChange(value: string) {
+        setStatus(value);
+        updateFilters(search, value);
+    }
 
-		updateFilters(search, status);
-	}
+    function clearFilters() {
+        setSearch("");
+        setStatus("");
 
-	function handleStatusChange(value: string) {
-		setStatus(value);
+        startTransition(() => {
+            router.push(pathname);
+        });
+    }
 
-		updateFilters(search, value);
-	}
+    return (
+        <section className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                {/* Search */}
+                <form onSubmit={handleSearchSubmit} className="flex-1">
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search order ID, service, target URL..."
+                        className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-zinc-700"
+                    />
+                </form>
 
-	function clearFilters() {
-		setSearch("");
-		setStatus("");
+                {/* Status */}
+                <select
+                    value={status}
+                    onChange={(e) => handleStatusChange(e.target.value)}
+                    className="rounded-2xl border border-zinc-800 bg-black px-4 py-3 text-sm text-white outline-none focus:border-zinc-700"
+                >
+                    {STATUS_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
 
-		startTransition(() => {
-			router.push("/orders");
-		});
-	}
+                {/* Search Button */}
+                <button
+                    onClick={() => updateFilters(search, status)}
+                    disabled={isPending}
+                    className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
+                >
+                    {isPending ? "Filtering..." : "Search"}
+                </button>
 
-	return (
-		<section
-			className="
-        rounded-3xl
-        border
-        border-zinc-800
-        bg-zinc-950
-        p-6
-      "
-		>
-			<div
-				className="
-          flex
-          flex-col
-          gap-4
-          lg:flex-row
-          lg:items-center
-        "
-			>
-				{/* Search */}
-
-				<form onSubmit={handleSearchSubmit} className="flex-1">
-					<input
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						placeholder="
-              Search order ID,
-              service,
-              target URL...
-            "
-						className="
-              w-full
-              rounded-2xl
-              border
-              border-zinc-800
-              bg-black
-              px-4
-              py-3
-              text-sm
-              text-white
-              outline-none
-              placeholder:text-zinc-500
-              focus:border-zinc-700
-            "
-					/>
-				</form>
-
-				{/* Status */}
-
-				<select
-					value={status}
-					onChange={(e) => handleStatusChange(e.target.value)}
-					className="
-            rounded-2xl
-            border
-            border-zinc-800
-            bg-black
-            px-4
-            py-3
-            text-sm
-            text-white
-            outline-none
-            focus:border-zinc-700
-          "
-				>
-					{STATUS_OPTIONS.map((option) => (
-						<option key={option.value} value={option.value}>
-							{option.label}
-						</option>
-					))}
-				</select>
-
-				{/* Search Button */}
-
-				<button
-					onClick={() => updateFilters(search, status)}
-					disabled={isPending}
-					className="
-            rounded-2xl
-            bg-white
-            px-5
-            py-3
-            text-sm
-            font-semibold
-            text-black
-            transition
-            hover:opacity-90
-          "
-				>
-					Search
-				</button>
-
-				{/* Reset */}
-
-				<button
-					onClick={clearFilters}
-					className="
-            rounded-2xl
-            border
-            border-zinc-800
-            px-5
-            py-3
-            text-sm
-            text-zinc-300
-            transition
-            hover:border-zinc-700
-            hover:text-white
-          "
-				>
-					Reset
-				</button>
-			</div>
-		</section>
-	);
+                {/* Reset */}
+                <button
+                    onClick={clearFilters}
+                    disabled={isPending}
+                    className="rounded-2xl border border-zinc-800 px-5 py-3 text-sm text-zinc-300 transition hover:border-zinc-700 hover:text-white"
+                >
+                    Reset
+                </button>
+            </div>
+        </section>
+    );
 }

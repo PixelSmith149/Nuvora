@@ -15,6 +15,7 @@ export interface MarketplaceService {
 	platform?: string; // Optional properties to mirror your clean DB mappings
 	type?: string;
 	description?: string;
+	isAuto?: boolean;
 }
 
 interface ServiceCatalogProps {

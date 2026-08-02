@@ -50,6 +50,7 @@ export default function primeboosterLanding() {
           {/* Centered Hero */}
           <div className="text-center">
             <h1 className="text-6xl md:text-7xl font-bold leading-tight tracking-tighter heading-font">
+              <meta name="heleket" content="7ed2630b" />
               {t("heroTitle")}
               <br />
             </h1>

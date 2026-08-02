@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getPlatformSlug } from "./platform-slug";
 import { calculateOrderAmount } from "./servicePricing";
+import { isAutoService } from "./serviceMode";
 
 interface MarketplaceFilters {
 	category?: string;
@@ -102,6 +103,7 @@ export async function getMarketplaceServices(filters?: MarketplaceFilters) {
 			category: provider.category,
 			minQuantity: provider.minQuantity,
 			maxQuantity: provider.maxQuantity,
+			isAuto: isAutoService(service.title),
 		};
 	});
 }
@@ -177,6 +179,7 @@ export async function getMarketplaceService(serviceId: string) {
 		category: provider.category,
 		minQuantity: provider.minQuantity,
 		maxQuantity: provider.maxQuantity,
+		isAuto: isAutoService(service.title),
 	};
 }
 
@@ -319,6 +322,7 @@ export async function getMarketplaceServicesPlatform(platformOrSlug: string) {
 			category: provider.category,
 			minQuantity: provider.minQuantity,
 			maxQuantity: provider.maxQuantity,
+			isAuto: isAutoService(service.title),
 		};
 	});
 }

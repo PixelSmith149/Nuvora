@@ -61,16 +61,6 @@ export async function processWithdraw(input: WithdrawInput) {
     // real-time rate fetching + automatic caching in `fx_rates`
     // =========================================================================
 
-    /* 
-       // NON-EXISTENT TABLE - REMOVED:
-       const { data: rateData } = await supabase
-           .from("currency_rates")
-           .select("rate_to_usd")
-           .eq("code", input.currency.toUpperCase())
-           .single();
-       const exchangeRate = rateData?.rate_to_usd || 1.0;
-    */
-
     const usdAmountMajor = Number(input.amount);
 
     const converted = await convertFromUSD(

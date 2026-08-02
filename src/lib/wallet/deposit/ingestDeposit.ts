@@ -7,7 +7,7 @@ type DepositInput = {
   amount: number; // major units of paid currency
   currency: Currency;
   reference: string;
-  provider: "paystack" | "momo" | "btcpay";
+  provider: "paystack" | "momo" | "btcpay" | "heleket";
   meta?: Record<string, unknown>;
   asAdmin?: boolean;
   /** Optional from Paystack payload */
