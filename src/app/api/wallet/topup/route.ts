@@ -153,7 +153,7 @@ export async function POST(req: Request) {
         amount: Math.round(chargeAmountGhs * 100), // pesewas
         currency: PAYSTACK_CHARGE_CURRENCY, // always GHS
         reference,
-        callback_url: `${siteUrl}/account/wallet`,
+        callback_url: `${siteUrl}/account/wallet/paystack/callback`,
         channels: ["card", "bank", "mobile_money", "bank_transfer"],
         metadata: {
           user_id: user.id,
