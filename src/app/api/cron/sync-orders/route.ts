@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = getAdminClient();
 
-    // 1. Select orders joined via services -> provider_services
+    // 1. Fetch orders in non-terminal states needing submit or sync
     const { data: activeOrders, error: ordersError } = await supabase
       .from("orders")
       .select(
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
       .limit(200);
 
     if (ordersError) {
-      console.error("[sync-orders] select failed:", ordersError);
+      console.error("[sync-orders] Select query failed:", ordersError);
       return NextResponse.json(
         { error: ordersError.message },
         { status: 500 },
@@ -162,7 +162,10 @@ export async function GET(request: NextRequest) {
 
     for (const raw of activeOrders as unknown as OrderRow[]) {
       const provider = normalizeProvider(raw.providers);
-      if (!provider?.api_url || !provider?.api_key) continue;
+      if (!provider?.api_url || !provider?.api_key) {
+        errors.push(`Order ${raw.id}: Missing provider API credentials`);
+        continue;
+      }
 
       // ----------------------------------------------------
       // STAGE A: Order HAS NO provider_order_id -> Submit to Provider
@@ -191,7 +194,11 @@ export async function GET(request: NextRequest) {
             raw.quantity
           );
 
-          const newProviderOrderId = String(result.providerOrderId || "");
+          // Safe extraction without TS property errors
+          const rawResponse = result.raw ?? {};
+          const newProviderOrderId = String(
+            result.providerOrderId || rawResponse.order || rawResponse.order_id || ""
+          );
 
           if (newProviderOrderId) {
             const { error: updateOrderError } = await supabase
@@ -218,10 +225,8 @@ export async function GET(request: NextRequest) {
         }
         continue;
       }
-
-      // ----------------------------------------------------
-      // STAGE B: Order HAS provider_order_id -> Group for Status Check
-      // ----------------------------------------------------
+      
+      // STAGE B: Has provider_order_id -> Batch Grouping
       if (!groups[provider.id]) {
         groups[provider.id] = {
           provider,
@@ -234,9 +239,7 @@ export async function GET(request: NextRequest) {
       groups[provider.id].byExternalId[raw.provider_order_id] = raw;
     }
 
-    // ----------------------------------------------------
-    // STAGE C: Process Batch Status Updates
-    // ----------------------------------------------------
+    // STAGE C: Process Batch Status Syncing & Automated Refunds
     for (const providerId of Object.keys(groups)) {
       const { provider, externalIds, byExternalId } = groups[providerId];
 
@@ -248,9 +251,9 @@ export async function GET(request: NextRequest) {
           externalIds,
         );
       } catch (e: any) {
-        const msg = e?.message || "provider status batch failed";
-        console.error(`[sync-orders] provider ${providerId}:`, msg);
-        errors.push(`provider ${providerId}: ${msg}`);
+        const msg = e?.message || "Provider status batch execution failed";
+        console.error(`[sync-orders] Provider ${providerId}:`, msg);
+        errors.push(`Provider ${providerId}: ${msg}`);
         continue;
       }
 
@@ -260,12 +263,10 @@ export async function GET(request: NextRequest) {
 
       for (const [externalId, metrics] of entries) {
         const order = byExternalId[externalId];
-        if (!order) continue;
-        if (!metrics || metrics.error) continue;
+        if (!order || !metrics || metrics.error) continue;
 
         const upstream = String(metrics.status || "");
-        const { localStatus, shouldRefundFull, isPartial } =
-          mapUpstreamStatus(upstream);
+        const { localStatus, shouldRefundFull, isPartial } = mapUpstreamStatus(upstream);
 
         const startCount =
           metrics.start_count !== undefined && metrics.start_count !== null
@@ -284,14 +285,14 @@ export async function GET(request: NextRequest) {
           refundAmount = cost;
         } else if (isPartial && cost > 0) {
           const remainsCount = Number(metrics.remains ?? 0);
-          const unit = cost / qty;
-          refundAmount = Math.max(0, Number((remainsCount * unit).toFixed(4)));
+          const unitCost = cost / qty;
+          refundAmount = Math.max(0, Number((remainsCount * unitCost).toFixed(4)));
         }
 
-        const alreadyTerminal =
-          order.status === "refunded" || order.status === "completed";
+        // Check if state transitioned from active to terminal refund state
+        const isAlreadyRefunded = order.status === "refunded";
 
-        if (refundAmount > 0 && !alreadyTerminal) {
+        if (refundAmount > 0 && !isAlreadyRefunded) {
           const { data: wallet } = await supabase
             .from("wallets")
             .select("id")
@@ -316,38 +317,40 @@ export async function GET(request: NextRequest) {
             );
 
             if (refundError) {
-              console.error("[sync-orders] refund RPC failed:", {
+              console.error("[sync-orders] Refund RPC failure:", {
                 orderId: order.id,
                 refundError,
               });
-              errors.push(`refund ${order.id}: ${refundError.message}`);
+              errors.push(`Refund failed for order ${order.id}: ${refundError.message}`);
             } else {
               refunded += 1;
             }
           } else {
-            errors.push(`no wallet for user ${order.user_id} order ${order.id}`);
+            errors.push(`No active wallet found for user ${order.user_id} on order ${order.id}`);
           }
         }
 
+        // Update final order state in database
+        const updatePayload: Record<string, any> = {
+          status: localStatus,
+          provider_response: metrics,
+          updated_at: new Date().toISOString(),
+        };
+
+        if (Number.isFinite(startCount)) updatePayload.start_count = startCount;
+        if (Number.isFinite(remains)) updatePayload.remains = remains;
+
         const { error: updateError } = await supabase
           .from("orders")
-          .update({
-            status: localStatus,
-            start_count: Number.isFinite(startCount as number)
-              ? startCount
-              : undefined,
-            remains: Number.isFinite(remains as number) ? remains : undefined,
-            provider_response: metrics,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq("id", order.id);
 
         if (updateError) {
-          console.error("[sync-orders] update failed:", {
+          console.error("[sync-orders] State update failed:", {
             orderId: order.id,
             updateError,
           });
-          errors.push(`update ${order.id}: ${updateError.message}`);
+          errors.push(`Update failed for order ${order.id}: ${updateError.message}`);
           continue;
         }
 
@@ -364,7 +367,7 @@ export async function GET(request: NextRequest) {
       errors: errors.length ? errors : undefined,
     });
   } catch (error: any) {
-    console.error("[sync-orders] fatal:", error);
+    console.error("[sync-orders] Fatal execution failure:", error);
     return NextResponse.json(
       { error: error?.message || "Internal sync failure" },
       { status: 500 },

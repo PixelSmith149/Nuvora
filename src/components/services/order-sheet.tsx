@@ -35,7 +35,16 @@ function humanizeOrderError(err: unknown): string {
 
   const msg = err.message || "Failed to create order.";
 
-  // Next.js sometimes prefixes server errors
+  // Catch Next.js production digest/render errors
+  if (
+    msg.includes("Server Components render") ||
+    msg.includes("digest") ||
+    msg.includes("An error occurred in")
+  ) {
+    return "Unable to process order at this time. Please try again later or contact support.";
+  }
+
+  // Preserve user balance message formatting
   if (/insufficient/i.test(msg)) {
     return msg.replace(/^.*?(Insufficient)/i, "$1").trim();
   }
@@ -192,17 +201,20 @@ if (!trimmedLink) {
         target: trimmedLink,
       });
 
-      // Strict success gate — no toast without this
+      // Strict success gate
       if (!res || res.success !== true || !res.orderId) {
-        const msg =
+        const rawMsg =
           res && typeof res === "object" && "error" in res
             ? String((res as any).error)
             : "Order could not be completed.";
-        setError(msg);
-        toast.error(msg);
+
+        // Run through the humanize filter
+        const cleanMsg = humanizeOrderError(new Error(rawMsg));
+
+        setError(cleanMsg);
+        toast.error(cleanMsg);
         return;
       }
-
       toast.success("Order placed successfully!");
       onSuccess?.();
       onClose();

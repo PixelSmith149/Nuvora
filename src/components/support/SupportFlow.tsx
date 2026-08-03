@@ -35,6 +35,33 @@ interface SupportFlowProps {
   onOpenLiveChat: () => void;
 }
 
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB limit
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+// Safely map phase colors to explicit Tailwind classes to ensure static compilation
+const PHASE_STYLES: Record<string, { bg: string; border: string; hoverBorder: string }> = {
+  emerald: {
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+    hoverBorder: "hover:border-emerald-500/30",
+  },
+  blue: {
+    bg: "bg-blue-500/10",
+    border: "border-blue-500/20",
+    hoverBorder: "hover:border-blue-500/30",
+  },
+  purple: {
+    bg: "bg-purple-500/10",
+    border: "border-purple-500/20",
+    hoverBorder: "hover:border-purple-500/30",
+  },
+  amber: {
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/20",
+    hoverBorder: "hover:border-amber-500/30",
+  },
+};
+
 export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
   const t = useTranslations("Support");
 
@@ -51,8 +78,16 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
     priority: "medium",
     category: "",
   });
+  const [fileError, setFileError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [troubleshootState, setTroubleshootState] = useState<Record<string, string>>({});
+
+  // Safe navigation helper preventing null values from entering history
+  const pushToHistory = (step: ConversationStep | null) => {
+    if (step) {
+      setHistory((prev) => [...prev, step]);
+    }
+  };
 
   // ─── Navigation ─────────────────────────────────────────────────
 
@@ -63,40 +98,45 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
     setSelectedTopic(null);
     setSelectedSubTopic(null);
     setTroubleshootState({});
+    setFileError(null);
   };
 
   const goToPhaseSelect = () => {
+    pushToHistory(currentStep);
     setCurrentStep({ id: "phase-select", type: "phase-select", data: {} });
-    setHistory((prev) => [...prev, currentStep!]);
     setSelectedPhase(null);
     setSelectedTopic(null);
     setSelectedSubTopic(null);
   };
 
   const goToTopicSelect = (phase: Phase) => {
+    if (!phase) return;
+    pushToHistory(currentStep);
     setSelectedPhase(phase);
     setCurrentStep({
       id: "topic-select",
       type: "topic-select",
       data: { phase },
     });
-    setHistory((prev) => [...prev, currentStep!]);
     setSelectedTopic(null);
     setSelectedSubTopic(null);
   };
 
   const goToSubTopicSelect = (phase: Phase, topicId: string) => {
+    if (!phase || !topicId) return;
+    pushToHistory(currentStep);
     setSelectedTopic(topicId);
     setCurrentStep({
       id: "sub-topic",
       type: "sub-topic",
       data: { phase, topicId },
     });
-    setHistory((prev) => [...prev, currentStep!]);
     setSelectedSubTopic(null);
   };
 
   const goToSolution = (phase: Phase, topicId: string, subTopicId: string) => {
+    if (!phase || !topicId || !subTopicId) return;
+    pushToHistory(currentStep);
     setSelectedSubTopic(subTopicId);
     const subTopic = getSubTopic(phase, topicId, subTopicId);
     setCurrentStep({
@@ -104,34 +144,47 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
       type: "solution",
       data: { phase, topicId, subTopicId, subTopic },
     });
-    setHistory((prev) => [...prev, currentStep!]);
   };
 
   const goToTicket = (phase: Phase, topicId: string, subTopicId: string) => {
+    if (!phase || !topicId || !subTopicId) return;
+    pushToHistory(currentStep);
     const subTopic = getSubTopic(phase, topicId, subTopicId);
     setCurrentStep({
       id: "ticket",
       type: "ticket",
       data: { phase, topicId, subTopicId, subTopic },
     });
-    setHistory((prev) => [...prev, currentStep!]);
   };
 
   const goToConfirmation = (data: TicketData) => {
+    pushToHistory(currentStep);
     setCurrentStep({
       id: "confirmation",
       type: "confirmation",
       data: { ticketData: data },
     });
-    setHistory((prev) => [...prev, currentStep!]);
   };
 
   const goBack = () => {
     if (history.length > 0) {
       const previous = history[history.length - 1];
-      setHistory(history.slice(0, -1));
-      setCurrentStep(previous);
+      setHistory((prev) => prev.slice(0, -1));
+      setCurrentStep(previous || null);
+    } else {
+      goToWelcome();
     }
+  };
+
+  // Helper for dynamic static safe phase styles
+  const getPhaseStyle = (colorName: string) => {
+    return (
+      PHASE_STYLES[colorName] || {
+        bg: "bg-emerald-500/10",
+        border: "border-emerald-500/20",
+        hoverBorder: "hover:border-emerald-500/30",
+      }
+    );
   };
 
   // ─── Render: Welcome ───────────────────────────────────────────
@@ -150,20 +203,25 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
 
       {/* Liquid grid */}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
-        {Object.entries(phases).map(([key, phase]) => (
-          <button
-            key={key}
-            onClick={() => goToTopicSelect(key as Phase)}
-            className={`p-4 rounded-xl border bg-zinc-950/40 hover:border-${phase.color}-500/30 transition-all text-center group`}
-          >
-            <div className="flex justify-center mb-2">
-              <div className={`p-2 rounded-full bg-${phase.color}-500/10 border border-${phase.color}-500/20 group-hover:scale-110 transition-transform`}>
-                {phase.icon}
+        {Object.entries(phases).map(([key, phase]) => {
+          const style = getPhaseStyle(phase.color);
+          return (
+            <button
+              key={key}
+              onClick={() => goToTopicSelect(key as Phase)}
+              className={`p-4 rounded-xl border bg-zinc-950/40 ${style.hoverBorder} transition-all text-center group`}
+            >
+              <div className="flex justify-center mb-2">
+                <div
+                  className={`p-2 rounded-full ${style.bg} ${style.border} group-hover:scale-110 transition-transform`}
+                >
+                  {phase.icon}
+                </div>
               </div>
-            </div>
-            <p className="text-xs font-bold text-white">{phase.label}</p>
-          </button>
-        ))}
+              <p className="text-xs font-bold text-white">{phase.label}</p>
+            </button>
+          );
+        })}
       </div>
 
       <div className="relative">
@@ -186,8 +244,8 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
           <p>{t("avgResponseTime")}</p>
         </div>
         <div>
-          <p className="font-bold text-white">🎯 98%</p>
-          <p>{t("satisfactionRate")}</p>
+          <p className="font-bold text-white">  </p>
+          <p>  </p>
         </div>
       </div>
 
@@ -220,23 +278,28 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3">
-        {Object.entries(phases).map(([key, phase]) => (
-          <button
-            key={key}
-            onClick={() => goToTopicSelect(key as Phase)}
-            className={`p-4 rounded-xl border bg-zinc-950/40 hover:border-${phase.color}-500/30 transition-all text-left group`}
-          >
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full bg-${phase.color}-500/10 border border-${phase.color}-500/20 group-hover:scale-110 transition-transform shrink-0`}>
-                {phase.icon}
+        {Object.entries(phases).map(([key, phase]) => {
+          const style = getPhaseStyle(phase.color);
+          return (
+            <button
+              key={key}
+              onClick={() => goToTopicSelect(key as Phase)}
+              className={`p-4 rounded-xl border bg-zinc-950/40 ${style.hoverBorder} transition-all text-left group`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`p-2 rounded-full ${style.bg} ${style.border} group-hover:scale-110 transition-transform shrink-0`}
+                >
+                  {phase.icon}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-white">{phase.label}</p>
+                  <p className="text-xs text-zinc-500">{t("clickToExplore")}</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-white">{phase.label}</p>
-                <p className="text-xs text-zinc-500">{t("clickToExplore")}</p>
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -244,6 +307,7 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
   // ─── Render: Topic Select ──────────────────────────────────────
 
   const renderTopicSelect = (phase: Phase) => {
+    if (!phase || !phases[phase]) return null;
     const topics = getPhaseTopics(phase);
 
     return (
@@ -252,7 +316,7 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
           <button onClick={goBack} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
             <ArrowLeft className="h-5 w-5 text-zinc-400" />
           </button>
-          <h2 className="text-lg font-bold text-white">{phases[phase!].label}</h2>
+          <h2 className="text-lg font-bold text-white">{phases[phase].label}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-2">
@@ -277,6 +341,7 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
   // ─── Render: Sub-Topic Select ──────────────────────────────────
 
   const renderSubTopicSelect = (phase: Phase, topicId: string) => {
+    if (!phase || !topicId) return null;
     const subTopics = getTopicSubTopics(phase, topicId);
     const topic = getPhaseTopics(phase).find((t) => t.id === topicId);
 
@@ -287,7 +352,7 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
             <ArrowLeft className="h-5 w-5 text-zinc-400" />
           </button>
           <div>
-            <h2 className="text-sm font-bold text-white">{topic?.label}</h2>
+            <h2 className="text-sm font-bold text-white">{topic?.label ?? ""}</h2>
             <p className="text-xs text-zinc-500">{t("whatsYourSpecificIssue")}</p>
           </div>
         </div>
@@ -316,8 +381,9 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
     phase: Phase,
     topicId: string,
     subTopicId: string,
-    subTopic: SubTopic
+    subTopic?: SubTopic
   ) => {
+    if (!subTopic) return null;
     const { solutionType, guideContent, troubleshootSteps, escalationReason } = subTopic;
 
     if (solutionType === "guide" && guideContent) return renderGuide(guideContent);
@@ -387,8 +453,8 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
     subTopic: SubTopic
   ) => {
     const currentStepIndex = Object.keys(troubleshootState).length;
-    const currentStep = steps[currentStepIndex];
-    const isComplete = !currentStep || currentStepIndex >= steps.length;
+    const currentStepItem = steps[currentStepIndex];
+    const isComplete = !currentStepItem || currentStepIndex >= steps.length;
 
     const handleOptionSelect = (value: string) => {
       setTroubleshootState((prev) => ({
@@ -444,9 +510,9 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
         </div>
 
         <div className="p-4 rounded-xl border border-white/5 bg-zinc-950/30">
-          <p className="text-sm font-medium text-white mb-3">{currentStep.question}</p>
+          <p className="text-sm font-medium text-white mb-3">{currentStepItem.question}</p>
           <div className="space-y-2">
-            {currentStep.options.map((option) => (
+            {currentStepItem.options.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleOptionSelect(option.value)}
@@ -516,11 +582,33 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
     </div>
   );
 
+  // ─── File Validation Handler ───────────────────────────────────
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setFileError("File size exceeds 5MB limit.");
+      e.target.value = "";
+      return;
+    }
+
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      setFileError("Unsupported file type. Please upload JPEG, PNG, WEBP, or GIF.");
+      e.target.value = "";
+      return;
+    }
+
+    setTicketData((prev) => ({ ...prev, attachment: file }));
+  };
+
   // ─── Render: Ticket ────────────────────────────────────────────
 
   const renderTicket = (phase: Phase, topicId: string, subTopicId: string) => {
     const subTopic = getSubTopic(phase, topicId, subTopicId);
-    const phaseLabel = phase ? phases[phase]?.label : "General";
+    const phaseLabel = phase && phases[phase] ? phases[phase].label : "General";
 
     const handleSubmit = () => {
       setIsSubmitting(true);
@@ -546,7 +634,7 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
         <div className="p-4 rounded-xl border border-white/5 bg-zinc-950/30 space-y-4">
           <div className="text-xs text-zinc-500 space-y-1">
             <p><span className="text-white">{t("category")}</span> {phaseLabel}</p>
-            <p><span className="text-white">{t("issue")}</span> {subTopic?.label}</p>
+            <p><span className="text-white">{t("issue")}</span> {subTopic?.label ?? ""}</p>
           </div>
 
           <div>
@@ -608,20 +696,17 @@ export function SupportFlow({ onOpenLiveChat }: SupportFlowProps) {
             <label className="text-xs font-bold text-zinc-400 mb-1.5 block">{t("screenshotsOptional")}</label>
             <input
               type="file"
-              accept="image/*"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  setTicketData({ ...ticketData, attachment: e.target.files[0] });
-                }
-              }}
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={handleFileChange}
               className="text-xs text-zinc-400 bg-black border border-white/10 rounded-xl p-2 w-full file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-white/5 file:text-white hover:file:bg-white/10"
             />
+            {fileError && <p className="text-xs text-red-400 mt-1.5">{fileError}</p>}
           </div>
         </div>
 
         <button
           onClick={handleSubmit}
-          disabled={!ticketData.email || !ticketData.subject || !ticketData.description || isSubmitting}
+          disabled={!ticketData.email || !ticketData.subject || !ticketData.description || isSubmitting || !!fileError}
           className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-bold rounded-xl h-12 text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2"
         >
           {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Send className="h-4 w-4" /> Submit Ticket</>}
