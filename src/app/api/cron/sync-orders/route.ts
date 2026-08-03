@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getProviderOrdersStatus } from "@/lib/providers/provider.service";
+import { 
+  getProviderOrdersStatus, 
+  createProviderOrder 
+} from "@/lib/providers/provider.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -24,16 +27,22 @@ type ProviderRow = {
   api_key: string;
 };
 
+type ProviderServiceRow = {
+  external_service_id: string | number;
+};
+
 type OrderRow = {
   id: string;
   user_id: string;
   provider_id: string | null;
   provider_order_id: string | null;
-  cost: number | string;
+  target: string | null;
   quantity: number;
+  cost: number | string;
   status: string;
   tracking_code: string | null;
   providers: ProviderRow | ProviderRow[] | null;
+  provider_services: ProviderServiceRow | ProviderServiceRow[] | null;
 };
 
 function normalizeProvider(
@@ -41,6 +50,13 @@ function normalizeProvider(
 ): ProviderRow | null {
   if (!providers) return null;
   return Array.isArray(providers) ? providers[0] ?? null : providers;
+}
+
+function normalizeProviderService(
+  services: OrderRow["provider_services"],
+): ProviderServiceRow | null {
+  if (!services) return null;
+  return Array.isArray(services) ? services[0] ?? null : services;
 }
 
 function mapUpstreamStatus(raw: string): {
@@ -73,7 +89,6 @@ function mapUpstreamStatus(raw: string): {
     return { localStatus: "processing", shouldRefundFull: false, isPartial: false };
   }
 
-  // Unknown → keep processing so we retry next cron
   return { localStatus: "processing", shouldRefundFull: false, isPartial: false };
 }
 
@@ -88,7 +103,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = getAdminClient();
 
-    // Active orders that already have a provider reference
+    // Fetch active orders (both unsubmitted orders AND orders requiring status checks)
     const { data: activeOrders, error: ordersError } = await supabase
       .from("orders")
       .select(
@@ -97,20 +112,23 @@ export async function GET(request: NextRequest) {
         user_id,
         provider_id,
         provider_order_id,
-        cost,
+        target,
         quantity,
+        cost,
         status,
         tracking_code,
         providers (
           id,
           api_url,
           api_key
+        ),
+        provider_services (
+          external_service_id
         )
       `,
       )
       .in("status", ["pending", "processing", "in_progress", "partial"])
-      .not("provider_order_id", "is", null)
-      .order("updated_at", { ascending: true })
+      .order("created_at", { ascending: true })
       .limit(200);
 
     if (ordersError) {
@@ -129,7 +147,12 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Group by provider
+    let submitted = 0;
+    let synchronized = 0;
+    let refunded = 0;
+    const errors: string[] = [];
+
+    // Group for status syncing
     const groups: Record<
       string,
       {
@@ -141,10 +164,62 @@ export async function GET(request: NextRequest) {
 
     for (const raw of activeOrders as OrderRow[]) {
       const provider = normalizeProvider(raw.providers);
-      if (!provider?.api_url || !provider?.api_key || !raw.provider_order_id) {
+      if (!provider?.api_url || !provider?.api_key) continue;
+
+     
+      // ----------------------------------------------------
+      // STAGE A: Order HAS NO provider_order_id -> Submit to Provider
+      // ----------------------------------------------------
+      if (!raw.provider_order_id) {
+        const pService = normalizeProviderService(raw.provider_services);
+        if (!pService?.external_service_id || !raw.target) {
+          errors.push(`order ${raw.id}: missing target or external_service_id`);
+          continue;
+        }
+
+        try {
+          // Convert external_service_id to string to fix TS(2345)
+          const serviceIdStr = String(pService.external_service_id);
+
+          const result = await createProviderOrder(
+            provider.api_url,
+            provider.api_key,
+            serviceIdStr,
+            raw.target,
+            raw.quantity
+          );
+
+          // Access providerOrderId directly to fix TS(2339)
+          const newProviderOrderId = String(result.providerOrderId || "");
+
+          if (newProviderOrderId) {
+            const { error: updateOrderError } = await supabase
+              .from("orders")
+              .update({
+                provider_order_id: newProviderOrderId,
+                provider_response: result.raw ?? result,
+                status: "processing",
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", raw.id);
+
+            if (updateOrderError) {
+              errors.push(`submit update failed for ${raw.id}: ${updateOrderError.message}`);
+            } else {
+              submitted += 1;
+            }
+          } else {
+            errors.push(`submit order ${raw.id}: provider returned empty order ID`);
+          }
+        } catch (err: any) {
+          console.error(`[sync-orders] Order ${raw.id} submit error:`, err);
+          errors.push(`submit order ${raw.id}: ${err.message}`);
+        }
         continue;
       }
-
+      // ----------------------------------------------------
+      // STAGE B: Order HAS provider_order_id -> Group for Batch Status Check
+      // ----------------------------------------------------
       if (!groups[provider.id]) {
         groups[provider.id] = {
           provider,
@@ -157,10 +232,9 @@ export async function GET(request: NextRequest) {
       groups[provider.id].byExternalId[raw.provider_order_id] = raw;
     }
 
-    let synchronized = 0;
-    let refunded = 0;
-    const errors: string[] = [];
-
+    // ----------------------------------------------------
+    // STAGE C: Process Batch Status Updates
+    // ----------------------------------------------------
     for (const providerId of Object.keys(groups)) {
       const { provider, externalIds, byExternalId } = groups[providerId];
 
@@ -178,7 +252,6 @@ export async function GET(request: NextRequest) {
         continue;
       }
 
-      // JAP returns either a map { "123": {...} } or sometimes a single object
       const entries: Array<[string, any]> = Array.isArray(providerStatuses)
         ? []
         : Object.entries(providerStatuses || {});
@@ -191,15 +264,6 @@ export async function GET(request: NextRequest) {
         const upstream = String(metrics.status || "");
         const { localStatus, shouldRefundFull, isPartial } =
           mapUpstreamStatus(upstream);
-
-        // Skip no-op updates (same status, no refund path)
-        if (
-          order.status === localStatus &&
-          !shouldRefundFull &&
-          !isPartial
-        ) {
-          // Still refresh start_count / remains if present
-        }
 
         const startCount =
           metrics.start_count !== undefined && metrics.start_count !== null
@@ -222,7 +286,6 @@ export async function GET(request: NextRequest) {
           refundAmount = Math.max(0, Number((remainsCount * unit).toFixed(4)));
         }
 
-        // Refund once: only when moving into refunded/partial from a non-terminal state
         const alreadyTerminal =
           order.status === "refunded" || order.status === "completed";
 
@@ -256,7 +319,6 @@ export async function GET(request: NextRequest) {
                 refundError,
               });
               errors.push(`refund ${order.id}: ${refundError.message}`);
-              // Still update status below so we don't loop forever without visibility
             } else {
               refunded += 1;
             }
@@ -294,6 +356,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       scanned: activeOrders.length,
+      submitted,
       synchronized,
       refunded,
       errors: errors.length ? errors : undefined,

@@ -36,6 +36,9 @@ export async function proxy(request: NextRequest) {
 	const pathname = url.pathname;
 	const hostname = request.headers.get("host") || "";
 
+	if (pathname.startsWith("/api/cron")) {
+    return NextResponse.next();
+  }
 	// ─── Custom Domain Detection ──────────────────────────────
 	// Add fallback
 	const platformDomain =
