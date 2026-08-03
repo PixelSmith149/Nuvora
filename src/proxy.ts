@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
 	// ─── Custom Domain Detection ──────────────────────────────
 	// Add fallback
 	const platformDomain =
-		process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "nu-vora.com";
+		process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "nu-vora.app";
 	const isLocalhost =
 		hostname.includes("localhost") || hostname.includes("127.0.0.1");
 
