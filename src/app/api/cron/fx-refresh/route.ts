@@ -5,13 +5,24 @@ import { createClient } from "@/lib/supabase/server";
 const CURRENCIES = ["USD", "EUR", "GBP"];
 
 export async function GET(req: NextRequest) {
-    // 1. Verify Authorization Header
-    const authHeader = req.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
+  const authHeader = req.headers.get("authorization");
+  const cronSecret = process.env.CRON_SECRET?.trim();
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  // Defensive Check
+  if (!cronSecret) {
+    console.error("CRON_ERROR: CRON_SECRET is not defined in Vercel environment variables.");
+    return NextResponse.json(
+      { error: "Server misconfiguration: CRON_SECRET missing" },
+      { status: 500 }
+    );
+  }
+
+  const expectedHeader = `Bearer ${cronSecret}`;
+
+  if (authHeader?.trim() !== expectedHeader) {
+    console.warn("CRON_AUTH_FAILED: Received header does not match CRON_SECRET.");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
     const supabase = await createClient();
     const results: Record<string, { count: number; provider: string }> = {};
