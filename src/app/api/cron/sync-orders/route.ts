@@ -27,13 +27,10 @@ type ProviderRow = {
   api_key: string;
 };
 
-type ProviderServiceRow = {
-  external_service_id: string | number;
-};
-
 type OrderRow = {
   id: string;
   user_id: string;
+  service_id: string | null;
   provider_id: string | null;
   provider_order_id: string | null;
   target: string | null;
@@ -42,7 +39,12 @@ type OrderRow = {
   status: string;
   tracking_code: string | null;
   providers: ProviderRow | ProviderRow[] | null;
-  provider_services: ProviderServiceRow | ProviderServiceRow[] | null;
+  services?: {
+    id: string;
+    provider_services?: {
+      external_service_id: string | number;
+    } | { external_service_id: string | number }[] | null;
+  } | { id: string; provider_services?: any }[] | null;
 };
 
 function normalizeProvider(
@@ -50,13 +52,6 @@ function normalizeProvider(
 ): ProviderRow | null {
   if (!providers) return null;
   return Array.isArray(providers) ? providers[0] ?? null : providers;
-}
-
-function normalizeProviderService(
-  services: OrderRow["provider_services"],
-): ProviderServiceRow | null {
-  if (!services) return null;
-  return Array.isArray(services) ? services[0] ?? null : services;
 }
 
 function mapUpstreamStatus(raw: string): {
@@ -103,13 +98,14 @@ export async function GET(request: NextRequest) {
 
     const supabase = getAdminClient();
 
-    // Fetch active orders (both unsubmitted orders AND orders requiring status checks)
+    // 1. Select orders joined via services -> provider_services
     const { data: activeOrders, error: ordersError } = await supabase
       .from("orders")
       .select(
         `
         id,
         user_id,
+        service_id,
         provider_id,
         provider_order_id,
         target,
@@ -122,8 +118,11 @@ export async function GET(request: NextRequest) {
           api_url,
           api_key
         ),
-        provider_services (
-          external_service_id
+        services (
+          id,
+          provider_services (
+            external_service_id
+          )
         )
       `,
       )
@@ -152,7 +151,6 @@ export async function GET(request: NextRequest) {
     let refunded = 0;
     const errors: string[] = [];
 
-    // Group for status syncing
     const groups: Record<
       string,
       {
@@ -162,24 +160,28 @@ export async function GET(request: NextRequest) {
       }
     > = {};
 
-    for (const raw of activeOrders as OrderRow[]) {
+    for (const raw of activeOrders as unknown as OrderRow[]) {
       const provider = normalizeProvider(raw.providers);
       if (!provider?.api_url || !provider?.api_key) continue;
 
-     
       // ----------------------------------------------------
       // STAGE A: Order HAS NO provider_order_id -> Submit to Provider
       // ----------------------------------------------------
       if (!raw.provider_order_id) {
-        const pService = normalizeProviderService(raw.provider_services);
-        if (!pService?.external_service_id || !raw.target) {
+        // Extract external_service_id through services -> provider_services relationship
+        const serviceData = Array.isArray(raw.services) ? raw.services[0] : raw.services;
+        const pServices = serviceData?.provider_services;
+        const pService = Array.isArray(pServices) ? pServices[0] : pServices;
+
+        const externalServiceId = pService?.external_service_id;
+
+        if (!externalServiceId || !raw.target) {
           errors.push(`order ${raw.id}: missing target or external_service_id`);
           continue;
         }
 
         try {
-          // Convert external_service_id to string to fix TS(2345)
-          const serviceIdStr = String(pService.external_service_id);
+          const serviceIdStr = String(externalServiceId);
 
           const result = await createProviderOrder(
             provider.api_url,
@@ -189,7 +191,6 @@ export async function GET(request: NextRequest) {
             raw.quantity
           );
 
-          // Access providerOrderId directly to fix TS(2339)
           const newProviderOrderId = String(result.providerOrderId || "");
 
           if (newProviderOrderId) {
@@ -217,8 +218,9 @@ export async function GET(request: NextRequest) {
         }
         continue;
       }
+
       // ----------------------------------------------------
-      // STAGE B: Order HAS provider_order_id -> Group for Batch Status Check
+      // STAGE B: Order HAS provider_order_id -> Group for Status Check
       // ----------------------------------------------------
       if (!groups[provider.id]) {
         groups[provider.id] = {
