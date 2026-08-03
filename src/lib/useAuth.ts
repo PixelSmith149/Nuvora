@@ -2,14 +2,13 @@
 
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client"; // FIXED: Import function instead of broken object instance
-
+import { createClient } from "@/lib/supabase/client"; 
 export function useUser() {
 	const [user, setUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const supabase = createClient(); // FIXED: Initialized the browser client inside the hook safely
+		const supabase = createClient(); 
 		let mounted = true;
 
 		async function loadUser() {

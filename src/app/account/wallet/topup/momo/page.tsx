@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import BackButton from "@/components/BackButton";
-import supabase from "@/lib/supabase/client";
 import { useUser } from "@/lib/useAuth";
 
 type MoMoNetwork = { label: string; value: string };
+
 type MoMoCountry = {
   code: string;
   currency: string;
@@ -13,6 +14,15 @@ type MoMoCountry = {
   name: string;
   networks: MoMoNetwork[];
 };
+
+type UiStatus =
+  | "idle"
+  | "awaiting_input"
+  | "processing"
+  | "requires_otp"
+  | "prompt_sent"
+  | "confirmed"
+  | "failed";
 
 const MOMO_COUNTRIES: MoMoCountry[] = [
   {
@@ -56,21 +66,26 @@ const MOMO_COUNTRIES: MoMoCountry[] = [
   },
 ];
 
+const MAX_POLL_ATTEMPTS = 40;
+const POLL_MS = 3000;
+
 export default function MomoPage() {
+  const router = useRouter();
   const { user } = useUser();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [amount, setAmount] = useState("");
   const [activeCountryIdx, setActiveCountryIdx] = useState(0);
   const [network, setNetwork] = useState(MOMO_COUNTRIES[0].networks[0].value);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [activeReference, setActiveReference] = useState<string | null>(null);
-  const [status, setStatus] = useState<
-    "idle" | "awaiting_input" | "processing" | "requires_otp" | "prompt_sent" | "confirmed"
-  >("idle");
+  const [status, setStatus] = useState<UiStatus>("idle");
+  const [hint, setHint] = useState<string | null>(null);
+
+  const pollAttemptsRef = useRef(0);
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelledRef = useRef(false);
 
   const currentCountry = MOMO_COUNTRIES[activeCountryIdx];
 
@@ -82,27 +97,114 @@ export default function MomoPage() {
     setNetwork(MOMO_COUNTRIES[activeCountryIdx].networks[0].value);
   }, [activeCountryIdx]);
 
-  const handleCountrySelect = (index: number) => {
-    setActiveCountryIdx(index);
-    if (scrollContainerRef.current) {
-      const element = scrollContainerRef.current.children[index] as HTMLElement;
-      if (element) {
-        scrollContainerRef.current.scrollTo({
-          left: element.offsetLeft - scrollContainerRef.current.offsetWidth / 2 + element.offsetWidth / 2,
-          behavior: "smooth",
-        });
-      }
+  useEffect(() => {
+    return () => {
+      cancelledRef.current = true;
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
+    };
+  }, []);
+
+  const clearPoll = () => {
+    if (pollTimerRef.current) {
+      clearTimeout(pollTimerRef.current);
+      pollTimerRef.current = null;
     }
   };
 
+  const goToCallback = (reference: string) => {
+    router.replace(
+      `/account/wallet/paystack/callback?reference=${encodeURIComponent(reference)}`,
+    );
+  };
+
+  async function pollPayment(reference: string) {
+    if (cancelledRef.current) return;
+
+    try {
+      const res = await fetch("/api/wallet/paystack/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (cancelledRef.current) return;
+
+      const next = String(data.status || "").toLowerCase();
+
+      if (next === "success" || next === "completed") {
+        clearPoll();
+        setStatus("confirmed");
+        setHint("Payment confirmed. Redirecting…");
+        setTimeout(() => goToCallback(reference), 800);
+        return;
+      }
+
+      if (next === "failed" || next === "abandoned" || next === "reversed") {
+        clearPoll();
+        setStatus("failed");
+        setHint(data.message || data.error || "Payment failed or was cancelled.");
+        setActiveReference(null);
+        return;
+      }
+
+      // pending / ongoing / processing / unknown → keep polling
+      pollAttemptsRef.current += 1;
+
+      if (pollAttemptsRef.current >= MAX_POLL_ATTEMPTS) {
+        clearPoll();
+        setHint(
+          "Still processing. If you approved the prompt, open the wallet in a moment or use the callback link.",
+        );
+        // Send user to callback page so it can keep verifying
+        goToCallback(reference);
+        return;
+      }
+
+      setStatus("prompt_sent");
+      setHint("Waiting for Mobile Money approval…");
+      pollTimerRef.current = setTimeout(() => pollPayment(reference), POLL_MS);
+    } catch {
+      if (cancelledRef.current) return;
+
+      pollAttemptsRef.current += 1;
+      if (pollAttemptsRef.current >= MAX_POLL_ATTEMPTS) {
+        clearPoll();
+        setHint("Network issue while checking payment. Opening confirmation page…");
+        goToCallback(reference);
+        return;
+      }
+
+      pollTimerRef.current = setTimeout(() => pollPayment(reference), POLL_MS);
+    }
+  }
+
+  function startPolling(reference: string) {
+    clearPoll();
+    cancelledRef.current = false;
+    pollAttemptsRef.current = 0;
+    setActiveReference(reference);
+    setStatus("prompt_sent");
+    setHint("Check your phone and approve the MoMo prompt.");
+    void pollPayment(reference);
+  }
+
   async function generateMomoInvoice() {
-    if (!user) return alert("Authentication required.");
+    if (!user) {
+      alert("Authentication required.");
+      return;
+    }
     if (!amount || Number(amount) <= 0 || !phone.trim()) {
-      return alert("Please enter a valid amount and phone number.");
+      alert("Please enter a valid amount and phone number.");
+      return;
     }
 
+    clearPoll();
     setLoading(true);
     setStatus("processing");
+    setHint(null);
+    setOtp("");
 
     try {
       const res = await fetch("/api/wallet/topup/momo", {
@@ -118,33 +220,32 @@ export default function MomoPage() {
       });
 
       const data = await res.json();
+
       if (!res.ok || !data.success || !data.reference) {
         throw new Error(data.error || "Charge initialization failed.");
       }
 
-      await supabase.from("wallet_transactions").insert([
-        {
-          user_id: user.id,
-          amount: Number(amount),
-          currency: currentCountry.currency,
-          reference: data.reference,
-          type: "deposit",
-          status: "pending",
-          network,
-          phone_number: phone.trim(),
-        },
-      ]);
-
-      setActiveReference(data.reference);
+      // Do NOT insert wallet_transactions from the client.
+      // Server route must create the pending row.
 
       if (data.status === "send_otp") {
+        setActiveReference(data.reference);
         setStatus("requires_otp");
+        setHint(data.displayText || "Enter the OTP sent to your phone.");
       } else {
-        setStatus("prompt_sent");
+        // pay_offline | pending | success | etc.
+        if (String(data.status).toLowerCase() === "success") {
+          setStatus("confirmed");
+          setActiveReference(data.reference);
+          setTimeout(() => goToCallback(data.reference), 800);
+        } else {
+          startPolling(data.reference);
+        }
       }
     } catch (error: any) {
-      alert(error.message || "Failed to process Mobile Money top-up.");
-      setStatus("awaiting_input");
+      setStatus("failed");
+      setHint(error?.message || "Failed to process Mobile Money top-up.");
+      alert(error?.message || "Failed to process Mobile Money top-up.");
     } finally {
       setLoading(false);
     }
@@ -152,7 +253,8 @@ export default function MomoPage() {
 
   async function submitOtpCode() {
     if (!otp.trim() || !activeReference) {
-      return alert("Please enter the verification code sent to your phone.");
+      alert("Please enter the verification code sent to your phone.");
+      return;
     }
 
     setLoading(true);
@@ -160,49 +262,40 @@ export default function MomoPage() {
       const res = await fetch("/api/wallet/topup/momo/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ otp: otp.trim(), reference: activeReference }),
+        body: JSON.stringify({
+          otp: otp.trim(),
+          reference: activeReference,
+        }),
       });
 
       const data = await res.json();
+
       if (!res.ok || !data.success) {
         throw new Error(data.error || "OTP verification failed.");
       }
 
-      setStatus("prompt_sent");
+      // After OTP, Paystack sends USSD / prompt — start polling
+      startPolling(activeReference);
     } catch (error: any) {
-      alert(error.message || "Error submitting OTP.");
+      alert(error?.message || "Error submitting OTP.");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    if (status !== "prompt_sent" || !activeReference) return;
+  function resetForm() {
+    clearPoll();
+    setAmount("");
+    setPhone("");
+    setOtp("");
+    setActiveReference(null);
+    setHint(null);
+    setStatus("awaiting_input");
+    pollAttemptsRef.current = 0;
+  }
 
-    const channel = supabase
-      .channel(`momo-wallet-${activeReference}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "wallet_transactions",
-          filter: `reference=eq.${activeReference}`,
-        },
-        (payload) => {
-          const updatedTx = payload.new as { status?: string };
-          if (updatedTx?.status === "success") {
-            setStatus("confirmed");
-            setActiveReference(null);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [status, activeReference]);
+  const formLocked =
+    loading || status === "prompt_sent" || status === "processing";
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col">
@@ -216,70 +309,122 @@ export default function MomoPage() {
           </p>
         </div>
 
+        {hint && status !== "confirmed" && (
+          <div className="mb-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-zinc-300">
+            {hint}
+          </div>
+        )}
+
+        {/* OTP step */}
         {status === "requires_otp" && (
-          <div className="mb-6 p-6 rounded-xl border border-yellow-500/30 bg-yellow-500/10 space-y-4">
-            <h3 className="font-bold text-yellow-400 text-sm">SMS Authorization Code Required</h3>
+          <div className="mb-6 space-y-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-6">
+            <h3 className="text-sm font-bold text-yellow-400">
+              SMS Authorization Code Required
+            </h3>
             <p className="text-xs text-white/70">
-              Paystack sent a verification code via SMS to <span className="font-mono">{phone}</span>. Please enter it below to authorize the direct charge.
+              Paystack sent a verification code via SMS to{" "}
+              <span className="font-mono">{phone}</span>. Enter it below to
+              authorize the charge.
             </p>
             <input
               type="text"
+              inputMode="numeric"
               placeholder="Enter SMS OTP Code"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="w-full p-4 bg-black border border-white/20 rounded-xl outline-none font-mono text-center text-lg tracking-widest focus:border-yellow-400"
+              className="w-full rounded-xl border border-white/20 bg-black p-4 text-center font-mono text-lg tracking-widest outline-none focus:border-yellow-400"
             />
             <button
               type="button"
               onClick={submitOtpCode}
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-yellow-400 text-black font-bold text-sm hover:bg-yellow-300 transition"
+              className="w-full rounded-xl bg-yellow-400 py-3.5 text-sm font-bold text-black transition hover:bg-yellow-300 disabled:opacity-50"
             >
               {loading ? "Verifying..." : "Confirm & Trigger Prompt"}
+            </button>
+            <button
+              type="button"
+              onClick={resetForm}
+              className="w-full py-2 text-xs text-zinc-500 hover:text-white"
+            >
+              Cancel
             </button>
           </div>
         )}
 
+        {/* Waiting for phone approval */}
         {status === "prompt_sent" && (
-          <div className="mb-6 p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-center space-y-2">
-            <p className="text-emerald-400 font-bold animate-pulse text-sm">
-              📲 USSD PIN Prompt Sent!
+          <div className="mb-6 space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center">
+            <p className="animate-pulse text-sm font-bold text-emerald-400">
+              📲 Approve on your phone
             </p>
             <p className="text-xs text-white/60">
-              Check your mobile device screen and enter your Mobile Money PIN to complete authorization.
+              Enter your Mobile Money PIN on the device prompt. We&apos;re
+              checking payment status automatically.
             </p>
+            {activeReference && (
+              <p className="break-all font-mono text-[10px] text-zinc-500">
+                Ref: {activeReference}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={() =>
+                activeReference && goToCallback(activeReference)
+              }
+              className="text-xs text-zinc-400 underline hover:text-white"
+            >
+              Open confirmation page
+            </button>
           </div>
         )}
 
+        {/* Confirmed */}
         {status === "confirmed" ? (
-          <button
-            type="button"
-            onClick={() => {
-              setAmount("");
-              setPhone("");
-              setOtp("");
-              setStatus("awaiting_input");
-            }}
-            className="w-full py-4 rounded-xl bg-white text-black font-bold tracking-wide hover:bg-white/90 transition"
-          >
-            Create New Deposit
-          </button>
+          <div className="space-y-4 text-center">
+            <p className="text-sm font-bold text-emerald-400">
+              Deposit confirmed
+            </p>
+            <button
+              type="button"
+              onClick={() =>
+                activeReference
+                  ? goToCallback(activeReference)
+                  : router.push("/account/wallet")
+              }
+              className="w-full rounded-xl bg-white py-4 font-bold tracking-wide text-black transition hover:bg-white/90"
+            >
+              Continue to wallet
+            </button>
+            <button
+              type="button"
+              onClick={resetForm}
+              className="w-full py-2 text-xs text-zinc-500 hover:text-white"
+            >
+              New deposit
+            </button>
+          </div>
         ) : (
-          status !== "requires_otp" && (
+          status !== "requires_otp" &&
+          status !== "prompt_sent" && (
             <div className="space-y-4">
+              {/* Country / currency */}
               <div className="relative w-full">
-                <div className="flex flex-row gap-2 overflow-x-auto pb-2 px-4 scrollbar-none snap-x touch-pan-x" style={{ scrollbarWidth: "none" }}>
+                <div
+                  className="flex flex-row gap-2 overflow-x-auto px-1 pb-2 snap-x touch-pan-x"
+                  style={{ scrollbarWidth: "none" }}
+                >
                   {MOMO_COUNTRIES.map((country, idx) => (
                     <button
                       key={country.code}
                       type="button"
-                      onClick={() => handleCountrySelect(idx)}
-                      disabled={loading || status === "prompt_sent"}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all shrink-0 snap-center ${
+                      onClick={() => setActiveCountryIdx(idx)}
+                      disabled={formLocked}
+                      className={`flex shrink-0 snap-center items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold transition-all ${
                         activeCountryIdx === idx
-                          ? "bg-white text-black border-white scale-105"
-                          : "bg-white/[0.02] text-zinc-400 border-white/5 hover:border-white/20"
-                      }`}
+                          ? "scale-105 border-white bg-white text-black"
+                          : "border-white/5 bg-white/[0.02] text-zinc-400 hover:border-white/20"
+                      } disabled:opacity-40`}
                     >
                       <span>{country.flag}</span>
                       <span className="font-mono">{country.currency}</span>
@@ -288,26 +433,26 @@ export default function MomoPage() {
                 </div>
               </div>
 
+              {/* Amount + network */}
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-mono">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-500">
                     {currentCountry.currency}
                   </span>
                   <input
                     type="number"
-                    disabled={loading || status === "prompt_sent"}
+                    disabled={formLocked}
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="w-full pl-14 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl outline-none font-mono text-base focus:border-white/30 transition disabled:opacity-40"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-14 pr-4 font-mono text-base outline-none transition focus:border-white/30 disabled:opacity-40"
                   />
                 </div>
-
                 <select
-                  disabled={loading || status === "prompt_sent"}
+                  disabled={formLocked}
                   value={network}
                   onChange={(e) => setNetwork(e.target.value)}
-                  className="w-40 bg-black border border-white/10 rounded-xl p-4 text-xs font-bold focus:border-white/30 outline-none cursor-pointer disabled:opacity-40"
+                  className="w-40 cursor-pointer rounded-xl border border-white/10 bg-black p-4 text-xs font-bold outline-none focus:border-white/30 disabled:opacity-40"
                 >
                   {currentCountry.networks.map((net) => (
                     <option key={net.value} value={net.value}>
@@ -319,18 +464,24 @@ export default function MomoPage() {
 
               <input
                 type="tel"
-                disabled={loading || status === "prompt_sent"}
-                placeholder="Wallet number (e.g., 024XXXXXXX)"
+                disabled={formLocked}
+                placeholder="Wallet number (e.g. 024XXXXXXX)"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none text-base font-mono focus:border-white/30 transition disabled:opacity-40"
+                className="w-full rounded-xl border border-white/10 bg-white/5 p-4 font-mono text-base outline-none transition focus:border-white/30 disabled:opacity-40"
               />
+
+              {status === "failed" && (
+                <p className="text-center text-xs text-red-400">
+                  {hint || "Something went wrong. Try again."}
+                </p>
+              )}
 
               <button
                 type="button"
                 onClick={generateMomoInvoice}
-                disabled={loading || status === "prompt_sent"}
-                className="w-full py-4 rounded-xl font-black transition bg-white text-black disabled:opacity-40 tracking-wider text-sm shadow-xl hover:bg-white/90"
+                disabled={formLocked || !user}
+                className="w-full rounded-xl bg-white py-4 text-sm font-black tracking-wider text-black shadow-xl transition hover:bg-white/90 disabled:opacity-40"
               >
                 {loading ? "Processing..." : "Authorize Network Deposit"}
               </button>

@@ -1,4 +1,4 @@
-import SupportPage from "@/components/SupportPage";
+import SupportPage from "@/components/support/SupportPage";
 
 export default function SupportRoute() {
 	return <SupportPage />;

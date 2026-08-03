@@ -1,159 +1,93 @@
-// app/api/market-place/verify-socio/route.ts
-
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { type NextRequest, NextResponse } from "next/server";
-import { runAssetVerificationEngine } from "@/lib/accountAuditor";
+import { runAssetVerificationEngine } from "@/services/accountAuditor"; // ← new modular engine
 
-// ─── Module-scoped admin client (initialized once) ─────────
-const supabaseUrl =
-	process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey =
-	process.env.SUPABASE_SERVICE_ROLE_KEY ||
-	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseServiceKey) {
-	console.error("❌ [ROUTE] Supabase env vars missing at module init");
-}
-
-const supabaseAdmin =
-	supabaseUrl && supabaseServiceKey
-		? createClient(supabaseUrl, supabaseServiceKey)
-		: null;
-
-// ─── Helper: resolve the user ID from the JWT ──────────────
-async function resolveUserId(
-	authHeader: string | null,
-): Promise<string | null> {
-	if (!authHeader || !supabaseUrl || !supabaseServiceKey) return null;
-
-	// Use a short-lived client that carries the user's JWT
-	const userClient = createClient(supabaseUrl, supabaseServiceKey, {
-		global: { headers: { Authorization: authHeader } },
-	});
-
-	const {
-		data: { user },
-		error,
-	} = await userClient.auth.getUser();
-
-	if (error || !user) {
-		console.error(
-			"❌ [ROUTE] Failed to resolve user from JWT:",
-			error?.message,
-		);
-		return null;
-	}
-	return user.id;
-}
-
-// ─── POST handler ──────────────────────────────────────────
 export async function POST(req: NextRequest) {
-	try {
-		if (!supabaseAdmin) {
-			return NextResponse.json(
-				{
-					error: "Server cluster failed to resolve environment configurations.",
-				},
-				{ status: 500 },
-			);
-		}
+  try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-		const authHeader = req.headers.get("Authorization");
-		const userId = await resolveUserId(authHeader);
-		if (!userId) {
-			return NextResponse.json(
-				{ error: "Unauthenticated operational access." },
-				{ status: 401 },
-			);
-		}
+    const token = authHeader.replace("Bearer ", "");
 
-		// ✅ FIX: Parse all fields including facebookUsername
-		const { auditId, platformId, username, password, facebookUsername } =
-			await req.json();
+    // Verify user
+    const supabaseUser = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+      }
+    );
 
-		if (!auditId || !platformId || !username || !password) {
-			return NextResponse.json(
-				{ error: "Missing core tracking parameters." },
-				{ status: 400 },
-			);
-		}
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseUser.auth.getUser();
 
-		// 1. Fetch platform config
-		const { data: configRow, error: configError } = await supabaseAdmin
-			.from("platform_configurations")
-			.select("*")
-			.eq("id", platformId)
-			.single();
+    if (authError || !user) {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
 
-		if (configError || !configRow) {
-			return NextResponse.json(
-				{ error: "Target platform selector footprint unmapped." },
-				{ status: 404 },
-			);
-		}
+    const body = await req.json();
+    const { auditId, platformId, username, password, facebookUsername } = body;
 
-		// 2. Verify the audit record exists AND belongs to this user
-		const { data: auditRow } = await supabaseAdmin
-			.from("asset_audits")
-			.select("id, user_id")
-			.eq("id", auditId)
-			.maybeSingle();
+    if (!auditId || !platformId || !username || !password) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
 
-		if (!auditRow) {
-			return NextResponse.json(
-				{ error: "Audit record not found. Please restart the process." },
-				{ status: 404 },
-			);
-		}
+    // Load platform config
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-		// Stamp user_id onto the audit row so RLS policies can match it
-		if (!auditRow.user_id) {
-			await supabaseAdmin
-				.from("asset_audits")
-				.update({ user_id: userId })
-				.eq("id", auditId);
-		}
+    const { data: config, error: configError } = await supabaseAdmin
+      .from("platform_configurations")
+      .select("*")
+      .eq("id", platformId)
+      .single();
 
-		// 3. Invoke the Playwright engine.
-		//    ✅ FIX: Include facebookUsername in the authGroup
-		const isFacebook =
-			platformId === "facebook" || platformId === "facebook_com";
+    if (configError || !config) {
+      return NextResponse.json(
+        { error: `Platform config not found: ${platformId}` },
+        { status: 404 }
+      );
+    }
 
-		runAssetVerificationEngine({
-			auditId,
-			config: configRow,
-			authGroup: {
-				u: username,
-				p: password,
-				// ✅ FIX: Only pass facebookUsername if it's a Facebook platform
-				...(isFacebook && facebookUsername ? { facebookUsername } : {}),
-			},
-		}).catch(async (err) => {
-			console.error("🚨 Background worker error:", err.message);
-			try {
-				await supabaseAdmin
-					.from("asset_audits")
-					.update({
-						status: "FAILED_TIMEOUT",
-						error_message: `Worker crashed: ${err.message}`,
-					})
-					.eq("id", auditId);
-			} catch (dbErr) {
-				console.warn("Failed to update error status in database:", dbErr);
-			}
-		});
+    // Fire and forget the worker (do not await long running process)
+    runAssetVerificationEngine({
+      auditId,
+      config: {
+        id: config.id,
+        login_url: config.login_url,
+        username_selector: config.username_selector,
+        password_selector: config.password_selector,
+        submit_selector: config.submit_selector,
+        followers_extractor_js: config.followers_extractor_js || null,
+      },
+      authGroup: {
+        u: username,
+        p: password,
+        facebookUsername: facebookUsername || undefined,
+      },
+    }).catch((err) => {
+      console.error("Worker crashed:", err);
+    });
 
-		// Return immediate acknowledgment — the frontend tracks progress via realtime
-		return NextResponse.json(
-			{
-				processing: true,
-				status: "INITIALIZED",
-				message: "Verification worker started. Monitor progress via the UI.",
-			},
-			{ status: 202 },
-		);
-	} catch (err: any) {
-		console.error("🚨 Route failure:", err);
-		return NextResponse.json({ error: err.message }, { status: 500 });
-	}
+    return NextResponse.json({
+      success: true,
+      message: "Verification worker started",
+      auditId,
+    });
+  } catch (error: any) {
+    console.error("verify-socio error:", error);
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

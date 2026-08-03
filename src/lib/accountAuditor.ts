@@ -87,10 +87,6 @@ async function updateAudit(
 	fields: Record<string, unknown>,
 ) {
 	try {
-		console.log(
-			`📝 [DB UPDATE] Updating audit ${auditId} with:`,
-			JSON.stringify(fields, null, 2),
-		);
 
 		// ✅ REMOVED .select() - it was causing the update to fail
 		 const { error } = await (supabase
@@ -107,10 +103,6 @@ async function updateAudit(
 			return null;
 		}
 
-		console.log(
-			`✅ [DB UPDATE] Success for audit ${auditId}. Updated fields:`,
-			Object.keys(fields).join(", "),
-		);
 		return { success: true };
 	} catch (e) {
 		console.error(`❌ [DB UPDATE EXCEPTION] audit=${auditId}`, e);
@@ -140,7 +132,6 @@ async function sendToastLog(
 		});
 
 		if (result) {
-			console.log(`💬 [TOAST] ${title}: ${description}`);
 		} else {
 			console.error(`❌ [TOAST] Failed to save toast: ${title}`);
 		}
@@ -224,7 +215,6 @@ async function captureScreenshot(
 
 		const publicUrl = urlData?.publicUrl || null;
 		if (publicUrl) {
-			console.log(`📸 [SCREENSHOT] Captured ${phase}: ${publicUrl}`);
 		}
 		return publicUrl;
 	} catch (e: unknown) {
@@ -355,9 +345,8 @@ async function extractPageMessage(
 		});
 
 		if (message) {
-			console.log(`💬 [PAGE MESSAGE] Platform says: "${message}"`);
+			
 		} else {
-			console.log(`💬 [PAGE MESSAGE] No error/toast message detected on page.`);
 		}
 		return message;
 	} catch (e: unknown) {
@@ -407,7 +396,6 @@ async function clickTryAnotherWay(
 		});
 
 		if (result) {
-			console.log('✅ [WORKER LOG] "Try another way" clicked via JavaScript');
 			await sleep(3000);
 			return true;
 		}
@@ -432,7 +420,6 @@ async function clickTryAnotherWay(
 				const element = page.locator(sel).first();
 				if (await element.isVisible({ timeout: 3000 }).catch(() => false)) {
 					await element.click({ force: true });
-					console.log(`✅ [WORKER LOG] "Try another way" clicked via: ${sel}`);
 					await sleep(3000);
 					return true;
 				}
@@ -537,7 +524,7 @@ async function proceedToScraping(
 		"success",
 	);
 
-	console.log(`✅ [WORKER LOG] Asset verified. Followers: ${followersCount}`);
+	
 }
 
 // ============================================================
@@ -551,10 +538,10 @@ async function detectOutcome(
 ): Promise<Outcome> {
 	try {
 		const currentUrl = page.url();
-		console.log(`📍 Current URL: ${currentUrl}`);
+		// console.log(`📍 Current URL: ${currentUrl}`);
 
 		if (pageMessage) {
-			console.log(`💬 [DETECT] Platform message evidence: "${pageMessage}"`);
+			// console.log(`💬 [DETECT] Platform message evidence: "${pageMessage}"`);
 		}
 
 		// ─── CHECK FOR FACEBOOK 2FA/PASSKEY SPECIFICALLY ───
@@ -569,7 +556,7 @@ async function detectOutcome(
 				currentUrl.includes("checkpoint");
 
 			if (is2FAPage) {
-				console.log("🔐 [DETECT] Facebook 2FA/Passkey page detected");
+				// console.log("🔐 [DETECT] Facebook 2FA/Passkey page detected");
 
 				const passkeyPrompt = await page
 					.locator(
@@ -579,9 +566,7 @@ async function detectOutcome(
 					.catch(() => false);
 
 				if (passkeyPrompt) {
-					console.log(
-						"🔐 [DETECT] Facebook Passkey/WebAuthn prompt → NEEDS_VERIFICATION_CODE",
-					);
+					// console.log("🔐 [DETECT] Facebook Passkey/WebAuthn prompt → NEEDS_VERIFICATION_CODE");
 					return "NEEDS_VERIFICATION_CODE";
 				}
 
@@ -591,9 +576,6 @@ async function detectOutcome(
 					.catch(() => false);
 
 				if (tryAnotherWay) {
-					console.log(
-						'🔐 [DETECT] Facebook 2FA with "Try another way" → NEEDS_VERIFICATION_CODE',
-					);
 					return "NEEDS_VERIFICATION_CODE";
 				}
 
@@ -605,15 +587,11 @@ async function detectOutcome(
 					.catch(() => false);
 
 				if (codeInput) {
-					console.log(
-						"🔐 [DETECT] Facebook 2FA code input visible → NEEDS_VERIFICATION_CODE",
-					);
+				
 					return "NEEDS_VERIFICATION_CODE";
 				}
 
-				console.log(
-					"🔐 [DETECT] Facebook 2FA page detected (generic) → NEEDS_VERIFICATION_CODE",
-				);
+			
 				return "NEEDS_VERIFICATION_CODE";
 			}
 		}
@@ -651,9 +629,9 @@ async function detectOutcome(
 			currentUrl.includes("two_step");
 
 		if (dynamicCodeBox || mfaUrlStructure) {
-			console.log(
-				"🔐 [DETECT] Security challenge structure pattern identified → NEEDS_VERIFICATION_CODE",
-			);
+			// console.log(
+			// 	"🔐 [DETECT] Security challenge structure pattern identified → NEEDS_VERIFICATION_CODE",
+			// );
 			return "NEEDS_VERIFICATION_CODE";
 		}
 
@@ -666,9 +644,9 @@ async function detectOutcome(
 			.catch(() => false);
 
 		if (passkeyText) {
-			console.log(
-				"🔐 [DETECT] Passkey/WebAuthn prompt detected → NEEDS_VERIFICATION_CODE",
-			);
+			// console.log(
+			// 	"🔐 [DETECT] Passkey/WebAuthn prompt detected → NEEDS_VERIFICATION_CODE",
+			// );
 			return "NEEDS_VERIFICATION_CODE";
 		}
 
@@ -705,7 +683,7 @@ async function detectOutcome(
 						.isVisible({ timeout: 3000 })
 						.catch(() => false)
 				) {
-					console.log("✅ [DETECT] Facebook home page detected → SUCCESS");
+					// console.log("✅ [DETECT] Facebook home page detected → SUCCESS");
 					return "SUCCESS";
 				}
 			}
@@ -714,9 +692,9 @@ async function detectOutcome(
 				currentUrl.includes("facebook.com") &&
 				!currentUrl.includes("/home")
 			) {
-				console.log(
-					"🔐 [DETECT] Facebook page without home elements, checking for 2FA...",
-				);
+				// console.log(
+				// 	"🔐 [DETECT] Facebook page without home elements, checking for 2FA...",
+				//);
 				return "NEEDS_VERIFICATION_CODE";
 			}
 		}
@@ -739,9 +717,9 @@ async function detectOutcome(
 				.catch(() => false);
 
 			if (inlineVerification) {
-				console.log(
-					"🔐 [DETECT] Verification code input field visible → NEEDS_VERIFICATION_CODE",
-				);
+				// console.log(
+				// 	"🔐 [DETECT] Verification code input field visible → NEEDS_VERIFICATION_CODE",
+				// );
 				return "NEEDS_VERIFICATION_CODE";
 			}
 
@@ -765,9 +743,9 @@ async function detectOutcome(
 
 				for (const pattern of credErrorPatterns) {
 					if (lowerMsg.includes(pattern)) {
-						console.log(
-							`🚫 [DETECT] Page message contains "${pattern}" → BAD_CREDS`,
-						);
+						// console.log(
+						// 	`🚫 [DETECT] Page message contains "${pattern}" → BAD_CREDS`,
+						// );
 						return "BAD_CREDS";
 					}
 				}
@@ -782,18 +760,18 @@ async function detectOutcome(
 					.catch(() => false);
 
 				if (errorText) {
-					console.log(
-						"🚫 [DETECT] Error text visible on login page → BAD_CREDS",
-					);
+					// console.log(
+					// 	"🚫 [DETECT] Error text visible on login page → BAD_CREDS",
+					// );
 					return "BAD_CREDS";
 				}
 			} catch (e) {
 				// Ignore
 			}
 
-			console.log(
-				"⚠️ [DETECT] Login page still visible but no credential evidence. Returning UNKNOWN.",
-			);
+			// console.log(
+			// 	"⚠️ [DETECT] Login page still visible but no credential evidence. Returning UNKNOWN.",
+		//	);
 			return "UNKNOWN";
 		}
 
@@ -807,9 +785,9 @@ async function detectOutcome(
 				.catch(() => false);
 
 			if (verificationPrompt) {
-				console.log(
-					"🔐 [DETECT] Verification prompt on post-login page → NEEDS_VERIFICATION_CODE",
-				);
+				// console.log(
+				// 	"🔐 [DETECT] Verification prompt on post-login page → NEEDS_VERIFICATION_CODE",
+				// );
 				return "NEEDS_VERIFICATION_CODE";
 			}
 		} catch (e) {
@@ -833,12 +811,12 @@ async function detectOutcome(
 					.isVisible({ timeout: 3000 })
 					.catch(() => false)
 			) {
-				console.log("✅ [DETECT] Profile content visible → SUCCESS");
+				// console.log("✅ [DETECT] Profile content visible → SUCCESS");
 				return "SUCCESS";
 			}
 		}
 
-		console.log("✅ [DETECT] Off login page, no verification prompt → SUCCESS");
+		// // console.log("✅ [DETECT] Off login page, no verification prompt → SUCCESS");
 		return "SUCCESS";
 	} catch (error) {
 		console.warn("⚠️ State detection failed, defaulting to BAD_CREDS:", error);
@@ -889,12 +867,7 @@ export async function runAssetVerificationEngine({
 		);
 		return;
 	}
-	console.log(`📝 [WORKER] Attempting to set status to AUTHENTICATING...`);
-	console.log(`✅ [WORKER] Status successfully updated to AUTHENTICATING`);
-
-	console.log(
-		`✅ [WORKER] Audit row confirmed in DB. Current status: ${existingRow.status}`,
-	);
+	
 	await sendToastLog(
 		supabase,
 		auditId,
@@ -950,7 +923,7 @@ export async function runAssetVerificationEngine({
 		(window as any).chrome = { runtime: {} };
 	});
 
-	console.log(`🤖 [WORKER LOG] Starting verification for audit: [${auditId}]`);
+	// // console.log(`🤖 [WORKER LOG] Starting verification for audit: [${auditId}]`);
 
 	try {
 		await updateAudit(supabase, auditId, { status: "AUTHENTICATING" });
@@ -961,7 +934,7 @@ export async function runAssetVerificationEngine({
 			`Navigating to ${config.id} login page...`,
 		);
 
-		console.log(`🌍 [WORKER LOG] Navigating to: ${config.login_url}`);
+		// // console.log(`🌍 [WORKER LOG] Navigating to: ${config.login_url}`);
 		await page.goto(config.login_url, {
 			waitUntil: "domcontentloaded",
 			timeout: 45000,
@@ -975,7 +948,7 @@ export async function runAssetVerificationEngine({
 
 		// ─── X/Twitter Flow ─────────────────────────────────────
 		if (config.login_url.includes("x.com")) {
-			console.log(`🐦 [WORKER LOG] X/Twitter specialized flow...`);
+			// // console.log(`🐦 [WORKER LOG] X/Twitter specialized flow...`);
 			await sendToastLog(
 				supabase,
 				auditId,
@@ -1031,7 +1004,7 @@ export async function runAssetVerificationEngine({
 
 		// ─── Google Flow ────────────────────────────────────────
 		else if (config.login_url.includes("accounts.google.com")) {
-			console.log(`🔴 [WORKER LOG] Google specialized flow...`);
+			// // console.log(`🔴 [WORKER LOG] Google specialized flow...`);
 			await sendToastLog(
 				supabase,
 				auditId,
@@ -1088,7 +1061,7 @@ export async function runAssetVerificationEngine({
 
 		// ─── Facebook Flow (REPLACE the entire Facebook section) ───
 		else if (config.login_url.includes("facebook.com")) {
-			console.log(`📘 [WORKER LOG] Facebook specialized flow...`);
+			// // console.log(`📘 [WORKER LOG] Facebook specialized flow...`);
 			await sendToastLog(
 				supabase,
 				auditId,
@@ -1102,7 +1075,7 @@ export async function runAssetVerificationEngine({
 			await sleep(2000);
 
 			// ─── STEP 2: Try multiple strategies to find the email field ───
-			console.log("🔍 [WORKER LOG] Looking for Facebook login fields...");
+			// // console.log("🔍 [WORKER LOG] Looking for Facebook login fields...");
 
 			let emailFieldFound = false;
 			let passwordFieldFound = false;
@@ -1131,7 +1104,7 @@ export async function runAssetVerificationEngine({
 				try {
 					const input = page.locator(sel).first();
 					if (await input.isVisible({ timeout: 3000 }).catch(() => false)) {
-						console.log(`✅ [WORKER LOG] Found email field using: ${sel}`);
+						// // console.log(`✅ [WORKER LOG] Found email field using: ${sel}`);
 						await input.fill(authGroup.u);
 						emailFieldFound = true;
 						break;
@@ -1158,9 +1131,9 @@ export async function runAssetVerificationEngine({
 								if (
 									await input.isVisible({ timeout: 2000 }).catch(() => false)
 								) {
-									console.log(
-										`✅ [WORKER LOG] Found email field after clicking login: ${sel}`,
-									);
+									// // console.log(
+									// 	`✅ [WORKER LOG] Found email field after clicking login: ${sel}`,
+									// );
 									await input.fill(authGroup.u);
 									emailFieldFound = true;
 									break;
@@ -1172,7 +1145,7 @@ export async function runAssetVerificationEngine({
 			}
 
 			if (!emailFieldFound) {
-				console.error("❌ [WORKER LOG] Could not find email field at all");
+				// // console.error("❌ [WORKER LOG] Could not find email field at all");
 				await sendToastLog(
 					supabase,
 					auditId,
@@ -1207,7 +1180,7 @@ export async function runAssetVerificationEngine({
 				try {
 					const input = page.locator(sel).first();
 					if (await input.isVisible({ timeout: 3000 }).catch(() => false)) {
-						console.log(`✅ [WORKER LOG] Found password field using: ${sel}`);
+						// // console.log(`✅ [WORKER LOG] Found password field using: ${sel}`);
 						await input.fill(authGroup.p);
 						passwordFieldFound = true;
 						break;
@@ -1218,7 +1191,7 @@ export async function runAssetVerificationEngine({
 			}
 
 			if (!passwordFieldFound) {
-				console.error("❌ [WORKER LOG] Could not find password field");
+				// // console.error("❌ [WORKER LOG] Could not find password field");
 				await sendToastLog(
 					supabase,
 					auditId,
@@ -1237,7 +1210,7 @@ export async function runAssetVerificationEngine({
 			await sleep(1000);
 
 			// ─── STEP 4: Click Login ───
-			console.log("🔑 [WORKER LOG] Credentials filled, clicking login...");
+			// // console.log("🔑 [WORKER LOG] Credentials filled, clicking login...");
 			await sendToastLog(
 				supabase,
 				auditId,
@@ -1261,7 +1234,7 @@ export async function runAssetVerificationEngine({
 				try {
 					const button = page.locator(sel).first();
 					if (await button.isVisible({ timeout: 3000 }).catch(() => false)) {
-						console.log(`☝️ [WORKER LOG] Clicking login button via: ${sel}`);
+						// // console.log(`☝️ [WORKER LOG] Clicking login button via: ${sel}`);
 						await Promise.all([
 							page
 								.waitForNavigation({ waitUntil: "networkidle", timeout: 30000 })
@@ -1287,7 +1260,7 @@ export async function runAssetVerificationEngine({
 			await page.waitForLoadState("networkidle").catch(() => {});
 
 			const currentUrl = page.url();
-			console.log(`📍 [WORKER LOG] After login URL: ${currentUrl}`);
+			
 
 			// ─── STEP 6: Check if we're on a 2FA page ───
 			const is2FAPage =
@@ -1298,7 +1271,7 @@ export async function runAssetVerificationEngine({
 				currentUrl.includes("login/confirm");
 
 			if (is2FAPage) {
-				console.log("🔐 [WORKER LOG] Facebook 2FA/Passkey page detected");
+				
 				await sendToastLog(
 					supabase,
 					auditId,
@@ -1336,7 +1309,7 @@ export async function runAssetVerificationEngine({
 				// Don't return - let the main flow handle 2FA
 			} else {
 				// ─── STEP 7: Check if login was successful and verify username ───
-				console.log("🔍 [WORKER LOG] Checking if login was successful...");
+				// // console.log("🔍 [WORKER LOG] Checking if login was successful...");
 
 				// Check if we're on the Facebook home page
 				const isLoggedIn = await page
@@ -1345,9 +1318,7 @@ export async function runAssetVerificationEngine({
 					.catch(() => false);
 
 				if (isLoggedIn) {
-					console.log(
-						"✅ [WORKER LOG] Facebook login successful (on home page)",
-					);
+				
 					await sendToastLog(
 						supabase,
 						auditId,
@@ -1433,12 +1404,12 @@ export async function runAssetVerificationEngine({
 								return null;
 							});
 
-							console.log(
-								`👤 [WORKER LOG] Scraped Facebook username: "${scrapedUsername}"`,
-							);
-							console.log(
-								`👤 [WORKER LOG] Expected Facebook username: "${authGroup.facebookUsername}"`,
-							);
+							// // console.log(
+							// 	`👤 [WORKER LOG] Scraped Facebook username: "${scrapedUsername}"`,
+							// );
+							// // console.log(
+							// 	`👤 [WORKER LOG] Expected Facebook username: "${authGroup.facebookUsername}"`,
+							// );
 
 							if (scrapedUsername) {
 								const expected = authGroup.facebookUsername
@@ -1447,9 +1418,9 @@ export async function runAssetVerificationEngine({
 								const actual = scrapedUsername.toLowerCase().trim();
 
 								if (expected === actual) {
-									console.log(
-										"✅ [WORKER LOG] Facebook username match confirmed!",
-									);
+									// // console.log(
+									// 	"✅ [WORKER LOG] Facebook username match confirmed!",
+									// );
 									await sendToastLog(
 										supabase,
 										auditId,
@@ -1458,9 +1429,7 @@ export async function runAssetVerificationEngine({
 										"success",
 									);
 								} else {
-									console.log(
-										`❌ [WORKER LOG] Facebook username mismatch. Expected: ${expected}, Actual: ${actual}`,
-									);
+								
 									await sendToastLog(
 										supabase,
 										auditId,
@@ -1475,9 +1444,7 @@ export async function runAssetVerificationEngine({
 									return;
 								}
 							} else {
-								console.log(
-									"⚠️ [WORKER LOG] Could not scrape username from profile",
-								);
+							
 								await sendToastLog(
 									supabase,
 									auditId,
@@ -1498,7 +1465,7 @@ export async function runAssetVerificationEngine({
 					// ─── STEP 8: Check for error messages ───
 					const errorMsg = await extractPageMessage(page);
 					if (errorMsg) {
-						console.log(`💬 [WORKER LOG] Error message: ${errorMsg}`);
+						// // console.log(`💬 [WORKER LOG] Error message: ${errorMsg}`);
 						await sendToastLog(
 							supabase,
 							auditId,
@@ -1514,7 +1481,7 @@ export async function runAssetVerificationEngine({
 					}
 
 					// ─── STEP 9: Unknown state ───
-					console.log("⚠️ [WORKER LOG] Unknown Facebook login state");
+					// // console.log("⚠️ [WORKER LOG] Unknown Facebook login state");
 					await sendToastLog(
 						supabase,
 						auditId,
@@ -1537,7 +1504,7 @@ export async function runAssetVerificationEngine({
 
 		// ─── TikTok Flow ────────────────────────────────────────
 		else if (config.login_url.includes("tiktok.com")) {
-			console.log(`🎵 [WORKER LOG] TikTok specialized flow...`);
+			// // console.log(`🎵 [WORKER LOG] TikTok specialized flow...`);
 			await sendToastLog(
 				supabase,
 				auditId,
@@ -1569,7 +1536,7 @@ export async function runAssetVerificationEngine({
 					await page.waitForSelector(sel, { timeout: 6000 });
 					await page.locator(sel).first().fill(authGroup.u);
 					usernameFilled = true;
-					console.log(`✅ Filled username using: ${sel}`);
+					// // console.log(`✅ Filled username using: ${sel}`);
 					break;
 				} catch {}
 			}
@@ -1586,11 +1553,9 @@ export async function runAssetVerificationEngine({
 				.catch(() => false);
 
 			if (passwordVisible) {
-				console.log(
-					`✅ Password field already visible on same page — filling both then submitting once.`,
-				);
+				
 				await page.fill('input[type="password"]', authGroup.p);
-				console.log(`✅ Filled password using: input[type="password"]`);
+				// // console.log(`✅ Filled password using: input[type="password"]`);
 				await sleep(800);
 
 				try {
@@ -1602,9 +1567,9 @@ export async function runAssetVerificationEngine({
 					console.error("Submit failed", err);
 				}
 			} else {
-				console.log(
-					`➡️ Password field not visible — clicking Next to proceed to password step.`,
-				);
+				// // console.log(
+				// 	`➡️ Password field not visible — clicking Next to proceed to password step.`,
+				// );
 				await page
 					.click(
 						'button:has-text("Next"), button:has-text("Log in"), button[type="submit"]',
@@ -1630,7 +1595,6 @@ export async function runAssetVerificationEngine({
 							1000,
 						);
 						passwordFilled = true;
-						console.log(`✅ Filled password using: ${sel}`);
 						break;
 					} catch {}
 				}
@@ -1655,9 +1619,7 @@ export async function runAssetVerificationEngine({
 
 		// ─── GENERIC SELECTOR PATH ─────────────────────────────
 		else {
-			console.log(
-				`🔍 [WORKER LOG] Generic selectors for platform: ${config.id}`,
-			);
+			
 			await sendToastLog(
 				supabase,
 				auditId,
@@ -1694,7 +1656,7 @@ export async function runAssetVerificationEngine({
 
 		// Safety: only fire submit_selector if no platform-specific flow already submitted
 		if (!formSubmitted) {
-			console.log(`🔑 [WORKER LOG] Fallback submit via config selector...`);
+		
 			await page.click(config.submit_selector).catch(() => {});
 		}
 
@@ -1711,9 +1673,9 @@ export async function runAssetVerificationEngine({
 		const pageMessage = await extractPageMessage(page);
 
 		// ─── STATE DETECTION ──────────────────────────────────
-		console.log(`🔎 [WORKER LOG] Analyzing page state after login attempt...`);
+		// // console.log(`🔎 [WORKER LOG] Analyzing page state after login attempt...`);
 		const outcome = await detectOutcome(page, config.login_url, pageMessage);
-		console.log(`🎯 [WORKER LOG] Outcome: [${outcome}]`);
+		// // console.log(`🎯 [WORKER LOG] Outcome: [${outcome}]`);
 
 		// Store the screenshot URL regardless of outcome
 		if (screenshotUrl) {
@@ -1740,9 +1702,9 @@ export async function runAssetVerificationEngine({
 
 		// ─── 2FA / VERIFICATION CODE HANDLING ─────────────────
 		if (outcome === "NEEDS_VERIFICATION_CODE") {
-			console.log(
-				"⏳ [WORKER LOG] Platform requested verification code. Waiting for user input...",
-			);
+			// // console.log(
+			// 	"⏳ [WORKER LOG] Platform requested verification code. Waiting for user input...",
+			// );
 			await sendToastLog(
 				supabase,
 				auditId,
@@ -1771,9 +1733,9 @@ export async function runAssetVerificationEngine({
 
 			while (attempts < maxAttempts) {
 				attempts++;
-				console.log(
-					`⏳ [WORKER LOG] Waiting for 2FA code... (${attempts}/${maxAttempts})`,
-				);
+				// // console.log(
+				// 	`⏳ [WORKER LOG] Waiting for 2FA code... (${attempts}/${maxAttempts})`,
+				// );
 
 				const { data } = (await supabase
 					.from("asset_audits")

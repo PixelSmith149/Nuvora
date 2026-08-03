@@ -67,15 +67,6 @@ export async function confirmDelivery(
 		const platformFee = amount * PLATFORM_FEE_PERCENTAGE;
 		const sellerPayout = amount - platformFee;
 
-		console.log(`💰 [Delivery] Amount: $${amount.toFixed(2)}`);
-		console.log(
-			`💰 [Delivery] Platform Fee (4.0%): $${platformFee.toFixed(2)}`,
-		);
-		console.log(`💰 [Delivery] Seller Payout: $${sellerPayout.toFixed(2)}`);
-
-		// ─── 3. Get seller's wallet ─────────────────────────────
-		console.log("🔍 [Delivery] Getting seller wallet for user:", sellerId);
-
 		const { data: sellerWallet, error: sellerWalletError } = await supabaseAdmin
 			.from("wallets")
 			.select("id")
@@ -92,11 +83,6 @@ export async function confirmDelivery(
 			return { success: false, error: "Seller wallet not found" };
 		}
 
-		console.log("✅ [Delivery] Seller wallet found:", sellerWallet.id);
-
-		// ─── 4. Get seller's current balance ─────────────────────
-		console.log("🔍 [Delivery] Getting balance for wallet:", sellerWallet.id);
-
 		const { data: sellerBalance, error: balanceError } = await supabaseAdmin
 			.from("wallet_balances")
 			.select("balance")
@@ -111,10 +97,6 @@ export async function confirmDelivery(
 		const currentSellerBalance = sellerBalance?.balance || 0;
 		const newSellerBalance = currentSellerBalance + sellerPayout;
 
-		console.log(
-			`✅ [Delivery] Seller Balance: $${currentSellerBalance.toFixed(2)} → $${newSellerBalance.toFixed(2)} ( +$${sellerPayout.toFixed(2)} )`,
-		);
-
 		// ─── 5. Credit seller (payout amount - after fee) ────────
 		const { error: creditError } = await supabaseAdmin
 			.from("wallet_balances")
@@ -125,14 +107,6 @@ export async function confirmDelivery(
 			console.error("❌ [Delivery] Credit error:", creditError);
 			return { success: false, error: "Failed to credit seller" };
 		}
-
-		console.log(
-			"✅ [Delivery] Seller credited successfully! New balance: $" +
-				newSellerBalance.toFixed(2),
-		);
-
-		// ─── 6. 🆕 Credit platform fee to admin wallet ────────────
-		console.log("🔍 [Delivery] Getting admin wallet...");
 
 		// Get admin wallet balance
 		const { data: adminBalance, error: adminBalanceError } = await supabaseAdmin
@@ -152,9 +126,6 @@ export async function confirmDelivery(
 		const currentAdminBalance = adminBalance?.balance || 0;
 		const newAdminBalance = currentAdminBalance + platformFee;
 
-		console.log(
-			`✅ [Delivery] Admin Balance: $${currentAdminBalance.toFixed(2)} → $${newAdminBalance.toFixed(2)} ( +$${platformFee.toFixed(2)} )`,
-		);
 
 		// Credit admin wallet
 		const { error: adminCreditError } = await supabaseAdmin
@@ -163,12 +134,6 @@ export async function confirmDelivery(
 			.eq("wallet_id", ADMIN_WALLET_ID);
 
 		if (adminCreditError) {
-			console.error("❌ [Delivery] Admin credit error:", adminCreditError);
-			// ⚠️ If admin wallet credit fails, we should reverse the seller credit
-			// This is a critical failure - log it prominently
-			console.error(
-				"🚨 CRITICAL: Failed to credit admin wallet. Rolling back seller credit...",
-			);
 
 			// Rollback seller credit
 			await supabaseAdmin
@@ -182,10 +147,6 @@ export async function confirmDelivery(
 			};
 		}
 
-		console.log(
-			"✅ [Delivery] Admin wallet credited successfully! New balance: $" +
-				newAdminBalance.toFixed(2),
-		);
 		if (!adminCreditError) {
 			await trackRevenue({
 				source: "platform_fee",
@@ -218,7 +179,7 @@ export async function confirmDelivery(
 			},
 		});
 
-		console.log("✅ [Delivery] Seller transaction logged");
+		
 
 		// ─── 8. 🆕 Log platform fee transaction ────────────────────
 		await supabaseAdmin.from("wallet_transactions").insert({
@@ -237,7 +198,6 @@ export async function confirmDelivery(
 			},
 		});
 
-		console.log("✅ [Delivery] Platform fee transaction logged");
 
 		// ─── 9. Update escrow ────────────────────────────────────
 		await supabaseAdmin
@@ -249,12 +209,6 @@ export async function confirmDelivery(
 			.eq("id", escrow.id);
 
 		// ─── 10. Update order ─────────────────────────────────────
-		console.log("🔍 [Delivery] Attempting to update order:", {
-			orderId,
-			buyerId,
-			currentStatus: order.status,
-			newStatus: "completed",
-		});
 
 		const { data: updateData, error: updateError } = await supabaseAdmin
 			.from("global_market_orders")
@@ -265,11 +219,6 @@ export async function confirmDelivery(
 			.eq("id", orderId)
 			.select();
 
-		console.log("🔍 [Delivery] Update result:", {
-			data: updateData,
-			error: updateError,
-		});
-
 		if (updateError) {
 			console.error("❌ Order update failed:", updateError);
 			return { success: false, error: "Failed to update order" };
@@ -279,8 +228,6 @@ export async function confirmDelivery(
 			console.error("❌ No rows updated! Order not found or RLS blocked.");
 			return { success: false, error: "Order not found or update blocked" };
 		}
-
-		console.log("✅ Order updated to:", updateData[0]?.status);
 
 		// ─── 11. Get buyer profile ────────────────────────────────
 		const { data: buyerProfile } = await supabaseAdmin
@@ -323,9 +270,6 @@ export async function confirmDelivery(
 			const assetType = determineAssetType(listing);
 
 			if (assetType === "one_time" || assetType === "socio") {
-				console.log(
-					`🔍 [Delivery] Updating ${assetType} listing status to 'sold_pinned'...`,
-				);
 
 				const { error: updateStatusError } = await supabaseAdmin
 					.from("market_listings")
@@ -341,19 +285,14 @@ export async function confirmDelivery(
 						updateStatusError,
 					);
 				} else {
-					console.log("✅ [Delivery] Listing status updated to sold_pinned");
 					listingUpdated = true;
 					assetUpdated = true;
 				}
 			} else {
-				console.log("🔄 [Delivery] Reusable asset - keeping for future sales");
-			}
+					}
 		}
 
-		console.log(`✅ [Delivery] Completed successfully for order: ${orderId}`);
-		console.log(
-			`   💰 Gross: $${amount.toFixed(2)} → Seller: $${sellerPayout.toFixed(2)} + Platform Fee: $${platformFee.toFixed(2)}`,
-		);
+		
 
 		return {
 			success: true,

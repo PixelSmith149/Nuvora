@@ -189,8 +189,6 @@ export function useMarket(userId: string | null): UseMarketReturn {
 			return;
 		}
 
-		console.log("🔄 [useMarket] Refreshing market data for user:", userId);
-
 		try {
 			const { data: s, error: sErr } = await supabase
 				.from("global_market_stores")
@@ -234,7 +232,6 @@ export function useMarket(userId: string | null): UseMarketReturn {
 			}
 
 			const rawListings = (l as MarketListing[]) ?? [];
-			console.log(`📊 [useMarket] Found ${rawListings.length} raw listings`);
 
 			const { data: metrics, error: mErr } = await supabase
 				.from("socio_market_metrics")

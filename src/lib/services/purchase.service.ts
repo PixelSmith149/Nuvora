@@ -203,12 +203,8 @@ export async function processPurchase(
 				.from("market_listings")
 				.update({ status: "sold_pinned" })
 				.eq("id", listingId);
-			console.log(`✅ [Purchase] ${assetType} listing marked as sold_pinned`);
+			
 		} else {
-			// Reusable asset - keep active for future sales
-			console.log(
-				`🔄 [Purchase] Reusable asset - keeping active for future sales`,
-			);
 		}
 
 		// ─── 12. Log transaction ──────────────────────────────────
@@ -225,7 +221,6 @@ export async function processPurchase(
 			},
 		});
 
-		console.log(`✅ [Purchase] Purchase successful for order: ${order.id}`);
 
 		return {
 			success: true,

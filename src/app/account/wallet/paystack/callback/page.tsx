@@ -1,96 +1,148 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, CheckCircle2, XCircle, Clock } from "lucide-react";
 import Link from "next/link";
+import { Loader2, CheckCircle2, XCircle, Clock } from "lucide-react";
 
 type Status = "checking" | "success" | "pending" | "failed";
+
+const MAX_ATTEMPTS = 20;
+const POLL_MS = 2500;
 
 function PaystackCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const reference =
-    searchParams.get("reference") || searchParams.get("trxref") || "";
+    searchParams.get("reference") ||
+    searchParams.get("trxref") ||
+    "";
 
   const [status, setStatus] = useState<Status>("checking");
   const [message, setMessage] = useState("Confirming your payment…");
   const [amount, setAmount] = useState<string | null>(null);
 
-  useEffect(() => {
+  const attemptsRef = useRef(0);
+  const cancelledRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const verify = useCallback(async () => {
+    if (cancelledRef.current) return;
+
     if (!reference) {
       setStatus("failed");
       setMessage("Missing payment reference.");
       return;
     }
 
-    let cancelled = false;
-    let attempts = 0;
-    const maxAttempts = 8;
+    try {
+      const res = await fetch("/api/wallet/paystack/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference }),
+      });
 
-    async function verify() {
-      try {
-        const res = await fetch("/api/wallet/paystack/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reference }),
-        });
+      const data = await res.json().catch(() => ({}));
 
-        const data = await res.json();
+      if (cancelledRef.current) return;
 
-        if (cancelled) return;
-
-        if (!res.ok) {
-          setStatus("failed");
-          setMessage(data.error || "Could not verify payment.");
-          return;
-        }
-
-        if (data.status === "success") {
-          setStatus("success");
-          setMessage("Deposit confirmed. Your wallet has been updated.");
-          if (data.amount != null) {
-            setAmount(
-              typeof data.amount === "number"
-                ? data.amount.toFixed(2)
-                : String(data.amount),
-            );
-          }
-          // Optional auto-redirect
-          setTimeout(() => router.replace("/account/wallet"), 2500);
-          return;
-        }
-
-        if (data.status === "pending") {
-          attempts += 1;
-          if (attempts < maxAttempts) {
-            setStatus("pending");
-            setMessage("Payment is still processing. Checking again…");
-            setTimeout(verify, 2000);
-            return;
-          }
+      if (!res.ok) {
+        // Retryable server errors while webhook may still run
+        if (res.status >= 500 && attemptsRef.current < MAX_ATTEMPTS - 1) {
+          attemptsRef.current += 1;
           setStatus("pending");
-          setMessage(
-            "Payment is processing. It will appear in your wallet shortly.",
-          );
+          setMessage("Still confirming with the payment provider…");
+          timerRef.current = setTimeout(verify, POLL_MS);
           return;
         }
 
         setStatus("failed");
-        setMessage(data.message || "Payment was not successful.");
-      } catch {
-        if (cancelled) return;
-        setStatus("failed");
-        setMessage("Network error while verifying payment.");
+        setMessage(
+          data.error || data.message || "Could not verify payment.",
+        );
+        return;
       }
-    }
 
+      const next = String(data.status || "").toLowerCase();
+
+      if (next === "success" || next === "completed") {
+        setStatus("success");
+        setMessage("Deposit confirmed. Your wallet has been updated.");
+
+        if (data.amount != null) {
+          setAmount(
+            typeof data.amount === "number"
+              ? data.amount.toFixed(2)
+              : String(data.amount),
+          );
+        }
+
+        timerRef.current = setTimeout(() => {
+          router.replace(
+            `/account/wallet?status=success&reference=${encodeURIComponent(reference)}`,
+          );
+          router.refresh();
+        }, 2200);
+        return;
+      }
+
+      if (next === "pending" || next === "ongoing" || next === "processing") {
+        attemptsRef.current += 1;
+
+        if (attemptsRef.current < MAX_ATTEMPTS) {
+          setStatus("pending");
+          setMessage("Payment is still processing. Checking again…");
+          timerRef.current = setTimeout(verify, POLL_MS);
+          return;
+        }
+
+        setStatus("pending");
+        setMessage(
+          "Payment is still processing. It will appear in your wallet shortly if approved.",
+        );
+        return;
+      }
+
+      // failed / abandoned / reversed / etc.
+      setStatus("failed");
+      setMessage(
+        data.message || data.error || "Payment was not successful.",
+      );
+    } catch {
+      if (cancelledRef.current) return;
+
+      attemptsRef.current += 1;
+      if (attemptsRef.current < MAX_ATTEMPTS) {
+        setStatus("pending");
+        setMessage("Network issue. Retrying verification…");
+        timerRef.current = setTimeout(verify, POLL_MS);
+        return;
+      }
+
+      setStatus("failed");
+      setMessage("Network error while verifying payment.");
+    }
+  }, [reference, router]);
+
+  useEffect(() => {
+    cancelledRef.current = false;
+    attemptsRef.current = 0;
+    clearTimer();
     void verify();
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
+      clearTimer();
     };
-  }, [reference, router]);
+  }, [verify]);
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center px-4">
@@ -115,13 +167,13 @@ function PaystackCallbackContent() {
         <p className="mt-2 text-sm text-zinc-400">{message}</p>
 
         {amount && status === "success" && (
-          <p className="mt-3 font-mono text-emerald-400 text-sm">
+          <p className="mt-3 font-mono text-sm text-emerald-400">
             Credited ≈ USD {amount}
           </p>
         )}
 
         {reference && (
-          <p className="mt-4 text-[10px] text-zinc-600 font-mono break-all">
+          <p className="mt-4 break-all font-mono text-[10px] text-zinc-600">
             Ref: {reference}
           </p>
         )}
@@ -129,17 +181,33 @@ function PaystackCallbackContent() {
         <div className="mt-8 flex flex-col gap-2">
           <Link
             href="/account/wallet"
-            className="w-full rounded-xl bg-white py-3 text-sm font-bold text-black hover:bg-zinc-200 transition"
+            className="w-full rounded-xl bg-white py-3 text-sm font-bold text-black transition hover:bg-zinc-200"
           >
             Go to wallet
           </Link>
+
           {status === "failed" && (
             <Link
-              href="/account/wallet/paystack"
-              className="w-full rounded-xl border border-white/10 py-3 text-sm text-zinc-300 hover:bg-white/5 transition"
+              href="/account/wallet/topup"
+              className="w-full rounded-xl border border-white/10 py-3 text-sm text-zinc-300 transition hover:bg-white/5"
             >
               Try again
             </Link>
+          )}
+
+          {status === "pending" && (
+            <button
+              type="button"
+              onClick={() => {
+                attemptsRef.current = 0;
+                setStatus("checking");
+                setMessage("Confirming your payment…");
+                void verify();
+              }}
+              className="w-full rounded-xl border border-white/10 py-3 text-sm text-zinc-300 transition hover:bg-white/5"
+            >
+              Check again
+            </button>
           )}
         </div>
 
@@ -158,7 +226,7 @@ export default function PaystackCallbackPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-black flex items-center justify-center text-zinc-400">
+        <main className="flex min-h-screen items-center justify-center bg-black text-zinc-400">
           <Loader2 className="h-6 w-6 animate-spin" />
         </main>
       }

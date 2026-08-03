@@ -55,7 +55,6 @@ export async function fetchNotifications(
 
 		if (error) {
 			console.error("Error fetching notifications:", error);
-			console.log("User ID:", userId);
 			return [];
 		}
 
@@ -99,7 +98,6 @@ export async function markAllNotificationsRead(
 			.update({ is_read: true, read_at: new Date().toISOString() })
 			.eq("user_id", userId)
 			.eq("is_read", false);
-		console.log("User ID:", userId);
 		if (error) {
 			console.error("Error marking all notifications read:", error);
 			return false;
@@ -135,7 +133,7 @@ export function subscribeToNotifications(
 		subscriptions.delete(channelName);
 	}
 
-	console.log(`🔔 Creating subscription for channel: ${channelName}`);
+	
 
 	const channel = supabase.channel(channelName);
 
@@ -149,16 +147,13 @@ export function subscribeToNotifications(
 				filter: `user_id=eq.${userId}`,
 			},
 			(payload) => {
-				console.log("🔔 New notification received:", payload.new);
 				onNotification(payload.new as Notification);
 			},
 		)
 		.subscribe((status) => {
-			console.log(`📡 Subscription status for ${channelName}:`, status);
 		});
 
 	const unsubscribe = () => {
-		console.log(`🔕 Unsubscribing from ${channelName}`);
 		try {
 			supabase.removeChannel(channel);
 		} catch (e) {}

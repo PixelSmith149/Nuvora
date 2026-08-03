@@ -213,10 +213,7 @@ export function SellerMessagingPanel({
 			}
 
 			if (initialConversationId && !convMap.has(initialConversationId)) {
-				console.log(
-					"🔍 Creating placeholder conversation for:",
-					initialConversationId,
-				);
+				
 
 				const { data: profile, error: profileError } = await supabase
 					.from("profiles")
@@ -225,10 +222,7 @@ export function SellerMessagingPanel({
 					.single();
 
 				if (profile) {
-					console.log(
-						"✅ Profile found for placeholder:",
-						profile.display_name,
-					);
+					
 
 					convMap.set(initialConversationId, {
 						id: initialConversationId,
@@ -251,7 +245,7 @@ export function SellerMessagingPanel({
 			if (initialConversationId) {
 				const conv = convMap.get(initialConversationId);
 				if (conv) {
-					console.log("✅ Setting active conversation:", conv.display_name);
+					// console.log("✅ Setting active conversation:", conv.display_name);
 					setActiveConversation(conv);
 					if (isMobile) setShowMobileList(false);
 				} else {
@@ -447,13 +441,6 @@ export function SellerMessagingPanel({
 				}),
 			};
 
-			console.log("📤 Sending message:", {
-				user_id: messageData.user_id,
-				sender_id: messageData.sender_id,
-				receiver_id: messageData.receiver_id,
-				title: messageData.title,
-				body_length: messageData.body.length,
-			});
 
 			const { data, error } = await supabase
 				.from("market_inbox_messages")
@@ -465,8 +452,6 @@ export function SellerMessagingPanel({
 				console.error("❌ Supabase insert error:", error);
 				throw new Error(`Failed to send message: ${error.message}`);
 			}
-
-			console.log("✅ Message sent successfully:", data.id);
 
 			// ─── Create new message object ──────────────────────────
 			const newMsg: ChatMessage = {

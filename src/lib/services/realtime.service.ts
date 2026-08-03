@@ -28,12 +28,11 @@ export class RealtimeService {
 		const channelId = `${table}-${filter || "all"}-${event}`;
 
 		if (this.channels.has(channelId)) {
-			console.log(`🔄 [Realtime] Already subscribed to ${channelId}`);
+		
 			return channelId;
 		}
 
-		console.log(`📡 [Realtime] Subscribing to ${channelId}`);
-
+	
 		const channel = supabase
 			.channel(channelId)
 			.on(
@@ -45,12 +44,10 @@ export class RealtimeService {
 					filter: filter || undefined,
 				},
 				(payload) => {
-					console.log(`📡 [Realtime] Event: ${event} on ${table}`, payload);
 					callback(payload);
 				},
 			)
 			.subscribe((status) => {
-				console.log(`📡 [Realtime] ${channelId} status: ${status}`);
 			});
 
 		this.channels.set(channelId, channel);
@@ -63,7 +60,6 @@ export class RealtimeService {
 		if (channel) {
 			supabase.removeChannel(channel);
 			this.channels.delete(channelId);
-			console.log(`📡 [Realtime] Unsubscribed from ${channelId}`);
 		}
 	}
 
@@ -73,7 +69,6 @@ export class RealtimeService {
 			supabase.removeChannel(channel);
 		});
 		this.channels.clear();
-		console.log("📡 [Realtime] Unsubscribed from all channels");
 	}
 }
 

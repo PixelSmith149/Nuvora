@@ -15,6 +15,7 @@ import {
 	UserCheck,
 	Wallet,
 	X,
+	HelpCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound, usePathname, useRouter } from "next/navigation";
@@ -95,6 +96,11 @@ export default function DashboardLayout({
 			to: `/${tech}/admin-dashboard/services-importer`,
 			label: "services importer",
 			icon: Activity,
+		},
+		{
+			to: `/${tech}/admin-dashboard/support`,
+			label: "Live Support",
+			icon: HelpCircle,
 		},
 	];
 

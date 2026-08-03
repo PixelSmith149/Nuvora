@@ -248,7 +248,7 @@ export function MarketAssetDetail({
 			}
 
 			// ─── 4. Fetch total sales ──────────────────────────────
-			debug("📊 Fetching total sales...");
+			
 			const { count } = await supabase
 				.from("global_market_orders")
 				.select("id", { count: "exact", head: true })

@@ -994,15 +994,7 @@ export function AssetPurchaseLocker({
 		);
 	}
 
-	// ─── Render ──────────────────────────────────────────────
-	console.log(
-		"🔍 [Locker] Orders:",
-		orders.map((o) => ({
-			id: o.id,
-			status: o.status,
-			amount: o.amount_paid,
-		})),
-	);
+
 	return (
 		<>
 			{/* Cards */}

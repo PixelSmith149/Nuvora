@@ -1,7 +1,7 @@
 // lib/services/notification.service.ts
 
 import { createClient as createClientAdmin } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
+
 
 // ─── ⚙️ Platform Fee Configuration ──────────────────────────────
 const PLATFORM_FEE_PERCENTAGE = 0.025; // 2.5%
@@ -54,9 +54,6 @@ export class NotificationService {
 
 	async send(payload: NotificationPayload): Promise<boolean> {
 		try {
-			console.log(
-				`🔔 [Notification] Sending to ${payload.user_id}: ${payload.title}`,
-			);
 
 			const { error } = await this.supabase
 				.from("market_inbox_messages")
@@ -75,7 +72,7 @@ export class NotificationService {
 				return false;
 			}
 
-			console.log(`✅ [Notification] Sent successfully`);
+			
 			return true;
 		} catch (err) {
 			console.error("❌ [Notification] Error:", err);
