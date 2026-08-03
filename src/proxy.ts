@@ -99,7 +99,9 @@ export async function proxy(request: NextRequest) {
 		: pathSegments[0] || "default";
 	const isGoingToAdmin = pathSegments.includes("admin-dashboard");
 
-	const isPublicRoute =
+	// proxy.ts
+
+    const isPublicRoute =
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
@@ -107,9 +109,10 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/st/domain/verify") ||
     pathname.startsWith("/api/st/domain/instructions") ||
-	pathname.startsWith("s/[siteId]") ||
-    pathname.startsWith("/api/cron/fx-refresh") ||
-    pathname.startsWith("/api/cron/sync-orders");
+    pathname.startsWith("/s/") || // Fixed missing leading slash
+    pathname.startsWith("/api/cron"); // 👈 Covers ALL cron endpoints automatically!
+
+
 
 if (!user && !isPublicRoute) {
     url.pathname = "/login";
