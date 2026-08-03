@@ -240,268 +240,1180 @@ export function SecuritySettings() {
 
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-950/50 p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-          <Shield className="h-5 w-5 text-emerald-400" />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold text-white">Security</h2>
-          <p className="text-sm text-zinc-500">Manage your account security</p>
-        </div>
+     {/* ───────────────────────── Security Header ───────────────────────── */}
+
+<div className="relative mb-7 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-900/70 via-zinc-950/90 to-black/90 p-6 backdrop-blur-2xl">
+
+  {/* Ambient Lighting */}
+  <div className="pointer-events-none absolute inset-0">
+
+    <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
+
+    <div className="absolute bottom-0 left-0 h-44 w-44 rounded-full bg-cyan-400/5 blur-3xl" />
+
+    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent" />
+
+    <div className="absolute left-10 right-10 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+
+  </div>
+
+  <div className="relative flex items-center justify-between">
+
+    <div className="flex items-center gap-5">
+
+      <div
+        className="
+          flex
+          h-16
+          w-16
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-emerald-500/20
+          bg-gradient-to-br
+          from-emerald-500/15
+          to-cyan-400/10
+          shadow-[0_0_28px_rgba(16,185,129,0.16)]
+        "
+      >
+        <Shield className="h-7 w-7 text-emerald-300" />
       </div>
 
-      {error && (
-        <div className="text-sm text-red-400 bg-red-500/10 p-3 rounded-lg mb-3 border border-red-500/20">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="text-sm text-emerald-400 bg-emerald-500/10 p-3 rounded-lg mb-3 border border-emerald-500/20">
-          {success}
-        </div>
-      )}
+      <div>
 
-      {/* ─── Passkeys ────────────────────────────────────────────────── */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Fingerprint className="h-4 w-4 text-zinc-400" />
-            <span className="text-sm font-medium text-white">Passkeys</span>
-            <span className="text-xs text-zinc-500">({passkeys.length})</span>
-          </div>
-          <button
-            onClick={() => {
-              if (!userId) {
-                setError('Session not ready. Refresh and try again.');
-                return;
-              }
-              setShowPasskeyModal(true);
-            }}
-            className="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors font-medium"
-          >
-            Add Passkey
-          </button>
+        <div className="flex items-center gap-3">
+
+          <h2 className="text-2xl font-bold tracking-tight text-white">
+            Security Center
+          </h2>
+
+          <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+            Protected
+          </span>
+
         </div>
+
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500">
+          Protect your account with passkeys, two-factor authentication,
+          password management and advanced authentication controls.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{/* ───────────────────────── Status Messages ───────────────────────── */}
+
+{error && (
+  <div className="mb-5 flex items-center gap-3 rounded-2xl border border-red-500/20 bg-gradient-to-r from-red-500/10 to-red-500/5 px-4 py-3 backdrop-blur-xl">
+
+    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10">
+      <Shield className="h-5 w-5 text-red-400" />
+    </div>
+
+    <div>
+
+      <p className="text-sm font-semibold text-red-300">
+        Security Action Failed
+      </p>
+
+      <p className="mt-0.5 text-sm text-red-400/90">
+        {error}
+      </p>
+
+    </div>
+
+  </div>
+)}
+
+{success && (
+  <div className="mb-5 flex items-center gap-3 rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 to-cyan-500/5 px-4 py-3 backdrop-blur-xl">
+
+    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+      <Shield className="h-5 w-5 text-emerald-300" />
+    </div>
+
+    <div>
+
+      <p className="text-sm font-semibold text-emerald-300">
+        Security Updated
+      </p>
+
+      <p className="mt-0.5 text-sm text-emerald-400/90">
+        {success}
+      </p>
+
+    </div>
+
+  </div>
+)}
+
+      {/* ───────────────────────── Passkey Vault ───────────────────────── */}
+
+<div className="relative mb-6 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-900/70 via-zinc-950/90 to-black/90 p-6 backdrop-blur-2xl">
+
+  {/* Ambient Background */}
+  <div className="pointer-events-none absolute inset-0">
+
+    <div className="absolute -top-16 right-0 h-44 w-44 rounded-full bg-emerald-500/8 blur-3xl" />
+
+    <div className="absolute bottom-0 left-0 h-36 w-36 rounded-full bg-cyan-400/5 blur-3xl" />
+
+    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent" />
+
+    <div className="absolute left-8 right-8 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+  </div>
+
+  <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+    {/* Left */}
+
+    <div className="flex items-start gap-4">
+
+      <div
+        className="
+          flex
+          h-14
+          w-14
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-emerald-500/20
+          bg-gradient-to-br
+          from-emerald-500/15
+          to-cyan-400/10
+          shadow-[0_0_22px_rgba(16,185,129,0.14)]
+        "
+      >
+        <Fingerprint className="h-6 w-6 text-emerald-300" />
+      </div>
+
+      <div>
+
+        <div className="flex flex-wrap items-center gap-3">
+
+          <h3 className="text-xl font-bold tracking-tight text-white">
+            Passkey Vault
+          </h3>
+
+          <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+            {passkeys.length} Registered
+          </span>
+
+        </div>
+
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500">
+          Passkeys provide passwordless authentication using your device's
+          biometric security or hardware security keys.
+        </p>
+
+      </div>
+
+    </div>
+
+    {/* Right */}
+
+    <button
+      onClick={() => {
+        if (!userId) {
+          setError("Session not ready. Refresh and try again.");
+          return;
+        }
+        setShowPasskeyModal(true);
+      }}
+      className="
+        group
+        relative
+        overflow-hidden
+        rounded-2xl
+        border
+        border-emerald-500/20
+        bg-gradient-to-r
+        from-emerald-500
+        via-emerald-500
+        to-cyan-500
+        px-5
+        py-3
+        text-sm
+        font-semibold
+        text-white
+        shadow-[0_12px_35px_rgba(16,185,129,0.25)]
+        transition-all
+        duration-300
+        hover:-translate-y-0.5
+        hover:shadow-[0_18px_45px_rgba(16,185,129,0.35)]
+        active:scale-[0.98]
+      "
+    >
+
+      <span
+        className="
+          absolute
+          inset-0
+          bg-gradient-to-r
+          from-transparent
+          via-white/25
+          to-transparent
+          translate-x-[-120%]
+          group-hover:translate-x-[120%]
+          transition-transform
+          duration-700
+        "
+      />
+
+      <span className="relative flex items-center gap-2">
+
+        <Fingerprint className="h-4 w-4" />
+
+        Add Passkey
+
+      </span>
+
+    </button>
+
+  </div>
+
 
         {passkeys.length === 0 ? (
-          <p className="text-sm text-zinc-500">No passkeys added yet</p>
-        ) : (
-          <div className="space-y-2">
-            {passkeys.map((passkey) => (
-              <div
-                key={passkey.id}
-                className="flex items-center justify-between p-3 rounded-xl bg-black/30 border border-white/5"
-              >
-                <div>
-                  <p className="text-sm font-medium text-white">{passkey.name}</p>
-                  <p className="text-xs text-zinc-500">
-                    Added {new Date(passkey.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <button
-                  onClick={() => removePasskey(passkey.id)}
-                  aria-label="Remove passkey"
-                  className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition-colors"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+  <div className="relative overflow-hidden rounded-3xl border border-dashed border-white/10 bg-gradient-to-b from-zinc-900/60 via-zinc-950/80 to-black/80 p-10 text-center">
+
+    {/* Ambient */}
+    <div className="pointer-events-none absolute inset-0">
+
+      <div className="absolute -top-12 right-0 h-40 w-40 rounded-full bg-emerald-500/5 blur-3xl" />
+
+      <div className="absolute bottom-0 left-0 h-32 w-32 rounded-full bg-cyan-400/5 blur-3xl" />
+
+    </div>
+
+    <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/15 to-cyan-400/10 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+
+      <Fingerprint className="h-9 w-9 text-emerald-300" />
+
+    </div>
+
+    <h4 className="relative mt-6 text-xl font-bold text-white">
+      No Passkeys Registered
+    </h4>
+
+    <p className="relative mx-auto mt-3 max-w-md text-sm leading-relaxed text-zinc-500">
+      Add your first passkey to enable passwordless sign in using your
+      fingerprint, Face ID, Windows Hello or a hardware security key.
+    </p>
+
+  </div>
+) : (
+  <div className="space-y-4">
+
+    {passkeys.map((passkey) => (
+
+      <div
+        key={passkey.id}
+        className="
+          group
+          relative
+          overflow-hidden
+          rounded-3xl
+          border
+          border-white/10
+          bg-gradient-to-b
+          from-zinc-900/80
+          via-zinc-950/90
+          to-black
+          p-5
+          transition-all
+          duration-300
+          hover:-translate-y-1
+          hover:border-emerald-500/20
+          hover:shadow-[0_18px_45px_rgba(16,185,129,0.10)]
+        "
+      >
+
+        {/* Ambient */}
+
+        <div className="absolute inset-0">
+
+          <div className="absolute -top-10 right-0 h-28 w-28 rounded-full bg-emerald-500/5 blur-3xl transition-all duration-500 group-hover:bg-emerald-500/15" />
+
+          <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-cyan-400/5 blur-2xl transition-all duration-500 group-hover:bg-cyan-400/10" />
+
+        </div>
+
+        <div className="relative flex items-center justify-between">
+
+          <div className="flex items-center gap-4">
+
+            <div
+              className="
+                flex
+                h-14
+                w-14
+                items-center
+                justify-center
+                rounded-2xl
+                border
+                border-emerald-500/20
+                bg-gradient-to-br
+                from-emerald-500/15
+                to-cyan-400/10
+                shadow-[0_0_20px_rgba(16,185,129,0.15)]
+              "
+            >
+              <Fingerprint className="h-6 w-6 text-emerald-300" />
+            </div>
+
+            <div>
+
+              <div className="flex items-center gap-3">
+
+                <p className="text-base font-semibold text-white">
+                  {passkey.name}
+                </p>
+
+                <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
+                  Active
+                </span>
+
               </div>
-            ))}
+
+              <p className="mt-2 text-sm text-zinc-500">
+                Registered on{" "}
+                {new Date(passkey.createdAt).toLocaleDateString()}
+              </p>
+
+            </div>
+
           </div>
-        )}
+
+          <button
+            onClick={() => removePasskey(passkey.id)}
+            aria-label="Remove passkey"
+            className="
+              group/remove
+              flex
+              h-12
+              w-12
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-white/5
+              bg-zinc-900/70
+              text-zinc-500
+              transition-all
+              duration-300
+              hover:border-red-500/20
+              hover:bg-red-500/10
+              hover:text-red-400
+              hover:shadow-[0_0_25px_rgba(239,68,68,0.20)]
+            "
+          >
+
+            <Trash2 className="h-5 w-5 transition-transform duration-300 group-hover/remove:scale-110" />
+
+          </button>
+
+        </div>
+
+        {/* Bottom Accent */}
+
+        <div className="absolute bottom-0 left-0 h-[2px] w-full overflow-hidden">
+
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-cyan-400/20 to-emerald-500/20" />
+
+          <div
+            className="
+              absolute
+              left-[-40%]
+              top-0
+              h-full
+              w-[40%]
+              bg-gradient-to-r
+              from-transparent
+              via-white/60
+              to-transparent
+              animate-[shine_4s_linear_infinite]
+            "
+          />
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+)}
       </div>
 
       {/* ─── Two-Factor Authentication ──────────────────────────────── */}
-      <div className="p-3.5 rounded-xl bg-black/30 border border-white/5 mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-white">Two-Factor Authentication</p>
-            <p className="text-xs text-zinc-500">
-              {twoFactorEnabled
-                ? 'Authenticator app is required on login'
-                : 'Add an extra layer of security with an authenticator app'}
-            </p>
-          </div>
+      <div className="
+  group
+  relative
+  mb-6
+  overflow-hidden
+  rounded-3xl
+  border
+  border-white/10
+  bg-gradient-to-b
+  from-zinc-900/80
+  via-zinc-950/90
+  to-black
+  p-5
+  backdrop-blur-2xl
+  transition-all
+  duration-300
+  hover:border-emerald-500/20
+  hover:shadow-[0_18px_45px_rgba(16,185,129,0.08)]
+">
 
-          {twoFactorEnabled ? (
-            <button
-              onClick={() => {
-                setShow2FASetup(true);
-                setQrCodeDataUrl(null);
-                setManualSecret(null);
-              }}
-              disabled={isSaving}
-              className="px-4 py-1.5 rounded-lg text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-colors disabled:opacity-50"
-            >
-              Disable
-            </button>
-          ) : (
-            <button
-              onClick={start2FASetup}
-              disabled={isSettingUp2FA || isSaving}
-              className="px-4 py-1.5 rounded-lg text-sm font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors disabled:opacity-50 flex items-center gap-2"
-            >
-              {isSettingUp2FA && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Enable
-            </button>
-          )}
+  {/* Ambient Glow */}
+  <div className="pointer-events-none absolute inset-0">
+
+    <div className="
+      absolute
+      -top-12
+      right-0
+      h-40
+      w-40
+      rounded-full
+      bg-emerald-500/10
+      blur-3xl
+      transition-all
+      duration-500
+      group-hover:bg-emerald-500/20
+    " />
+
+    <div className="
+      absolute
+      bottom-0
+      left-0
+      h-32
+      w-32
+      rounded-full
+      bg-cyan-400/5
+      blur-3xl
+    " />
+
+  </div>
+
+
+  <div className="relative">
+
+    {/* Header */}
+    <div className="flex items-center justify-between gap-4">
+
+      <div className="flex items-center gap-4">
+
+        <div className="
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-emerald-500/20
+          bg-gradient-to-br
+          from-emerald-500/15
+          to-cyan-400/10
+          shadow-[0_0_22px_rgba(16,185,129,0.15)]
+        ">
+          <Shield className="h-5 w-5 text-emerald-300" />
         </div>
 
-        {/* Setup / Disable Panel */}
-        {show2FASetup && (
-          <div className="mt-4 p-4 rounded-xl bg-black/40 border border-white/10 space-y-4">
-            {!twoFactorEnabled && qrCodeDataUrl && (
-              <>
-                <p className="text-sm text-zinc-300">
-                  Scan this QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.)
-                </p>
-                <div className="flex justify-center">
-                  <img
-                    src={qrCodeDataUrl}
-                    alt="2FA QR Code"
-                    className="rounded-lg border border-white/10"
-                  />
-                </div>
-                {manualSecret && (
-                  <div className="text-center">
-                    <p className="text-xs text-zinc-500 mb-1">Or enter this key manually:</p>
-                    <code className="text-sm text-emerald-400 bg-black/50 px-3 py-1.5 rounded-lg select-all">
-                      {manualSecret}
-                    </code>
-                  </div>
-                )}
-              </>
-            )}
 
-            <div>
-              <label className="text-xs text-zinc-400 block mb-1">
-                {twoFactorEnabled
-                  ? 'Enter a code from your authenticator app to disable'
-                  : 'Enter the 6-digit code to confirm'}
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={verifyCode}
-                onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, ''))}
-                placeholder="000000"
-                className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/30 text-sm tracking-widest text-center text-lg"
-              />
-            </div>
+        <div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() =>
-                  verifyAndToggle2FA(twoFactorEnabled ? 'disable' : 'enable')
+          <div className="flex items-center gap-3">
+
+            <p className="text-base font-semibold text-white">
+              Two-Factor Authentication
+            </p>
+
+
+            <span
+              className={`
+                rounded-full
+                px-2.5
+                py-1
+                text-[10px]
+                font-semibold
+                uppercase
+                tracking-wider
+                ${
+                  twoFactorEnabled
+                    ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+                    : "border border-zinc-700 bg-zinc-800/70 text-zinc-400"
                 }
-                disabled={isSaving || verifyCode.length < 6}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
-                {twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}
-              </button>
-              <button
-                onClick={() => {
-                  setShow2FASetup(false);
-                  setQrCodeDataUrl(null);
-                  setManualSecret(null);
-                  setVerifyCode('');
-                  setError(null);
-                }}
-                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
+              `}
+            >
+              {twoFactorEnabled ? "Protected" : "Disabled"}
+            </span>
+
           </div>
-        )}
+
+
+          <p className="mt-1 text-xs text-zinc-500">
+            {twoFactorEnabled
+              ? "Authenticator verification is required during login."
+              : "Add an extra security layer with an authenticator app."}
+          </p>
+
+        </div>
+
       </div>
 
-      {/* ─── Change Password ─────────────────────────────────────────── */}
-      <div>
+
+      {/* Action Button */}
+
+      {twoFactorEnabled ? (
+
         <button
           onClick={() => {
-            setShowChangePassword(!showChangePassword);
-            setError(null);
+            setShow2FASetup(true);
+            setQrCodeDataUrl(null);
+            setManualSecret(null);
           }}
-          className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
+          disabled={isSaving}
+          className="
+            rounded-xl
+            border
+            border-red-500/20
+            bg-red-500/10
+            px-4
+            py-2
+            text-sm
+            font-semibold
+            text-red-300
+            transition-all
+            duration-300
+            hover:bg-red-500/20
+            hover:shadow-[0_0_25px_rgba(239,68,68,0.15)]
+            disabled:opacity-50
+          "
         >
-          <Lock className="h-4 w-4" />
-          Change Password
+          Disable
         </button>
 
-        {showChangePassword && (
-          <div className="mt-3 space-y-3 p-4 rounded-xl bg-black/30 border border-white/5">
-            <div>
-              <label className="text-xs text-zinc-400 block mb-1">Current Password</label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter current password"
-                className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/30 text-sm"
+      ) : (
+
+        <button
+          onClick={start2FASetup}
+          disabled={isSettingUp2FA || isSaving}
+          className="
+            flex
+            items-center
+            gap-2
+            rounded-xl
+            bg-gradient-to-r
+            from-emerald-500
+            to-cyan-500
+            px-5
+            py-2
+            text-sm
+            font-semibold
+            text-white
+            shadow-[0_10px_25px_rgba(16,185,129,0.25)]
+            transition-all
+            duration-300
+            hover:-translate-y-0.5
+            hover:shadow-[0_15px_35px_rgba(16,185,129,0.35)]
+            disabled:opacity-50
+          "
+        >
+          {isSettingUp2FA && (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          )}
+
+          Enable
+
+        </button>
+
+      )}
+
+    </div>
+
+
+    {/* Setup Panel */}
+
+    {show2FASetup && (
+
+      <div className="
+        mt-5
+        space-y-5
+        rounded-2xl
+        border
+        border-white/10
+        bg-black/40
+        p-5
+        backdrop-blur-xl
+      ">
+
+
+        {!twoFactorEnabled && qrCodeDataUrl && (
+
+          <>
+
+            <p className="text-sm leading-relaxed text-zinc-400">
+              Scan this QR code with your authenticator application
+              (Google Authenticator, Authy, 1Password, etc.)
+            </p>
+
+
+            <div className="
+              flex
+              justify-center
+              rounded-2xl
+              border
+              border-white/10
+              bg-zinc-900/50
+              p-5
+            ">
+
+              <img
+                src={qrCodeDataUrl}
+                alt="2FA QR Code"
+                className="
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-white
+                  p-3
+                  shadow-xl
+                "
               />
+
             </div>
 
-            <div>
-              <label className="text-xs text-zinc-400 block mb-1">New Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password (min. 8 characters)"
-                  className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/30 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+
+            {manualSecret && (
+
+              <div className="text-center">
+
+                <p className="mb-2 text-xs text-zinc-500">
+                  Or enter this key manually
+                </p>
+
+
+                <code className="
+                  inline-block
+                  rounded-xl
+                  border
+                  border-emerald-500/20
+                  bg-emerald-500/5
+                  px-4
+                  py-2
+                  font-mono
+                  text-sm
+                  tracking-widest
+                  text-emerald-300
+                  select-all
+                ">
+                  {manualSecret}
+                </code>
+
               </div>
-            </div>
 
-            <div>
-              <label className="text-xs text-zinc-400 block mb-1">Confirm New Password</label>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-                className="w-full p-2.5 rounded-lg bg-black/50 border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/30 text-sm"
-              />
-            </div>
+            )}
 
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={changePassword}
-                disabled={isSaving}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
-                Update Password
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowChangePassword(false);
-                  setCurrentPassword('');
-                  setNewPassword('');
-                  setConfirmPassword('');
-                  setError(null);
-                }}
-                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+          </>
+
         )}
+
+
+
+        <div>
+
+          <label className="
+            mb-2
+            block
+            text-xs
+            font-medium
+            text-zinc-400
+          ">
+            {twoFactorEnabled
+              ? "Enter your authenticator code to disable protection"
+              : "Enter the 6-digit verification code"}
+          </label>
+
+
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            value={verifyCode}
+            onChange={(e) =>
+              setVerifyCode(
+                e.target.value.replace(/\D/g, "")
+              )
+            }
+            placeholder="000000"
+            className="
+              w-full
+              rounded-2xl
+              border
+              border-white/10
+              bg-zinc-900/80
+              px-4
+              py-4
+              text-center
+              text-2xl
+              font-semibold
+              tracking-[0.5em]
+              text-white
+              placeholder-zinc-700
+              outline-none
+              transition-all
+              focus:border-emerald-500/40
+              focus:ring-4
+              focus:ring-emerald-500/10
+            "
+          />
+
+        </div>
+
+
+
+        <div className="flex gap-3">
+
+          <button
+            onClick={() =>
+              verifyAndToggle2FA(
+                twoFactorEnabled ? "disable" : "enable"
+              )
+            }
+            disabled={isSaving || verifyCode.length < 6}
+            className="
+              flex
+              items-center
+              gap-2
+              rounded-xl
+              bg-gradient-to-r
+              from-emerald-500
+              to-cyan-500
+              px-5
+              py-2.5
+              text-sm
+              font-semibold
+              text-white
+              shadow-[0_10px_25px_rgba(16,185,129,0.2)]
+              transition-all
+              hover:shadow-[0_15px_35px_rgba(16,185,129,0.3)]
+              disabled:opacity-50
+            "
+          >
+
+            {isSaving && (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            )}
+
+            {twoFactorEnabled
+              ? "Disable 2FA"
+              : "Enable 2FA"}
+
+          </button>
+
+
+
+          <button
+            onClick={() => {
+              setShow2FASetup(false);
+              setQrCodeDataUrl(null);
+              setManualSecret(null);
+              setVerifyCode("");
+              setError(null);
+            }}
+            className="
+              rounded-xl
+              border
+              border-white/10
+              bg-zinc-900
+              px-5
+              py-2.5
+              text-sm
+              font-medium
+              text-zinc-300
+              transition-all
+              hover:border-white/20
+              hover:bg-zinc-800
+              hover:text-white
+            "
+          >
+            Cancel
+          </button>
+
+        </div>
+
+
       </div>
 
+    )}
+
+  </div>
+
+</div>
+    {/* ─── Change Password ─────────────────────────────────────────── */}
+<div className="
+  group
+  relative
+  overflow-hidden
+  rounded-2xl
+  border
+  border-white/10
+  bg-gradient-to-b
+  from-zinc-900/70
+  via-zinc-950
+  to-black
+  transition-all
+  duration-300
+  hover:border-emerald-500/20
+">
+
+  {/* Ambient glow */}
+  <div className="
+    pointer-events-none
+    absolute
+    -right-10
+    top-0
+    h-32
+    w-32
+    rounded-full
+    bg-emerald-500/10
+    blur-3xl
+    opacity-0
+    transition-opacity
+    duration-500
+    group-hover:opacity-100
+  " />
+
+
+  <button
+    onClick={() => {
+      setShowChangePassword(!showChangePassword);
+      setError(null);
+    }}
+    className="
+      relative
+      flex
+      w-full
+      items-center
+      justify-between
+      px-5
+      py-4
+      text-left
+      transition-all
+    "
+  >
+
+    <div className="flex items-center gap-4">
+
+      <div className="
+        flex
+        h-11
+        w-11
+        items-center
+        justify-center
+        rounded-xl
+        border
+        border-emerald-500/20
+        bg-emerald-500/10
+        shadow-[0_0_20px_rgba(16,185,129,0.12)]
+      ">
+        <Lock className="h-5 w-5 text-emerald-300" />
+      </div>
+
+
+      <div>
+
+        <p className="text-sm font-semibold text-white">
+          Change Password
+        </p>
+
+        <p className="mt-1 text-xs text-zinc-500">
+          Update your account credentials securely
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div className="
+      rounded-full
+      border
+      border-white/10
+      bg-zinc-900
+      px-3
+      py-1
+      text-xs
+      text-zinc-400
+      transition-all
+      group-hover:border-emerald-500/20
+      group-hover:text-emerald-300
+    ">
+      {showChangePassword ? "Close" : "Manage"}
+    </div>
+
+  </button>
+
+
+
+  {showChangePassword && (
+
+    <div className="
+      relative
+      border-t
+      border-white/10
+      bg-black/30
+      p-5
+      space-y-5
+      animate-in
+      fade-in
+      slide-in-from-top-2
+      duration-300
+    ">
+
+
+      {/* Current Password */}
+
+      <div>
+
+        <label className="
+          mb-2
+          block
+          text-xs
+          font-medium
+          text-zinc-400
+        ">
+          Current Password
+        </label>
+
+
+        <input
+          type="password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          placeholder="Enter current password"
+          className="
+            w-full
+            rounded-xl
+            border
+            border-white/10
+            bg-zinc-900/80
+            px-4
+            py-3
+            text-sm
+            text-white
+            placeholder-zinc-600
+            outline-none
+            transition-all
+            focus:border-emerald-500/40
+            focus:ring-4
+            focus:ring-emerald-500/10
+          "
+        />
+
+      </div>
+
+
+
+      {/* New Password */}
+
+      <div>
+
+        <label className="
+          mb-2
+          block
+          text-xs
+          font-medium
+          text-zinc-400
+        ">
+          New Password
+        </label>
+
+
+        <div className="relative">
+
+          <input
+            type={showPassword ? "text" : "password"}
+            value={newPassword}
+            onChange={(e)=>setNewPassword(e.target.value)}
+            placeholder="Minimum 8 characters"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-zinc-900/80
+              px-4
+              py-3
+              pr-12
+              text-sm
+              text-white
+              placeholder-zinc-600
+              outline-none
+              transition-all
+              focus:border-emerald-500/40
+              focus:ring-4
+              focus:ring-emerald-500/10
+            "
+          />
+
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="
+              absolute
+              right-3
+              top-1/2
+              -translate-y-1/2
+              rounded-lg
+              p-1.5
+              text-zinc-500
+              transition-colors
+              hover:bg-white/5
+              hover:text-white
+            "
+          >
+            {showPassword
+              ? <EyeOff className="h-4 w-4" />
+              : <Eye className="h-4 w-4" />
+            }
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      {/* Confirm Password */}
+
+      <div>
+
+        <label className="
+          mb-2
+          block
+          text-xs
+          font-medium
+          text-zinc-400
+        ">
+          Confirm New Password
+        </label>
+
+
+        <input
+          type={showPassword ? "text" : "password"}
+          value={confirmPassword}
+          onChange={(e)=>setConfirmPassword(e.target.value)}
+          placeholder="Confirm new password"
+          className="
+            w-full
+            rounded-xl
+            border
+            border-white/10
+            bg-zinc-900/80
+            px-4
+            py-3
+            text-sm
+            text-white
+            placeholder-zinc-600
+            outline-none
+            transition-all
+            focus:border-emerald-500/40
+            focus:ring-4
+            focus:ring-emerald-500/10
+          "
+        />
+
+      </div>
+
+
+
+      {/* Actions */}
+
+      <div className="flex gap-3 pt-2">
+
+
+        <button
+          onClick={changePassword}
+          disabled={isSaving}
+          className="
+            flex
+            items-center
+            gap-2
+            rounded-xl
+            bg-gradient-to-r
+            from-emerald-500
+            to-cyan-500
+            px-5
+            py-2.5
+            text-sm
+            font-semibold
+            text-white
+            shadow-[0_10px_25px_rgba(16,185,129,0.25)]
+            transition-all
+            hover:shadow-[0_15px_35px_rgba(16,185,129,0.35)]
+            disabled:opacity-50
+          "
+        >
+
+          {isSaving &&
+            <Loader2 className="h-4 w-4 animate-spin" />
+          }
+
+          Update Password
+
+        </button>
+
+
+
+        <button
+          type="button"
+          onClick={()=>{
+            setShowChangePassword(false);
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+            setError(null);
+          }}
+          className="
+            rounded-xl
+            border
+            border-white/10
+            bg-zinc-900
+            px-5
+            py-2.5
+            text-sm
+            font-medium
+            text-zinc-300
+            transition-all
+            hover:border-white/20
+            hover:bg-zinc-800
+            hover:text-white
+          "
+        >
+          Cancel
+        </button>
+
+
+      </div>
+
+    </div>
+
+  )}
+
+</div>
       {/* ─── Passkey Modal ───────────────────────────────────────────── */}
       <PasskeyModal
         isOpen={showPasskeyModal}

@@ -19,7 +19,6 @@ export default function SettingsPage() {
 
         {/* ─── Settings Cards ──────────────────────────────────────────── */}
         <div className="space-y-6">
-          <AppearanceSettings />
           <LanguageSettings />
           <SecuritySettings />
           <NotificationSettings />

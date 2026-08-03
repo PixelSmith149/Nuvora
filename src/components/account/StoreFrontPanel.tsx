@@ -486,8 +486,9 @@ export function StoreFrontPanel() {
 		return (
 			<div className="w-full space-y-4">
 				{/* ─── Category Tabs ────────────────────────────────────────────── */}
-				<div className="w-full flex justify-center border-b border-white/5 pb-3">
-					<div className="flex flex-wrap items-center gap-1.5">
+				<div className="w-full border-b border-white/5 pb-3">
+                 <div className="flex items-center justify-center overflow-x-auto scrollbar-hide">
+                  <div className="flex flex-nowrap items-center gap-2 min-w-max">
 						<Button
 							variant={activeCategory === "digital_tool" ? "default" : "ghost"}
 							onClick={() => setActiveCategory("digital_tool")}
@@ -525,10 +526,11 @@ export function StoreFrontPanel() {
 							Social Accounts
 						</Button>
 
-						<Badge className="ml-2 bg-zinc-900 border-white/5 text-zinc-400 text-[10px] font-bold">
+						 <Badge className="ml-2 flex-none bg-zinc-900 border-white/5 text-zinc-400 text-[10px] font-bold">
 							{filteredListings.length}
 						</Badge>
 					</div>
+				  </div>
 				</div>
 
 				{/* ─── Listings Grid ────────────────────────────────────────────── */}

@@ -39,18 +39,41 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" className={cn("dark scroll-smooth", "font-sans", geist.variable)}>
+		<html
+			lang="en"
+			className={cn(
+				"dark",
+				geist.variable
+			)}
+		>
 			<body
-				className={`${inter.variable} ${playfair.variable} bg-black text-white antialiased`}
+				className="
+					min-h-dvh
+					w-full
+					overflow-x-hidden
+					bg-black
+					text-white
+					antialiased
+				"
 			>
-		         <AppLockProvider leaveTimeoutMs={0} idleTimeoutMs={2 * 60 * 1000}>
-			      <Providers>
-					<SessionHydrator />
-					<div className="min-h-screen flex flex-col">
-						<NotificationWrapper>{children}</NotificationWrapper>
-					</div>
-				  </Providers>
-				 </AppLockProvider>
+				<AppLockProvider leaveTimeoutMs={0} idleTimeoutMs={2 * 60 * 1000}>
+					<Providers>
+						<SessionHydrator />
+
+						<div className="
+							flex
+							min-h-dvh
+							w-full
+							flex-col
+							overflow-x-hidden
+						">
+							<NotificationWrapper>
+								{children}
+							</NotificationWrapper>
+						</div>
+
+					</Providers>
+				</AppLockProvider>
 			</body>
 		</html>
 	);
