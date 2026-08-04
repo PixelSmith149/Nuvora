@@ -89,7 +89,6 @@ export async function createProviderOrder(
       }
       params.username = username;
 
-      // JAP Auto: require min + max (min < max)
       const min = Number(options?.min);
       const max = Number(options?.max);
 
@@ -106,14 +105,10 @@ export async function createProviderOrder(
       params.min = String(Math.floor(min));
       params.max = String(Math.floor(max));
 
-      // Some panels still want quantity; if yours rejects it, remove this line
-      // params.quantity = String(Math.floor(min));
-
       if (options?.runs != null && Number(options.runs) > 0) {
         params.runs = String(Math.floor(Number(options.runs)));
       }
     } else {
-      // Normal (non-auto) services
       params.quantity = String(quantity);
     }
 
@@ -122,21 +117,27 @@ export async function createProviderOrder(
       timeout: 20000,
     });
 
-    if (!data || data.error) {
-      throw new Error(
-        data?.error ||
-          "Upstream wholesaling engine rejected order transmission.",
-      );
+    // Real rejection only
+    if (data == null) {
+      throw new Error("Empty response from provider.");
+    }
+    if (typeof data === "object" && data.error) {
+      throw new Error(String(data.error));
     }
 
-    if (!data.order) {
-      throw new Error(
-        "API responded successfully but failed to return a tracking Order ID reference.",
-      );
-    }
+    // Optional id — do NOT throw if missing (JAP may still process)
+    const orderIdRaw =
+      typeof data === "object"
+        ? (data.order ?? data.order_id ?? data.id)
+        : null;
+
+    const providerOrderId =
+      orderIdRaw != null && String(orderIdRaw).trim() !== ""
+        ? String(orderIdRaw).trim()
+        : "";
 
     return {
-      providerOrderId: String(data.order),
+      providerOrderId,
       raw: data,
     };
   } catch (error) {

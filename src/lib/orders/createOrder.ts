@@ -20,17 +20,10 @@ type CreateOrderResult =
       cost: number;
       providerOrderId: string | null;
     }
-  | {
-      success: false;
-      error: string;
-    };
-
-function isInsufficientBalanceError(message: string): boolean {
-  return /insufficient/i.test(message);
-}
+  | { success: false; error: string };
 
 function mapDebitError(message: string): string {
-  if (isInsufficientBalanceError(message)) {
+  if (/insufficient/i.test(message)) {
     const cleaned = message
       .replace(/^.*insufficient/i, "Insufficient")
       .replace(/\s+/g, " ")
@@ -42,22 +35,23 @@ function mapDebitError(message: string): string {
   return message || "Payment debit failed. No order was created.";
 }
 
-/** Pull external order id from common JAP / panel response shapes */
 function extractProviderOrderId(result: any): string {
   const raw = result?.raw ?? result ?? {};
-  const candidates = [
+  for (const c of [
     result?.providerOrderId,
     raw?.order,
     raw?.order_id,
     raw?.id,
-  ];
-
-  for (const c of candidates) {
+  ]) {
     if (c == null) continue;
     const s = String(c).trim();
     if (s && s !== "undefined" && s !== "null") return s;
   }
   return "";
+}
+
+function makeTrackingCode(orderId: string): string {
+  return `PB-${orderId.replace(/-/g, "").slice(0, 10).toUpperCase()}`;
 }
 
 export async function createOrder({
@@ -71,23 +65,15 @@ export async function createOrder({
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Authentication required." };
 
-    if (!user) {
-      return { success: false, error: "Authentication required." };
-    }
-
-    // ── 1. WALLET ───────────────────────────────────────────
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("id")
       .eq("user_id", user.id)
       .single();
-
     if (walletError || !wallet) {
-      return {
-        success: false,
-        error: "Wallet not found. Please setup a wallet configuration.",
-      };
+      return { success: false, error: "Wallet not found. Please setup a wallet configuration." };
     }
 
     const { data: balanceRow } = await supabase
@@ -95,25 +81,17 @@ export async function createOrder({
       .select("balance")
       .eq("wallet_id", wallet.id)
       .maybeSingle();
-
     const availableBalance = Number(balanceRow?.balance ?? 0);
 
-    // ── 2. SERVICE & PROVIDER ───────────────────────────────
     const { data: service, error: serviceError } = await supabase
       .from("services")
       .select("*")
       .eq("id", serviceId)
       .eq("active", true)
       .single();
-
     if (serviceError || !service) {
-      console.error("CREATE_ORDER: Service fetch error:", serviceError);
-      return {
-        success: false,
-        error: "The selected service is currently unavailable.",
-      };
+      return { success: false, error: "The selected service is currently unavailable." };
     }
-
     if (isAutoService(service.title || service.name || "")) {
       return {
         success: false,
@@ -128,19 +106,10 @@ export async function createOrder({
       .eq("id", service.provider_service_id)
       .eq("active", true)
       .single();
-
     if (pServiceError || !providerService) {
-      console.error("CREATE_ORDER: Wholesale mapping error:", pServiceError);
-      return {
-        success: false,
-        error: "Wholesale configuration mapping error for this service.",
-      };
+      return { success: false, error: "Wholesale configuration mapping error for this service." };
     }
-
-    if (
-      quantity < providerService.min_qty ||
-      quantity > providerService.max_qty
-    ) {
+    if (quantity < providerService.min_qty || quantity > providerService.max_qty) {
       return {
         success: false,
         error: `Invalid quantity. Order bounds must be between ${providerService.min_qty} and ${providerService.max_qty}.`,
@@ -153,34 +122,21 @@ export async function createOrder({
       .eq("id", providerService.provider_id)
       .eq("active", true)
       .single();
-
-    if (providerError || !provider) {
-      console.error("CREATE_ORDER: Provider gateway error:", providerError);
-      return {
-        success: false,
-        error: "External provider network gateway is currently offline.",
-      };
+    if (providerError || !provider?.api_url || !provider?.api_key) {
+      return { success: false, error: "External provider network gateway is currently offline." };
     }
 
-    // ── 3. COST ─────────────────────────────────────────────
     const retailRate = Number(service.price_per_1000 ?? 0);
-
     if (!Number.isFinite(retailRate) || retailRate <= 0) {
       return {
         success: false,
-        error:
-          "This service has no valid retail price configured (price_per_1000).",
+        error: "This service has no valid retail price configured (price_per_1000).",
       };
     }
-
-    const orderCost = Number(
-      calculateOrderAmount(retailRate, quantity).toFixed(4),
-    );
-
+    const orderCost = Number(calculateOrderAmount(retailRate, quantity).toFixed(4));
     if (!Number.isFinite(orderCost) || orderCost <= 0) {
       return { success: false, error: "Invalid order cost calculated." };
     }
-
     if (availableBalance < orderCost) {
       return {
         success: false,
@@ -189,8 +145,9 @@ export async function createOrder({
     }
 
     const orderId = crypto.randomUUID();
+    const trackingCode = makeTrackingCode(orderId);
 
-    // ── 4. DEBIT FIRST ──────────────────────────────────────
+    // 1) Debit
     const { data: debitResult, error: debitError } = await supabase.rpc(
       "debit_wallet_for_purchase",
       {
@@ -205,25 +162,19 @@ export async function createOrder({
           provider_id: provider.id,
           quantity,
           target,
-          phase: "pre_order_debit",
+          tracking_code: trackingCode,
         },
       },
     );
-
     if (debitError) {
-      console.error("CREATE_ORDER: Debit RPC failed:", debitError);
-      return {
-        success: false,
-        error: mapDebitError(debitError.message || ""),
-      };
+      return { success: false, error: mapDebitError(debitError.message || "") };
     }
-
     const ledgerId =
       debitResult && typeof debitResult === "object"
         ? ((debitResult as any).ledger_id as string | null)
         : null;
 
-    // ── 5. INSERT (submitting — cron must not resubmit) ─────
+    // 2) Local row only — does NOT call JAP
     const { data: order, error: orderCreateError } = await supabase
       .from("orders")
       .insert({
@@ -234,18 +185,17 @@ export async function createOrder({
         target,
         quantity,
         cost: orderCost,
-        status: "submitting",
+        status: "pending",
+        tracking_code: trackingCode,
+        is_auto: false,
         provider_order_id: null,
+        provider_response: null,
       })
       .select()
       .single();
 
     if (orderCreateError || !order) {
-      console.error(
-        "CREATE_ORDER: Order insert failed after debit — refunding",
-        orderCreateError,
-      );
-
+      console.error("CREATE_ORDER: insert failed after debit", orderCreateError);
       await supabase.rpc("credit_wallet_for_refund", {
         p_wallet_id: wallet.id,
         p_usd_amount: orderCost,
@@ -254,10 +204,10 @@ export async function createOrder({
         p_reference_type: "boost_order",
         p_metadata: {
           reason: "order_insert_failed",
+          db_message: orderCreateError?.message,
           original_ledger_id: ledgerId,
         },
       });
-
       return {
         success: false,
         error:
@@ -265,11 +215,14 @@ export async function createOrder({
       };
     }
 
-    // ── 6. PROVIDER ─────────────────────────────────────────
-    // JAP may accept the order even when no providerOrderId is returned.
-    // Then: NO refund, NO user failure — save provider_response, status=pending,
-    // cron recovers provider_order_id from provider_response (never re-add).
+    // 3) THIS is the JAP API call (server-side, not a Next route)
     try {
+      console.info("CREATE_ORDER: calling JAP createProviderOrder", {
+        orderId: order.id,
+        external_service_id: providerService.external_service_id,
+        api_url: provider.api_url,
+      });
+
       const result = await createProviderOrder(
         provider.api_url,
         provider.api_key,
@@ -285,9 +238,14 @@ export async function createOrder({
 
       const assignedExternalId = extractProviderOrderId(result);
 
-      // ── 6a. Usable provider order id ───────────────────────
+      console.info("CREATE_ORDER: JAP response", {
+        orderId: order.id,
+        assignedExternalId: assignedExternalId || null,
+        raw,
+      });
+
       if (assignedExternalId) {
-        const { data: updated, error: updateError } = await supabase
+        const { error: updateError } = await supabase
           .from("orders")
           .update({
             provider_order_id: assignedExternalId,
@@ -295,24 +253,16 @@ export async function createOrder({
             status: "processing",
             updated_at: new Date().toISOString(),
           })
-          .eq("id", order.id)
-          .select("id, provider_order_id, status, tracking_code")
-          .single();
+          .eq("id", order.id);
 
-        if (updateError || !updated?.provider_order_id) {
-          console.error(
-            "CREATE_ORDER: failed to persist provider_order_id — pending for cron",
-            { orderId: order.id, assignedExternalId, updateError },
-          );
-
+        if (updateError) {
+          console.error("CREATE_ORDER: update after JAP failed", updateError);
           await supabase
             .from("orders")
             .update({
-              provider_order_id: null,
               provider_response: {
                 ...(typeof raw === "object" && raw ? raw : { payload: raw }),
                 recovered_provider_order_id: assignedExternalId,
-                local_error: "failed_to_persist_provider_order_id",
               },
               status: "pending",
               updated_at: new Date().toISOString(),
@@ -322,7 +272,7 @@ export async function createOrder({
           return {
             success: true,
             orderId: order.id,
-            trackingCode: order.tracking_code || order.id,
+            trackingCode: order.tracking_code || trackingCode,
             ledgerId,
             cost: orderCost,
             providerOrderId: null,
@@ -332,20 +282,15 @@ export async function createOrder({
         return {
           success: true,
           orderId: order.id,
-          trackingCode: updated.tracking_code || order.id,
+          trackingCode: order.tracking_code || trackingCode,
           ledgerId,
           cost: orderCost,
-          providerOrderId: String(updated.provider_order_id),
+          providerOrderId: assignedExternalId,
         };
       }
 
-      // ── 6b. No providerOrderId — still treat as accepted ───
-      console.warn(
-        "CREATE_ORDER: no providerOrderId — pending for cron recovery",
-        { orderId: order.id, raw },
-      );
-
-      const { error: pendingUpdateError } = await supabase
+      // JAP answered but no order id — still success; save body for cron
+      await supabase
         .from("orders")
         .update({
           provider_order_id: null,
@@ -355,50 +300,29 @@ export async function createOrder({
         })
         .eq("id", order.id);
 
-      if (pendingUpdateError) {
-        console.error(
-          "CREATE_ORDER: failed to save pending provider_response",
-          pendingUpdateError,
-        );
-      }
-
       return {
         success: true,
         orderId: order.id,
-        trackingCode: order.tracking_code || order.id,
+        trackingCode: order.tracking_code || trackingCode,
         ledgerId,
         cost: orderCost,
         providerOrderId: null,
       };
     } catch (error: any) {
-      // ── 6c. Hard failure only → refund ─────────────────────
-      console.error(
-        "CRITICAL: Provider API failed after debit. Refunding...",
-        error,
-      );
+      console.error("CREATE_ORDER: JAP hard failure", error);
 
-      const { error: refundError } = await supabase.rpc(
-        "credit_wallet_for_refund",
-        {
-          p_wallet_id: wallet.id,
-          p_usd_amount: orderCost,
-          p_description: `Refund: Provider failure for Order ${order.id}`,
-          p_reference_id: order.id,
-          p_reference_type: "boost_order",
-          p_metadata: {
-            reason: error?.message || "provider_failure",
-            order_id: order.id,
-            original_ledger_id: ledgerId,
-          },
+      await supabase.rpc("credit_wallet_for_refund", {
+        p_wallet_id: wallet.id,
+        p_usd_amount: orderCost,
+        p_description: `Refund: Provider failure for Order ${order.id}`,
+        p_reference_id: order.id,
+        p_reference_type: "boost_order",
+        p_metadata: {
+          reason: error?.message || "provider_failure",
+          order_id: order.id,
+          original_ledger_id: ledgerId,
         },
-      );
-
-      if (refundError) {
-        console.error("CATACLYSMIC: Refund RPC failed:", {
-          orderId: order.id,
-          refundError,
-        });
-      }
+      });
 
       await supabase
         .from("orders")
@@ -411,14 +335,10 @@ export async function createOrder({
         })
         .eq("id", order.id);
 
-      const rawErrorMsg = error?.message || "";
-      const isBalanceError = /balance|not enough/i.test(rawErrorMsg);
-
       return {
         success: false,
-        error: isBalanceError
-          ? "Service currently unavailable due to provider limits. Your wallet balance has been refunded."
-          : "Provider rejected the order. Funds have been refunded to your wallet.",
+        error:
+          "Provider rejected the order. Funds have been refunded to your wallet.",
       };
     }
   } catch (err: any) {
