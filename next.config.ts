@@ -61,13 +61,13 @@ const nextConfig: NextConfig = {
         has: [
           {
             type: 'host',
-            value: 'admin.nu-vora.app',
+            value: 'tech.nu-vora.app',
           },
         ],
         destination: '/[tech]/:path*',
       },
     ];
-  },
+  }, 
 
 
 	// ─── Compiler ──────────────────────────────────────────────────────
