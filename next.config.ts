@@ -52,34 +52,48 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
+	reactStrictMode: true,
 
-   compiler: {
-    removeConsole:
-      process.env.NODE_ENV === "production"
-        ? {
-            exclude: ["error", "warn"],
-          }
-        : false,
-  },
+	// ─── Redirects ──────────────────────────────────────────────────────
+	async redirects() {
+		return [
+			{
+				source: "/(.*)",
+				destination: "https://nu-vora.app/$1",
+				permanent: true,
+			},
+		];
+	},
 
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-      },
-    ],
-  },
+	// ─── Compiler ──────────────────────────────────────────────────────
+	compiler: {
+		removeConsole:
+			process.env.NODE_ENV === "production"
+				? {
+						exclude: ["error", "warn"],
+				  }
+				: false,
+	},
 
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: securityHeaders,
-      },
-    ];
-  },
+	// ─── Images ──────────────────────────────────────────────────────
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "lh3.googleusercontent.com",
+			},
+		],
+	},
+
+	// ─── Headers ──────────────────────────────────────────────────────
+	async headers() {
+		return [
+			{
+				source: "/:path*",
+				headers: securityHeaders,
+			},
+		];
+	},
 };
 
 export default nextConfig;

@@ -78,7 +78,7 @@ export async function proxy(request: NextRequest) {
 				return new NextResponse(site.html_code, {
 					headers: {
 						"Content-Type": "text/html; charset=utf-8",
-						"X-Served-By": "PrimeBoostage",
+						"X-Served-By": "NuVora| Elite Platform",
 						"X-Site-Id": site.site_slug || "unknown",
 						"Cache-Control":
 							"public, max-age=3600, stale-while-revalidate=86400",
