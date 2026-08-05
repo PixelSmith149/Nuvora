@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 	title: "NuVora | Elite Platform",
 	description: "Elite Access to Services, Global Markets & Tenant Management",
 	other: {
-    heleket: "7ed2630b",
+    heleket: "596e4a79",
   },
 };
 
