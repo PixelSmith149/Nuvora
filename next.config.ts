@@ -54,16 +54,21 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
 	reactStrictMode: true,
 
-	// ─── Redirects ──────────────────────────────────────────────────────
-	async redirects() {
-		return [
-			{
-				source: "/(.*)",
-				destination: "https://nu-vora.app/$1",
-				permanent: true,
-			},
-		];
-	},
+	 async rewrites() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'admin.nu-vora.app',
+          },
+        ],
+        destination: '/[tech]/:path*',
+      },
+    ];
+  },
+
 
 	// ─── Compiler ──────────────────────────────────────────────────────
 	compiler: {
