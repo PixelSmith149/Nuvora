@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { OrderSheet } from "./order-sheet";
 import { ServiceCard } from "./service-card";
 import { ServiceFilters } from "./service-filters";
@@ -12,7 +12,7 @@ export interface MarketplaceService {
 	retailRate: number;
 	minQuantity: number;
 	maxQuantity: number;
-	platform?: string; // Optional properties to mirror your clean DB mappings
+	platform?: string;
 	type?: string;
 	description?: string;
 	isAuto?: boolean;
@@ -20,7 +20,26 @@ export interface MarketplaceService {
 
 interface ServiceCatalogProps {
 	services: MarketplaceService[];
-	categories: string[]; // Handled as fallback or initial catalog context lists
+	categories: string[];
+}
+
+/**
+ * Production-safe Fisher-Yates shuffle.
+ * Does not mutate the original array.
+ */
+function shuffleServices<T>(items: T[]): T[] {
+	const shuffled = [...items];
+
+	for (let i = shuffled.length - 1; i > 0; i--) {
+		const randomIndex = Math.floor(Math.random() * (i + 1));
+
+		[shuffled[i], shuffled[randomIndex]] = [
+			shuffled[randomIndex],
+			shuffled[i],
+		];
+	}
+
+	return shuffled;
 }
 
 export function ServiceCatalog({
@@ -32,38 +51,59 @@ export function ServiceCatalog({
 	const [selectedService, setSelectedService] =
 		useState<MarketplaceService | null>(null);
 
-	// 1. Memoize dynamic data properties safely to avoid repetitive processing
-	const categories = useMemo(
-		() => [
-			...new Set(services.map((service) => service.category).filter(Boolean)),
-		],
-		[services],
-	);
+	/**
+	 * Initial render uses server data.
+	 * After hydration, randomize once.
+	 */
+	const [displayServices, setDisplayServices] =
+		useState<MarketplaceService[]>(services);
 
-	// 2. Memoize catalog filtering processes
+	useEffect(() => {
+		setDisplayServices(shuffleServices(services));
+	}, [services]);
+
+	/**
+	 * Dynamic category generation.
+	 */
+	const categories = useMemo(() => {
+		return [
+			...new Set(
+				displayServices
+					.map((service) => service.category)
+					.filter(Boolean)
+			),
+		];
+	}, [displayServices]);
+
+	/**
+	 * Filtering happens AFTER shuffle.
+	 * Order stays randomized but stable.
+	 */
 	const filteredServices = useMemo(() => {
-		return services.filter((service) => {
+		const query = search.trim().toLowerCase();
+
+		return displayServices.filter((service) => {
 			const matchesCategory =
-				selectedCategory === "all"
-					? true
-					: service.category === selectedCategory;
+				selectedCategory === "all" ||
+				service.category === selectedCategory;
 
 			const matchesSearch =
-				service.name.toLowerCase().includes(search.toLowerCase()) ||
-				service.category.toLowerCase().includes(search.toLowerCase());
+				!query ||
+				service.name.toLowerCase().includes(query) ||
+				service.category.toLowerCase().includes(query);
 
 			return matchesCategory && matchesSearch;
 		});
-	}, [services, search, selectedCategory]);
+	}, [
+		displayServices,
+		search,
+		selectedCategory,
+	]);
 
 	return (
 		<>
 			<section className="space-y-8">
-				{/* Hero Segment */}
-
-				{/* Dashboard Catalog Headers & Metrics Modules */}
 				<div className="space-y-6">
-					{/* Single Unified Filter Control Layout Bar */}
 					<ServiceFilters
 						search={search}
 						selectedCategory={selectedCategory}
@@ -73,22 +113,25 @@ export function ServiceCatalog({
 					/>
 				</div>
 
-				{/* Dynamic Count State Indicators */}
 				<div className="flex items-center justify-between">
 					<p className="text-sm text-zinc-400">
 						{filteredServices.length}{" "}
-						{filteredServices.length === 1 ? "service" : "services"} found
+						{filteredServices.length === 1
+							? "service"
+							: "services"}{" "}
+						found
 					</p>
 				</div>
 
-				{/* Services Render Processing Grid Matrix */}
 				{filteredServices.length > 0 ? (
 					<div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
 						{filteredServices.map((service) => (
 							<ServiceCard
 								key={service.id}
 								service={service}
-								onOrder={() => setSelectedService(service)}
+								onOrder={() =>
+									setSelectedService(service)
+								}
 							/>
 						))}
 					</div>
@@ -97,6 +140,7 @@ export function ServiceCatalog({
 						<h3 className="text-lg font-semibold text-white">
 							No services found
 						</h3>
+
 						<p className="mt-2 text-zinc-400">
 							Try another category or search term.
 						</p>
@@ -104,10 +148,9 @@ export function ServiceCatalog({
 				)}
 			</section>
 
-			{/* Target Interaction Capture Slider Drawer Sheet */}
 			<OrderSheet
 				service={selectedService}
-				open={!!selectedService}
+				open={Boolean(selectedService)}
 				onClose={() => setSelectedService(null)}
 			/>
 		</>

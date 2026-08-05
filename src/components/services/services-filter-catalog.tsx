@@ -24,6 +24,42 @@ interface ServicesFilterCatalogProps {
     categories: string[];
 }
 
+function shuffleWithSeed<T>(items: T[]) {
+    const array = [...items];
+
+    const seed =
+        typeof window !== "undefined"
+            ? Number(
+                  sessionStorage.getItem("service_shuffle_seed") ||
+                      (() => {
+                          const value = Math.floor(
+                              Math.random() * 1000000
+                          );
+                          sessionStorage.setItem(
+                              "service_shuffle_seed",
+                              value.toString()
+                          );
+                          return value;
+                      })()
+              )
+            : 12345;
+
+    let random = seed;
+
+    const seededRandom = () => {
+        random = (random * 9301 + 49297) % 233280;
+        return random / 233280;
+    };
+
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(seededRandom() * (i + 1));
+
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    return array;
+}
+
 export function ServicesFilterCatalog({
     platforms,
     services,
@@ -32,9 +68,13 @@ export function ServicesFilterCatalog({
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
+    const shuffledPlatforms = useMemo(() => {
+    return shuffleWithSeed(platforms);
+     }, [platforms]);
+
     // Filter platforms in real-time based on query and selected category
     const filteredPlatforms = useMemo(() => {
-        return platforms.filter((platform) => {
+    return shuffledPlatforms.filter((platform) => {
             // Find services belonging to this platform
             const platformServices = services.filter(
                 (s) =>
@@ -63,7 +103,12 @@ export function ServicesFilterCatalog({
 
             return matchesCategory && matchesQuery;
         });
-    }, [platforms, services, searchQuery, selectedCategory]);
+    }, [
+    shuffledPlatforms,
+    services,
+    searchQuery,
+    selectedCategory,
+   ]);
 
     return (
         <div className="mt-8 space-y-6">
