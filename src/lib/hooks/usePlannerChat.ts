@@ -1,8 +1,8 @@
-// hooks/usePlannerChat.ts
+// lib/hooks/usePlannerChat.ts
 
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage, SiteBlueprint } from "@/lib/st/types";
 
 interface UsePlannerChatReturn {
@@ -14,6 +14,7 @@ interface UsePlannerChatReturn {
 	blueprint: SiteBlueprint | null;
 	isComplete: boolean;
 	shouldConfirm: boolean;
+	isLoadingHistory: boolean;
 }
 
 export function usePlannerChat(siteId?: string): UsePlannerChatReturn {
@@ -23,7 +24,55 @@ export function usePlannerChat(siteId?: string): UsePlannerChatReturn {
 	const [blueprint, setBlueprint] = useState<SiteBlueprint | null>(null);
 	const [isComplete, setIsComplete] = useState(false);
 	const [shouldConfirm, setShouldConfirm] = useState(false);
+	const [isLoadingHistory, setIsLoadingHistory] = useState(!!siteId);
 	const abortControllerRef = useRef<AbortController | null>(null);
+	const historyLoadedRef = useRef(false);
+
+	// ─── Load existing chat history + blueprint on mount ───────
+	useEffect(() => {
+		if (!siteId || historyLoadedRef.current) return;
+
+		const loadHistory = async () => {
+			try {
+				const res = await fetch(`/api/st/sites/${siteId}`);
+				if (!res.ok) return;
+
+				const data = await res.json();
+				const site = data.site;
+
+				if (site?.chat_history && Array.isArray(site.chat_history)) {
+					const restored: ChatMessage[] = site.chat_history.map(
+						(m: any, idx: number) => ({
+							id: m.id || `hist-${idx}`,
+							role: m.role === "assistant" ? "assistant" : "user",
+							content: m.content || "",
+							timestamp: m.timestamp || new Date().toISOString(),
+						}),
+					);
+					setMessages(restored);
+				}
+
+				if (site?.blueprint && Object.keys(site.blueprint).length > 0) {
+					setBlueprint(site.blueprint);
+					// If blueprint already has required fields, mark as complete
+					if (
+						site.blueprint.brand_name &&
+						Array.isArray(site.blueprint.sections) &&
+						site.blueprint.sections.length > 0
+					) {
+						setIsComplete(true);
+					}
+				}
+			} catch (err) {
+				console.error("Failed to load chat history:", err);
+			} finally {
+				setIsLoadingHistory(false);
+				historyLoadedRef.current = true;
+			}
+		};
+
+		loadHistory();
+	}, [siteId]);
 
 	const resetChat = useCallback(() => {
 		setMessages([]);
@@ -41,7 +90,6 @@ export function usePlannerChat(siteId?: string): UsePlannerChatReturn {
 		async (content: string) => {
 			if (!content.trim()) return;
 
-			// Add user message
 			const userMessage: ChatMessage = {
 				id: crypto.randomUUID(),
 				role: "user",
@@ -75,7 +123,6 @@ export function usePlannerChat(siteId?: string): UsePlannerChatReturn {
 
 				const data = await response.json();
 
-				// Add assistant response
 				const assistantMessage: ChatMessage = {
 					id: crypto.randomUUID(),
 					role: "assistant",
@@ -92,9 +139,7 @@ export function usePlannerChat(siteId?: string): UsePlannerChatReturn {
 				setIsComplete(data.isComplete || false);
 				setShouldConfirm(data.shouldConfirm || false);
 			} catch (err: any) {
-				if (err.name === "AbortError") {
-					return;
-				}
+				if (err.name === "AbortError") return;
 				setError(err.message || "Failed to send message");
 			} finally {
 				setIsTyping(false);
@@ -112,5 +157,6 @@ export function usePlannerChat(siteId?: string): UsePlannerChatReturn {
 		blueprint,
 		isComplete,
 		shouldConfirm,
+		isLoadingHistory,
 	};
 }

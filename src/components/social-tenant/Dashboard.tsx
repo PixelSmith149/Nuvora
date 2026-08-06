@@ -3,27 +3,20 @@
 "use client";
 
 import {
-	AlertCircle,
-	ArrowRight,
 	Building2,
 	CheckCircle2,
 	Clock,
-	Edit3,
 	ExternalLink,
 	Eye,
 	Globe,
 	LayoutTemplate,
 	Loader2,
-	MoreVertical,
 	Plus,
 	Rocket,
 	Settings,
 	Sparkles,
 	Star,
 	Trash2,
-	TrendingUp,
-	Users,
-	Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSocialTenant } from "@/lib/hooks/useSocialTenant";
+import { getSitePublicUrl } from "@/lib/st/urls";
 
 interface DashboardProps {
 	userId: string;
@@ -227,7 +221,7 @@ export function Dashboard({ userId, username }: DashboardProps) {
 
 									<div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/60 px-3">
 										<span className="text-xs whitespace-nowrap text-zinc-500">
-											nu-vora.com/s/
+                                         slug.nu-vora.app
 										</span>
 
 										<Input
@@ -385,7 +379,7 @@ export function Dashboard({ userId, username }: DashboardProps) {
 							{site.site_slug && site.status === "published" && (
 								<div className="absolute bottom-3 left-3">
 									<span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 text-zinc-300">
-										/s/{site.site_slug}
+										{site.site_slug}.nu-vora.app
 									</span>
 								</div>
 							)}
@@ -410,7 +404,7 @@ export function Dashboard({ userId, username }: DashboardProps) {
 									{/* ✅ Fixed: site_slug instead of public_url_id */}
 									{site.status === "published" && site.site_slug && (
 										<Link
-											href={`/s/${site.site_slug}`}
+											href={getSitePublicUrl(site.site_slug)}
 											target="_blank"
 											className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500 hover:text-emerald-400 transition-colors"
 										>
@@ -436,7 +430,7 @@ export function Dashboard({ userId, username }: DashboardProps) {
 								{/* ✅ Fixed: site_slug instead of public_url_id */}
 								{site.status === "published" && site.site_slug ? (
 									<Link
-										href={`/s/${site.site_slug}`}
+										href={getSitePublicUrl(site.site_slug)}
 										target="_blank"
 										className="flex-1 bg-zinc-900/50 hover:bg-zinc-800 text-white rounded-lg py-2 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
 									>
@@ -530,7 +524,7 @@ export function Dashboard({ userId, username }: DashboardProps) {
 							</Label>
 							<div className="flex items-center gap-2">
 								<span className="text-xs text-zinc-500 whitespace-nowrap">
-									nu-vora.com/s/
+									slug.nu-vora.app
 								</span>
 								<Input
 									value={siteSlug}

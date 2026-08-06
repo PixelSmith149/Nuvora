@@ -144,6 +144,30 @@ export default function CryptoWithdrawPage() {
     }
   };
 
+  const CRYPTO_WITHDRAWAL_ENABLED = false;
+
+if (!CRYPTO_WITHDRAWAL_ENABLED) {
+  return (
+    <main className="min-h-screen bg-black text-white">
+      <BackButton />
+
+      <section className="mx-auto max-w-xl px-6 pt-32 pb-20 text-center">
+        <h1 className="text-3xl font-black uppercase tracking-tight">
+          ⚡ Crypto Withdrawal
+        </h1>
+
+        <h2 className="mt-10 text-4xl font-black text-orange-500">
+          Coming Soon
+        </h2>
+
+        <p className="mt-4 text-zinc-500">
+          Crypto withdrawals are currently under development.
+        </p>
+      </section>
+    </main>
+  );
+}
+
   return (
     <main className="min-h-screen bg-black text-white selection:bg-orange-500/30">
       <BackButton />

@@ -3,17 +3,27 @@
 export type SiteStatus =
 	| "draft"
 	| "generating"
+	| "generated" // ← new intermediate status
 	| "published"
 	| "failed"
 	| "archived";
 
-// lib/st/types.ts
-
 export interface SiteBlueprint {
+	// Core identity
+	business_type: string;
 	brand_name: string;
 	brand_tagline?: string;
-	theme: string;
-	sections: string[];
+	industry?: string;
+	target_audience?: string;
+	business_goal?: string;
+
+	// Design
+	design_style?: string;
+	theme?: string;
+	tone?: string;
+	primary_cta?: string;
+	secondary_cta?: string;
+
 	colors?: {
 		primary?: string;
 		secondary?: string;
@@ -21,26 +31,53 @@ export interface SiteBlueprint {
 		background?: string;
 		text?: string;
 	};
-	fonts?: {
+
+	typography?: {
 		heading?: string;
 		body?: string;
 	};
-	cta_text?: string;
+
+	layout?: {
+		corner_radius?: string;
+		card_style?: string;
+		button_style?: string;
+		animation_style?: string;
+		spacing?: string;
+	};
+
+	// Structure
+	sections: string[];
+	features?: string[];
+	services?: string[];
+
+	// Contact & social
 	social_links?: {
 		instagram?: string;
 		facebook?: string;
 		tiktok?: string;
 		twitter?: string;
 		youtube?: string;
+		linkedin?: string;
 	};
-	contact_email?: string;
-	contact_phone?: string;
 
+	contact_information?: {
+		email?: string;
+		phone?: string;
+		address?: string;
+	};
+
+	// SEO
+	seo?: {
+		title?: string;
+		description?: string;
+		keywords?: string[];
+	};
+
+	// Platform extras (kept for settings)
 	custom_domain?: string;
 	custom_domain_verified?: boolean;
 	custom_domain_verified_at?: string | null;
 	custom_domain_verification_error?: string | null;
-
 	analytics_id?: string;
 	site_description?: string;
 }
@@ -58,6 +95,7 @@ export interface UserSite {
 	session_expires_at: string | null;
 	is_session_active: boolean;
 	published_at: string | null;
+	chat_history?: ChatMessage[];
 	created_at: string;
 	updated_at: string;
 }
@@ -85,18 +123,6 @@ export interface SiteEdit {
 	created_at: string;
 }
 
-export interface BuilderState {
-	siteId: string | null;
-	sessionId: string | null;
-	isSessionActive: boolean;
-	sessionExpiresAt: string | null;
-	isGenerating: boolean;
-	isComplete: boolean;
-	chatHistory: ChatMessage[];
-	htmlBuffer: string;
-	blueprint: SiteBlueprint | null;
-}
-
 export interface ChatMessage {
 	id: string;
 	role: "user" | "assistant" | "system";
@@ -106,11 +132,10 @@ export interface ChatMessage {
 }
 
 export interface PlannerResponse {
-	type: "planning" | "code" | "confirmation" | "edit";
-	content: string;
+	message: string;
 	blueprint?: SiteBlueprint;
-	section?: string;
-	htmlChunk?: string;
+	isComplete: boolean;
+	shouldConfirm?: boolean;
 }
 
 export interface EditRequest {
@@ -124,3 +149,9 @@ export interface EditRequest {
 export const SYSTEM_WALLET_ID = "997f4dd7-2124-4f36-9a71-e636e7e6d56a";
 export const SESSION_EXPIRY_HOURS = 48;
 export const BUILD_COST = 5.0;
+
+// Required fields that must exist before we allow generation
+export const REQUIRED_BLUEPRINT_FIELDS = [
+	"brand_name",
+	"sections",
+] as const;

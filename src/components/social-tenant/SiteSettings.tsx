@@ -28,6 +28,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useSocialTenant } from "@/lib/hooks/useSocialTenant";
+import { getSitePublicUrl } from "@/lib/st/urls";
 
 interface SiteSettingsProps {
 	siteId: string;
@@ -293,39 +294,43 @@ export function SiteSettings({ siteId, userId, username }: SiteSettingsProps) {
 						</div>
 
 						<div className="space-y-2">
-							<Label className="text-xs font-medium text-zinc-400">
-								Public URL
-							</Label>
-							<div className="flex items-center gap-2">
-								<div className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-400 truncate">
-									{site?.site_slug
-										? `${window.location.origin}/s/${site.site_slug}`
-										: "Not published yet"}
-								</div>
-								{site?.site_slug && (
-									<>
-										<button
-											onClick={handleCopyUrl}
-											className="p-2.5 rounded-xl bg-zinc-900/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors border border-white/5"
-										>
-											{copied ? (
-												<CheckCircle2 className="h-4 w-4 text-emerald-400" />
-											) : (
-												<Copy className="h-4 w-4" />
-											)}
-										</button>
-										<a
-											href={`/s/${site.site_slug}`}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="p-2.5 rounded-xl bg-zinc-900/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors border border-white/5"
-										>
-											<ExternalLink className="h-4 w-4" />
-										</a>
-									</>
-								)}
-							</div>
-						</div>
+  <Label className="text-xs font-medium text-zinc-400">
+    Public URL
+  </Label>
+  <div className="flex items-center gap-2">
+    <div className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-400 truncate">
+      {site?.site_slug && site.status === "published"
+        ? getSitePublicUrl(site.site_slug)
+        : "Not published yet"}
+    </div>
+    {site?.site_slug && site.status === "published" && (
+      <>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(getSitePublicUrl(site.site_slug));
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }}
+          className="p-2.5 rounded-xl bg-zinc-900/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors border border-white/5"
+        >
+          {copied ? (
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+        </button>
+        <a
+          href={getSitePublicUrl(site.site_slug)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2.5 rounded-xl bg-zinc-900/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors border border-white/5"
+        >
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      </>
+    )}
+  </div>
+</div>
 					</div>
 
 					<div className="mt-6 space-y-2">
@@ -492,11 +497,12 @@ export function SiteSettings({ siteId, userId, username }: SiteSettingsProps) {
 
 						{showInstructions && domainInstructions && (
 							<DomainGuide
-								domain={domainInstructions.domain}
-								provider={domainInstructions.provider}
-								records={domainInstructions.records}
-								onVerify={handleVerifyDomain}
-							/>
+  domain={domainInstructions.domain}
+  siteSlug={site.site_slug}
+  provider={domainInstructions.provider}
+  records={domainInstructions.records}
+  onVerify={handleVerifyDomain}
+/>
 						)}
 
 						{/* Analytics */}

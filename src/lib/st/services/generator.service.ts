@@ -2,6 +2,11 @@
 
 import { GENERATOR_SYSTEM_PROMPT } from "@/lib/st/prompts/generator-prompt";
 import type { SiteBlueprint } from "@/lib/st/types";
+import {
+	createBuildPrompt,
+	isBlueprintReady,
+	normalizeBlueprint,
+} from "@/lib/st/services/blueprint.service";
 import { getAIService } from "./ai.service";
 
 export interface GenerateStreamChunk {
@@ -15,12 +20,28 @@ export async function* generateWebsiteStream(
 ): AsyncGenerator<GenerateStreamChunk> {
 	const ai = getAIService();
 
+	// Always normalize + validate before generation
+	const cleanBlueprint = normalizeBlueprint(blueprint);
+
+	if (!isBlueprintReady(cleanBlueprint)) {
+		yield {
+			type: "error",
+			content:
+				"Blueprint is incomplete. Please finish the planning conversation first.",
+			progress: 0,
+		};
+		return;
+	}
+
+	const buildPrompt = createBuildPrompt(cleanBlueprint);
+
 	const systemPrompt = GENERATOR_SYSTEM_PROMPT.replace(
 		"{blueprint_json}",
-		JSON.stringify(blueprint, null, 2),
+		buildPrompt,
 	);
 
-	const userMessage = "Generate a complete website based on this blueprint.";
+	const userMessage =
+		"Generate a complete, production-ready website based on this blueprint. Return ONLY valid HTML.";
 
 	yield {
 		type: "start",
@@ -45,6 +66,17 @@ export async function* generateWebsiteStream(
 			};
 		}
 
+		// Basic sanity check
+		if (!fullHtml.includes("<!DOCTYPE html") && !fullHtml.includes("<html")) {
+			yield {
+				type: "error",
+				content:
+					"Generation produced invalid HTML. Please try again or adjust the blueprint.",
+				progress: 0,
+			};
+			return;
+		}
+
 		yield {
 			type: "complete",
 			content: fullHtml,
@@ -63,13 +95,13 @@ export async function* generateWebsiteStream(
 			yield {
 				type: "error",
 				content:
-					'🚧 Our AI engine is currently experiencing heavy traffic. Your website progress has been saved. Click "Resume" to continue building.',
+					'Our AI engine is currently experiencing heavy traffic. Your progress has been saved. Click "Resume" to continue.',
 				progress: 0,
 			};
 		} else {
 			yield {
 				type: "error",
-				content: `❌ ${error?.message || "An unexpected error occurred. Please try again."}`,
+				content: error?.message || "An unexpected error occurred. Please try again.",
 				progress: 0,
 			};
 		}
@@ -81,17 +113,20 @@ export async function* resumeGeneration(
 	partialHtml: string,
 ): AsyncGenerator<GenerateStreamChunk> {
 	const ai = getAIService();
+	const cleanBlueprint = normalizeBlueprint(blueprint);
+	const buildPrompt = createBuildPrompt(cleanBlueprint);
 
 	const systemPrompt = `
 You are completing a partially generated website. Continue from where you left off.
 
-The current HTML is:
+Current HTML so far:
 ${partialHtml}
 
 Complete the remaining sections based on this blueprint:
-${JSON.stringify(blueprint, null, 2)}
+${buildPrompt}
 
-Continue from where the HTML stopped. Do NOT repeat what's already written.
+Continue from where the HTML stopped. Do NOT repeat what is already written.
+Return only the continuation (or the full completed document if easier).
 `;
 
 	yield {
@@ -130,7 +165,7 @@ Continue from where the HTML stopped. Do NOT repeat what's already written.
 		yield {
 			type: "error",
 			content:
-				"❌ Failed to resume generation. Please try again from the beginning.",
+				"Failed to resume generation. Please try again from the beginning.",
 			progress: 0,
 		};
 	}

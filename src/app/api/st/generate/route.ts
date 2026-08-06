@@ -66,19 +66,19 @@ export async function POST(req: NextRequest) {
 		const ai = getAIService();
 		const health = await ai.healthCheck();
 
-		// ✅ Specific "Server Busy" card
 		if (!health.healthy) {
 			return NextResponse.json(
 				{
 					error:
-						"🚧 Architect is taking a quick breath! Our AI engine is currently experiencing heavy traffic. We've saved your website progress—click Resume to try generating the rest of your pages.",
+						"Architect is taking a quick breath! Our AI engine is currently experiencing heavy traffic. We've saved your website progress—click Resume to try generating the rest of your pages.",
 					type: "server_busy",
 					canResume: true,
 				},
 				{ status: 503 },
 			);
 		}
-		// Start session
+
+		// Start session only on first generation
 		if (!resume) {
 			await startSession(siteId);
 		}
@@ -90,14 +90,17 @@ export async function POST(req: NextRequest) {
 				let fullHtml = "";
 
 				try {
-					// Send initial status
 					controller.enqueue(
 						encoder.encode(
-							`data: ${JSON.stringify({ type: "start", message: resume ? "Resuming generation..." : "Generating your website..." })}\n\n`,
+							`data: ${JSON.stringify({
+								type: "start",
+								message: resume
+									? "Resuming generation..."
+									: "Generating your website...",
+							})}\n\n`,
 						),
 					);
 
-					// Generate or resume website
 					const generator = resume
 						? resumeGeneration(blueprint, partialHtml)
 						: generateWebsiteStream(blueprint);
@@ -107,22 +110,35 @@ export async function POST(req: NextRequest) {
 							fullHtml += chunk.content;
 							controller.enqueue(
 								encoder.encode(
-									`data: ${JSON.stringify({ type: "chunk", content: chunk.content, progress: chunk.progress })}\n\n`,
+									`data: ${JSON.stringify({
+										type: "chunk",
+										content: chunk.content,
+										progress: chunk.progress,
+									})}\n\n`,
 								),
 							);
 						} else if (chunk.type === "complete") {
-							// Save complete HTML to database
 							const completeHtml = chunk.content;
-							await updateSiteHtml(siteId, completeHtml, "published");
+
+							// IMPORTANT: status = "generated" (NOT published)
+							await updateSiteHtml(siteId, completeHtml, "generated");
+
 							controller.enqueue(
 								encoder.encode(
-									`data: ${JSON.stringify({ type: "complete", message: "Website generated successfully!" })}\n\n`,
+									`data: ${JSON.stringify({
+										type: "complete",
+										message: "Website generated successfully! Review it and publish when ready.",
+									})}\n\n`,
 								),
 							);
 						} else if (chunk.type === "error") {
 							controller.enqueue(
 								encoder.encode(
-									`data: ${JSON.stringify({ type: "error", message: chunk.content, canResume: true })}\n\n`,
+									`data: ${JSON.stringify({
+										type: "error",
+										message: chunk.content,
+										canResume: true,
+									})}\n\n`,
 								),
 							);
 						}

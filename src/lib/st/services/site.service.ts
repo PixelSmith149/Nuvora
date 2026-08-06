@@ -126,25 +126,32 @@ export async function updateSiteHtml(
 }
 
 export async function updateSiteStatus(
-	siteId: string,
-	status: SiteStatus,
+  siteId: string,
+  status: SiteStatus,
 ): Promise<UserSite> {
-	const supabase = await createClient();
+  const supabase = await createClient();
 
-	const updateData: any = { status };
-	if (status === "published") {
-		updateData.published_at = new Date().toISOString();
-	}
+  const updateData: any = { status };
 
-	const { data, error } = await supabase
-		.from("user_sites")
-		.update(updateData)
-		.eq("id", siteId)
-		.select()
-		.single();
+  if (status === "published") {
+    updateData.published_at = new Date().toISOString();
+  }
 
-	if (error) throw new Error(`Failed to update status: ${error.message}`);
-	return data as UserSite;
+  // When publishing we also close the free-edit session
+  if (status === "published") {
+    updateData.is_session_active = false;
+    updateData.session_expires_at = null;
+  }
+
+  const { data, error } = await supabase
+    .from("user_sites")
+    .update(updateData)
+    .eq("id", siteId)
+    .select()
+    .single();
+
+  if (error) throw new Error(`Failed to update status: ${error.message}`);
+  return data as UserSite;
 }
 
 export async function deleteSite(siteId: string): Promise<void> {

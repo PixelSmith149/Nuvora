@@ -11,9 +11,11 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { getSiteHostname } from "@/lib/st/urls";
 
 interface DomainGuideProps {
 	domain: string;
+	siteSlug: string; // ← now required so we can point to the correct subdomain
 	provider: {
 		id: string;
 		name: string;
@@ -30,12 +32,14 @@ interface DomainGuideProps {
 
 export function DomainGuide({
 	domain,
+	siteSlug,
 	provider,
 	records,
 	onVerify,
 }: DomainGuideProps) {
 	const [expanded, setExpanded] = useState(true);
-	const [step, setStep] = useState(1);
+
+	const targetHostname = getSiteHostname(siteSlug); // e.g. bakery.nu-vora.app
 
 	const providerSteps: Record<string, { title: string; steps: string[] }> = {
 		cloudflare: {
@@ -44,9 +48,8 @@ export function DomainGuide({
 				"Log in to Cloudflare at https://dash.cloudflare.com",
 				`Select your domain: ${domain}`,
 				'Click the "DNS" tab in the left sidebar',
-				"Add CNAME record: Name: www, Target: nu-vora.com, Proxy: OFF",
-				"Add A record: Name: @, IPv4: 76.76.21.21, Proxy: OFF",
-				'Click "Save" for each record',
+				`Add CNAME record: Name: www (or @), Target: ${targetHostname}, Proxy: OFF (gray cloud)`,
+				'Click "Save"',
 			],
 		},
 		namecheap: {
@@ -54,9 +57,8 @@ export function DomainGuide({
 			steps: [
 				"Log in to Namecheap",
 				`Go to Domain List → ${domain} → Manage → Advanced DNS`,
-				"Add CNAME record: Host: www, Value: nu-vora.com, TTL: 300",
-				"Add A record: Host: @, Value: 76.76.21.21, TTL: 300",
-				"Click the checkmark to save each record",
+				`Add CNAME record: Host: www (or @), Value: ${targetHostname}, TTL: Automatic`,
+				"Click the checkmark to save",
 			],
 		},
 		godaddy: {
@@ -65,8 +67,7 @@ export function DomainGuide({
 				"Log in to GoDaddy",
 				`Go to My Products → ${domain} → DNS`,
 				'Click "Add New Record"',
-				"Add CNAME: Type: CNAME, Name: www, Value: nu-vora.com, TTL: 1 Hour",
-				"Add A: Type: A, Name: @, Value: 76.76.21.21, TTL: 1 Hour",
+				`Type: CNAME, Name: www (or @), Value: ${targetHostname}, TTL: 1 Hour`,
 				'Click "Save"',
 			],
 		},
@@ -76,8 +77,7 @@ export function DomainGuide({
 				"Log in to Google Domains",
 				`Select ${domain}`,
 				"Go to DNS → Custom resource records",
-				"Add CNAME: Name: www, Data: nu-vora.com, TTL: 300",
-				"Add A: Name: @, Data: 76.76.21.21, TTL: 300",
+				`Add CNAME: Name: www (or @), Data: ${targetHostname}, TTL: 300`,
 				'Click "Save"',
 			],
 		},
@@ -88,8 +88,7 @@ export function DomainGuide({
 				"Go to Route 53 → Hosted Zones",
 				`Select ${domain}`,
 				'Click "Create Record"',
-				"Add CNAME: Record name: www, Record type: CNAME, Value: nu-vora.com",
-				"Add A: Record name: @, Record type: A, Value: 76.76.21.21",
+				`Record name: www (or leave blank for @), Record type: CNAME, Value: ${targetHostname}`,
 				'Click "Create"',
 			],
 		},
@@ -100,8 +99,7 @@ export function DomainGuide({
 				"Go to DNS Zones",
 				`Select ${domain}`,
 				'Click "+ Record Set"',
-				"Add CNAME: Name: www, Type: CNAME, Value: nu-vora.com, TTL: 300",
-				"Add A: Name: @, Type: A, Value: 76.76.21.21, TTL: 300",
+				`Name: www (or @), Type: CNAME, Value: ${targetHostname}, TTL: 300`,
 				'Click "OK"',
 			],
 		},
@@ -110,8 +108,7 @@ export function DomainGuide({
 			steps: [
 				"Log in to your DNS provider or domain registrar",
 				`Find the DNS management section for ${domain}`,
-				"Add a CNAME record: Name: www, Points to: nu-vora.com",
-				"Add an A record: Name: @, Points to: 76.76.21.21",
+				`Add a CNAME record: Name: www (or @), Points to: ${targetHostname}`,
 				"Save your changes and wait 5-30 minutes for propagation",
 				'Return here and click "Verify Domain"',
 			],
@@ -119,6 +116,22 @@ export function DomainGuide({
 	};
 
 	const providerInfo = providerSteps[provider.id] || providerSteps.unknown;
+
+	// Canonical records we recommend
+	const recommendedRecords = [
+		{
+			type: "CNAME",
+			name: "www",
+			value: targetHostname,
+			required: true,
+		},
+		{
+			type: "CNAME",
+			name: "@",
+			value: targetHostname,
+			required: false, // some providers don't allow CNAME on apex
+		},
+	];
 
 	return (
 		<div className="mt-4 border border-sky-500/20 rounded-xl overflow-hidden bg-zinc-900/30">
@@ -156,7 +169,7 @@ export function DomainGuide({
 							DNS Records to Add:
 						</p>
 						<div className="space-y-1.5">
-							{records
+							{recommendedRecords
 								.filter((r) => r.required)
 								.map((record, idx) => (
 									<div
@@ -207,7 +220,12 @@ export function DomainGuide({
 						<ul className="text-xs text-zinc-400 space-y-1 list-disc list-inside">
 							<li>Turn OFF proxy (gray cloud) if using Cloudflare</li>
 							<li>DNS changes can take 5-30 minutes to propagate</li>
-							<li>Keep both records (CNAME and A) for full functionality</li>
+							<li>
+								Point your domain to{" "}
+								<span className="text-emerald-400 font-mono">
+									{targetHostname}
+								</span>
+							</li>
 						</ul>
 					</div>
 
@@ -232,7 +250,7 @@ export function DomainGuide({
 						<button
 							onClick={() => {
 								const subject = `DNS Configuration for ${domain}`;
-								const body = `Here are the DNS records to add for ${domain}:\n\nCNAME: www → nu-vora.com\nA: @ → 76.76.21.21\n\nProvider: ${providerInfo.title}\n\nFull guide: ${window.location.href}`;
+								const body = `Here are the DNS records to add for ${domain}:\n\nCNAME: www → ${targetHostname}\n\nProvider: ${providerInfo.title}`;
 								window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 							}}
 							className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1.5"
@@ -242,7 +260,6 @@ export function DomainGuide({
 						</button>
 					</div>
 
-					{/* Email Provider */}
 					<p className="text-[10px] text-zinc-600 border-t border-white/5 pt-3 mt-2">
 						Need personalized help? Contact your DNS provider's support.
 					</p>

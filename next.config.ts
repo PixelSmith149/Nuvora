@@ -64,7 +64,7 @@ const nextConfig: NextConfig = {
             value: 'tech.nu-vora.app',
           },
         ],
-        destination: '/[tech]/:path*',
+        destination: '/core-tech/:path*',
       },
     ];
   }, 

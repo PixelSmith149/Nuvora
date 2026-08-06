@@ -5,6 +5,12 @@ import { getAIService } from "@/lib/st/services/ai.service";
 import { processPlannerMessage } from "@/lib/st/services/planner.service";
 import { createClient } from "@/lib/supabase/server";
 
+
+		// Simple in-memory rate limit (per user)
+    const plannerRateLimit = new Map<string, { count: number; resetAt: number }>();
+    const PLANNER_LIMIT = 20; // max messages per window
+    const PLANNER_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+	
 export async function POST(req: NextRequest) {
 	const supabase = await createClient();
 	const {
@@ -14,6 +20,29 @@ export async function POST(req: NextRequest) {
 	if (!user) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
+
+	// Soft rate limit
+const now = Date.now();
+const userLimit = plannerRateLimit.get(user.id);
+
+if (userLimit && now < userLimit.resetAt) {
+	if (userLimit.count >= PLANNER_LIMIT) {
+		return NextResponse.json(
+			{
+				error:
+					"You're sending messages too quickly. Please wait a few minutes before continuing the conversation.",
+				type: "rate_limited",
+			},
+			{ status: 429 },
+		);
+	}
+	userLimit.count += 1;
+} else {
+	plannerRateLimit.set(user.id, {
+		count: 1,
+		resetAt: now + PLANNER_WINDOW_MS,
+	});
+}
 
 	try {
 		const body = await req.json();

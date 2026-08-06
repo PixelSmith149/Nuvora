@@ -4,7 +4,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
-	BuilderState,
 	ChatMessage,
 	SiteBlueprint,
 	type UserSite,

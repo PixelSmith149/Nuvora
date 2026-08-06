@@ -2,6 +2,10 @@
 
 import { PLANNER_SYSTEM_PROMPT } from "@/lib/st/prompts/planner-prompt";
 import type { ChatMessage, SiteBlueprint } from "@/lib/st/types";
+import {
+	isBlueprintReady,
+	normalizeBlueprint,
+} from "@/lib/st/services/blueprint.service";
 import { type AIMessage, getAIService } from "./ai.service";
 
 export interface PlannerResponse {
@@ -17,7 +21,6 @@ export async function processPlannerMessage(
 ): Promise<PlannerResponse> {
 	const ai = getAIService();
 
-	// ✅ Fix: Properly type the messages conversion
 	const aiMessages: AIMessage[] = [
 		{ role: "system", content: PLANNER_SYSTEM_PROMPT },
 		...messages.map(
@@ -40,26 +43,57 @@ export async function processPlannerMessage(
 		let isComplete = false;
 		let shouldConfirm = false;
 
-		const jsonMatch = fullResponse.match(/```json\s*([\s\S]*?)\s*```/);
+		// 1. Try to extract JSON (supports both fenced and raw JSON)
+		const jsonMatch =
+			fullResponse.match(/```json\s*([\s\S]*?)\s*```/) ||
+			fullResponse.match(/\{[\s\S]*"brand_name"[\s\S]*\}/);
+
 		if (jsonMatch) {
 			try {
-				const parsed = JSON.parse(jsonMatch[1]);
-				blueprint = parsed;
-				isComplete = true;
+				const raw = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+				const normalized = normalizeBlueprint(raw);
+
+				if (isBlueprintReady(normalized)) {
+					blueprint = normalized;
+					isComplete = true;
+				} else {
+					// Partial blueprint – keep it but do not mark complete
+					blueprint = normalized;
+				}
 			} catch {
-				// JSON parse failed, but we still have the message
+				// JSON parse failed – continue without blueprint
 			}
 		}
 
+		// 2. Explicit confirmation signals from the model
+		const lower = fullResponse.toLowerCase();
 		if (
-			fullResponse.includes("satisfied") ||
-			fullResponse.includes("happy with")
+			lower.includes("does this look correct") ||
+			lower.includes("are you happy with this plan") ||
+			lower.includes("ready to build") ||
+			lower.includes("shall i proceed")
 		) {
 			shouldConfirm = true;
 		}
 
+		// 3. If we already have a ready blueprint from previous turns, preserve it
+		if (!blueprint && currentBlueprint && isBlueprintReady(currentBlueprint)) {
+			blueprint = currentBlueprint;
+		}
+
+		// Clean the visible message: remove the raw JSON block so the user sees only natural language
+		let cleanMessage = fullResponse
+			.replace(/```json\s*[\s\S]*?\s*```/g, "")
+			.trim();
+
+		if (!cleanMessage) {
+			cleanMessage = isComplete
+				? "Your website blueprint is ready. Click Build when you are happy with it."
+				: fullResponse;
+		}
+
 		return {
-			message: fullResponse,
+			message: cleanMessage,
 			blueprint: blueprint || currentBlueprint || undefined,
 			isComplete,
 			shouldConfirm,
@@ -72,83 +106,5 @@ export async function processPlannerMessage(
 			isComplete: false,
 			shouldConfirm: false,
 		};
-	}
-}
-
-export async function detectSectionToEdit(
-	userMessage: string,
-	currentHtml: string,
-): Promise<string | null> {
-	const ai = getAIService();
-
-	const prompt = `
-Given the user message and the current HTML, identify which section they want to edit.
-
-User message: "${userMessage}"
-
-Current HTML is ${currentHtml.length} characters long.
-
-Return ONLY the section name (one of: hero, about, services, products, testimonials, pricing, contact) or "unknown" if you can't determine it.
-`;
-
-	try {
-		const response = await ai.generateEdit(
-			prompt,
-			"Identify the section to edit.",
-			{
-				maxTokens: 50,
-				temperature: 0.1,
-			},
-		);
-
-		const section = response.trim().toLowerCase();
-		const validSections = [
-			"hero",
-			"about",
-			"services",
-			"products",
-			"testimonials",
-			"pricing",
-			"contact",
-		];
-
-		if (validSections.includes(section)) {
-			return section;
-		}
-		return null;
-	} catch (error) {
-		console.error("Section detection error:", error);
-		return null;
-	}
-}
-
-export async function generateEditHtml(
-	section: string,
-	newContent: string,
-	currentHtml: string,
-): Promise<string> {
-	const ai = getAIService();
-
-	const prompt = `
-Update the "${section}" section in the following HTML.
-
-Current HTML:
-${currentHtml}
-
-New content for ${section}:
-${newContent}
-
-Return ONLY the updated section HTML.
-`;
-
-	try {
-		const result = await ai.generateEdit(prompt, "Update the section.", {
-			maxTokens: 4096,
-			temperature: 0.2,
-		});
-		return result;
-	} catch (error) {
-		console.error("Edit generation error:", error);
-		return currentHtml;
 	}
 }

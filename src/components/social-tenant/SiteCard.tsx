@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import type { UserSite } from "@/lib/st/types";
+import { getSitePublicUrl } from "@/lib/st/urls";
 
 interface SiteCardProps {
 	site: UserSite;
@@ -28,12 +29,18 @@ interface SiteCardProps {
 export function SiteCard({ site, onDelete, isDeleting }: SiteCardProps) {
 	const statusColors = {
 		published: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+		generated: "bg-sky-500/10 border-sky-500/20 text-sky-400",
 		draft: "bg-zinc-500/10 border-zinc-500/20 text-zinc-400",
 		generating:
 			"bg-amber-500/10 border-amber-500/20 text-amber-400 animate-pulse",
 		failed: "bg-red-500/10 border-red-500/20 text-red-400",
 		archived: "bg-zinc-600/10 border-zinc-600/20 text-zinc-500",
 	};
+
+	const publicUrl =
+		site.site_slug && site.status === "published"
+			? getSitePublicUrl(site.site_slug)
+			: null;
 
 	return (
 		<div className="group bg-zinc-950/40 border border-white/5 rounded-xl overflow-hidden hover:border-white/15 transition-all">
@@ -66,11 +73,11 @@ export function SiteCard({ site, onDelete, isDeleting }: SiteCardProps) {
 					</span>
 				</div>
 
-				{/* ✅ Site Slug Badge */}
-				{site.site_slug && site.status === "published" && (
+				{/* Subdomain Badge */}
+				{publicUrl && (
 					<div className="absolute bottom-3 left-3">
 						<span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 text-zinc-300">
-							/s/{site.site_slug}
+							{site.site_slug}.nu-vora.app
 						</span>
 					</div>
 				)}
@@ -78,16 +85,16 @@ export function SiteCard({ site, onDelete, isDeleting }: SiteCardProps) {
 				{/* Hover Overlay */}
 				<div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 					<div className="flex items-center gap-3">
-						{site.status === "published" &&
-							site.site_slug && ( // ← Changed
-								<Link
-									href={`/s/${site.site_slug}`} // ← Changed
-									target="_blank"
-									className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-								>
-									<Eye className="h-5 w-5" />
-								</Link>
-							)}
+						{publicUrl && (
+							<a
+								href={publicUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+							>
+								<Eye className="h-5 w-5" />
+							</a>
+						)}
 						<Link
 							href={
 								site.status === "published"
@@ -140,11 +147,18 @@ export function SiteCard({ site, onDelete, isDeleting }: SiteCardProps) {
 					</button>
 				</div>
 
-				{/* ✅ URL Display */}
-				{site.site_slug && site.status === "published" && (
+				{/* Public URL */}
+				{publicUrl && (
 					<div className="mt-2 flex items-center gap-2 text-[10px] text-zinc-500">
 						<Globe className="h-3 w-3" />
-						<span className="truncate">/s/{site.site_slug}</span>
+						<a
+							href={publicUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="truncate hover:text-emerald-400 transition-colors"
+						>
+							{site.site_slug}.nu-vora.app
+						</a>
 					</div>
 				)}
 
