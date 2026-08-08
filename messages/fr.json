@@ -46,6 +46,16 @@
       "hide": "Masquer le panneau de la vitrine",
       "show": "Ouvrir le panneau de la vitrine",
       "closeAria": "Fermer la vitrine"
+    },
+    "referralCard": {
+      "title": "Programme de parrainage",
+      "description": "Invitez vos amis et gagnez des récompenses pour chaque parrainage réussi.",
+      "button": "Consulter le tableau de bord des recommandations"
+    },
+    "storeCard": {
+      "title": "Ma boutique en ligne",
+      "description": "Gérez et prévisualisez votre vitrine publique.",
+      "button": "Vitrine ouverte"
     }
   },
   "PrivacyPolicy": {

@@ -1,3 +1,4 @@
+// src\lib\wallet\getWallet.ts
 import { createClient } from "@/lib/supabase/server";
 
 export async function getWallet() {
@@ -21,3 +22,4 @@ export async function getWallet() {
 
 	return data;
 }
+

@@ -1,5 +1,4 @@
-// proxy.ts
-
+// src/proxy.ts
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -9,6 +8,26 @@ export async function proxy(request: NextRequest) {
       headers: request.headers,
     },
   });
+
+  const url = request.nextUrl.clone();
+  
+  // ─── Referral Tracking Cookie ─────────────────────────────────
+const refParam = url.searchParams.get("ref");
+const typeParam = url.searchParams.get("type") || "publish";
+
+if (refParam) {
+  const payload = JSON.stringify({
+    code: refParam.trim().toUpperCase(),
+    type: typeParam,
+  });
+
+  response.cookies.set("nu_referral", payload, {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    path: "/",
+    httpOnly: false,
+    sameSite: "lax",
+  });
+}
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,7 +51,6 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const url = request.nextUrl.clone();
   const pathname = url.pathname;
   const hostname = request.headers.get("host") || "";
 
@@ -107,11 +125,22 @@ export async function proxy(request: NextRequest) {
     if (isSubdomain) {
       slug = hostname.replace(`.${platformDomain}`, "").split(".")[0];
     } else {
-      // bakery.localhost:3000 → bakery
       slug = hostname.split(".")[0];
     }
 
-    if (slug && slug !== "www" && slug !== "app") {
+    if (slug === "tech") {
+      const rewriteUrl = request.nextUrl.clone();
+
+      if (pathname === "/" || pathname === "") {
+        rewriteUrl.pathname = "/core-tech";
+      } else {
+        rewriteUrl.pathname = `/core-tech${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+      }
+
+      return NextResponse.rewrite(rewriteUrl);
+    }
+
+    if (slug && slug !== "www" && slug !== "app" && slug !== "tech") {
       const { data: site } = await supabase
         .from("user_sites")
         .select("html_code, site_slug, site_name, status")
@@ -152,11 +181,17 @@ export async function proxy(request: NextRequest) {
 
   // ─── Regular middleware logic ───────────────────────────────
   const pathSegments = pathname.split("/").filter(Boolean);
+
   const isTechRoute =
-    pathSegments[0] === "tech" || pathSegments.includes("tech");
+    pathSegments[0] === "tech" ||
+    pathSegments[0] === "core-tech" ||
+    pathSegments.includes("tech") ||
+    pathSegments.includes("core-tech");
+
   const extractedSlug = isTechRoute
     ? pathSegments[1] || "default"
     : pathSegments[0] || "default";
+
   const isGoingToAdmin = pathSegments.includes("admin-dashboard");
 
   const isPublicRoute =
@@ -164,10 +199,16 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
     pathname.startsWith("/auth") ||
+    pathname.startsWith("/privacy-policy") ||
+    pathname.startsWith("/terms-of-service") ||
+    pathname.startsWith("/m/global-market") ||
+    pathname.startsWith("/marketing-terms-of-service") ||
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/st/domain/verify") ||
     pathname.startsWith("/api/st/domain/instructions") ||
-    pathname.startsWith("/s/") ||
+    pathname.startsWith("/s/services") ||
+    pathname.startsWith("/s/[siteId]") ||
+    pathname.startsWith("/support") ||
     pathname.startsWith("/api/cron");
 
   if (!user && !isPublicRoute) {
@@ -180,7 +221,6 @@ export async function proxy(request: NextRequest) {
     const adminHandshakeCookie = request.cookies.get(
       "admin_portal_handshake_token",
     );
-
     const allowedEmailsEnv = process.env.ALLOWED_ADMIN_EMAILS || "";
     const adminWhiteList = allowedEmailsEnv
       .split(",")
@@ -209,9 +249,11 @@ export async function proxy(request: NextRequest) {
       }
 
       response.cookies.delete("admin_portal_handshake_token");
+
       const redirectPath = isTechRoute
-        ? `/tech/${extractedSlug}`
+        ? `/${pathSegments[0]}/${extractedSlug}`
         : `/${extractedSlug}`;
+
       url.pathname = redirectPath;
       url.searchParams.set("status", "handshake_failed_reauth_required");
       return NextResponse.redirect(url);
@@ -219,7 +261,6 @@ export async function proxy(request: NextRequest) {
   }
 
   const appLocked = request.cookies.get("app_locked")?.value === "1";
-
   const isLockExempt =
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||

@@ -46,6 +46,16 @@
       "hide": "Schaufenster-Panel ausblenden",
       "show": "Schaufenster-Panel öffnen",
       "closeAria": "Schaufenster schließen"
+    },
+    "referralCard": {
+      "title": "Empfehlungsprogramm",
+      "description": "Lade Freunde ein und erhalte für jede erfolgreiche Empfehlung Prämien.",
+      "button": "Empfehlungs-Dashboard anzeigen"
+    },
+    "storeCard": {
+      "title": "Mein Shop",
+      "description": "Verwalten Sie Ihren öffentlichen Shop und sehen Sie sich eine Vorschau an.",
+      "button": "Ladenfront öffnen"
     }
   },
   "PrivacyPolicy": {

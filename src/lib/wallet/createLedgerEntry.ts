@@ -1,3 +1,4 @@
+// \src\lib\wallet\createLedgerEntry.ts
 import { createClient } from "@/lib/supabase/server";
 
 type LedgerType =
@@ -8,7 +9,8 @@ type LedgerType =
   | "purchase"
   | "refund"
   | "bonus"
-  | "adjustment";
+  | "adjustment"
+  | "referral";
 
 interface CreateLedgerEntryParams {
   walletId: string;

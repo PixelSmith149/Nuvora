@@ -120,9 +120,19 @@ try {
         <div className="relative rounded-3xl border border-white/10 bg-zinc-950/80 backdrop-blur-xl p-8 shadow-2xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600">
-              <Rocket className="h-8 w-8 text-white" />
-            </div>
+  {/* Premium Logo with gradient ring */}
+  <div className="mx-auto mb-6 flex items-center justify-center">
+  <div className="relative flex h-25 w-25 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+    {/* Subtle ambient glow */}
+    <div className="absolute -inset-4 -z-10 rounded-3xl bg-emerald-500/10 blur-2xl" />
+
+    <img
+      src="/favicon.ico"
+      alt="Nu-vora"
+      className="h-22 w-22 object-contain"
+    />
+  </div>
+</div>
 
             <h1 className="text-3xl font-bold text-white">Nu-vora</h1>
             <p className="text-sm text-purple-400 font-medium">Elite Platform</p>

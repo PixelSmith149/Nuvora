@@ -67,6 +67,66 @@ function extractProviderOrderId(result: any): string {
   return "";
 }
 
+/**
+ * Checks if referee has met the $10.00 boost spend threshold and issues the $1.00 referrer reward
+ */
+async function checkAndProcessBoostReferral(admin: any, userId: string) {
+  try {
+    const { data: referral } = await admin
+      .from("referrals")
+      .select("id, referrer_id, status")
+      .eq("referee_id", userId)
+      .eq("type", "boost")
+      .eq("status", "pending")
+      .maybeSingle();
+
+    if (!referral) return;
+
+    // Calculate total spend across non-refunded boost orders for referee
+    const { data: orders } = await admin
+      .from("orders")
+      .select("cost")
+      .eq("user_id", userId)
+      .neq("status", "refunded")
+      .neq("status", "cancelled");
+
+    const totalSpend = (orders || []).reduce(
+      (sum: number, o: { cost: number }) => sum + Number(o.cost || 0),
+      0
+    );
+
+    if (totalSpend >= 10.0) {
+      const rewardAmount = 1.0;
+
+      const { error: updateErr } = await admin
+        .from("referrals")
+        .update({
+          status: "rewarded",
+          reward_amount: rewardAmount,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", referral.id);
+
+      if (!updateErr) {
+        await admin.rpc("credit_referral_balance", {
+          p_wallet_id: referral.referrer_id,
+          p_amount: rewardAmount,
+        });
+
+        await admin.from("ledger_entries").insert({
+          user_id: referral.referrer_id,
+          amount: rewardAmount,
+          type: "referral_bonus",
+          description: `Boost referral reward: referee ${userId} reached $10+ spend threshold`,
+          reference_id: referral.id,
+        });
+      }
+    }
+  } catch (refErr) {
+    console.error("Boost referral processing error:", refErr);
+  }
+}
+
 export async function createOrder({
   serviceId,
   quantity,
@@ -224,7 +284,7 @@ export async function createOrder({
         ? ((debitResult as any).ledger_id as string | null)
         : null;
 
-    // ── Insert (no tracking_code — your DB/trigger owns ORD-…) ─
+    // ── Insert ───────────────────────────────────────────────
     const { data: order, error: orderCreateError } = await supabase
       .from("orders")
       .insert({
@@ -267,7 +327,7 @@ export async function createOrder({
     const trackingCode = order.tracking_code || order.id;
     const admin = getAdminClient();
 
-    // ── JAP call + service-role update (always persist response) ─
+    // ── JAP call + service-role update ───────────────────────
     try {
       console.info("[CREATE_ORDER] calling JAP", {
         orderId: order.id,
@@ -321,6 +381,9 @@ export async function createOrder({
           has_response: updated?.provider_response != null,
         });
       }
+
+      // Check if user reached $10.00 spend threshold for pending boost referral
+      await checkAndProcessBoostReferral(admin, user.id);
 
       return {
         success: true,

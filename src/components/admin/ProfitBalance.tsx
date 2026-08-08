@@ -1,3 +1,4 @@
+//src/components/admin/ProfitBalance.tsx
 "use client";
 
 import { AlertCircle, RotateCw, Wallet } from "lucide-react";

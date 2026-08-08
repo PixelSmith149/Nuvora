@@ -3,10 +3,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-/**
- * Validates the admin signature hash completely on the server side.
- * The secret key never leaves the hosting environment.
- */
 export async function verifyAdminPasskey(
 	inputPasskey: string,
 ): Promise<boolean> {

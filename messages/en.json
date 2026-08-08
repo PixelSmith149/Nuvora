@@ -42,10 +42,15 @@
       "description": "Manage your account preferences, security, and privacy.",
       "button": "Open Settings"
     },
-    "storefront": {
-      "hide": "Hide Storefront Panel",
-      "show": "Open Storefront Panel",
-      "closeAria": "Close storefront"
+    "referralCard": {
+      "title": "Referral Program",
+      "description": "Invite friends and earn rewards for each successful referral.",
+      "button": "View Referral Dashboard"
+    },
+    "storeCard": {
+      "title": "My Storefront",
+      "description": "Manage and preview your public storefront.",
+      "button": "Open Storefront"
     }
   },
   "PrivacyPolicy": {

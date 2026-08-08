@@ -1,7 +1,18 @@
+// src/components/auth/SignupForm.tsx
 "use client";
 
-import { ArrowLeft, Eye, EyeOff, KeyRound, Lock, LogIn, Mail, Rocket } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Lock,
+  LogIn,
+  Mail,
+  Tag,
+} from "lucide-react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import supabase from "@/lib/supabase/client";
 
@@ -10,6 +21,7 @@ type Step = "credentials" | "verify_otp";
 
 export default function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [mode, setMode] = useState<Mode>("signup");
   const [step, setStep] = useState<Step>("credentials");
@@ -19,16 +31,52 @@ export default function SignupForm() {
   const [otp, setOtp] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Single-type referral state
+  const [referralCode, setReferralCode] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // Resend Cooldown Timer
+  // Resend cooldown
   const [cooldown, setCooldown] = useState(0);
 
+  // Initialize and sync referral code from URL search params & localStorage
+  useEffect(() => {
+    const urlRef = searchParams.get("ref");
+    const storedRef = localStorage.getItem("pending_referral_code");
+
+    if (urlRef) {
+      const cleanUrlRef = urlRef.trim().toUpperCase();
+      setReferralCode(cleanUrlRef);
+      localStorage.setItem("pending_referral_code", cleanUrlRef);
+    } else if (storedRef) {
+      setReferralCode(storedRef.trim().toUpperCase());
+    }
+  }, [searchParams]);
+
+  // Listen to auth state (session)
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+        router.push("/account");
+        router.refresh();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router]);
+
+  // Cooldown timer
   useEffect(() => {
     if (cooldown <= 0) return;
-    const timer = setInterval(() => setCooldown((prev) => prev - 1), 1000);
+    const timer = setInterval(() => {
+      setCooldown((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
     return () => clearInterval(timer);
   }, [cooldown]);
 
@@ -40,15 +88,47 @@ export default function SignupForm() {
     setMessage("");
   };
 
-  // Restrict OTP input to numbers only
   const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 6) setOtp(value);
   };
 
-  // =========================
-  // EMAIL AUTH / SIGNUP INIT
-  // =========================
+  // Helper to trigger backend referral tracking and credit the referrer after authentication
+  // Helper to trigger backend referral tracking
+async function executeReferralTracking() {
+  const activeRef =
+    referralCode.trim().toUpperCase() ||
+    localStorage.getItem("pending_referral_code") ||
+    "";
+
+  if (!activeRef) return;
+
+  try {
+    const res = await fetch("/api/referral/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        referralCode: activeRef,
+        type: "publish", // default type for signup
+      }),
+    });
+
+    if (res.ok) {
+      localStorage.removeItem("pending_referral_code");
+      // Also clear the cookie version if present
+      document.cookie = "nu_referral=; path=/; max-age=0";
+    } else {
+      const data = await res.json();
+      console.error("Referral tracking notice:", data.error);
+    }
+  } catch (err) {
+    console.error("Failed to track referral:", err);
+  }
+}
+
+  // =========================================================
+  // EMAIL AUTH / SIGNUP
+  // =========================================================
   async function handleEmailAuth(e: React.FormEvent) {
     e.preventDefault();
 
@@ -56,21 +136,38 @@ export default function SignupForm() {
     setError("");
     setMessage("");
 
-    const cleanEmail = email.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
         });
 
         if (error) throw error;
 
+        // Persist active referral code to localStorage during OTP pending state
+        if (referralCode.trim()) {
+          localStorage.setItem(
+            "pending_referral_code",
+            referralCode.trim().toUpperCase()
+          );
+        }
+
+        // Already registered + confirmed
+        if (data.user?.email_confirmed_at) {
+          setError("This email is already registered. Please log in instead.");
+          setMode("login");
+          return;
+        }
+
+        // Move to OTP step
         setStep("verify_otp");
-        setCooldown(60); // Start 60s cooldown
+        setCooldown(60);
         setMessage("A 6-digit verification code has been sent to your email.");
       } else {
+        // LOGIN
         const { error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
           password,
@@ -78,23 +175,30 @@ export default function SignupForm() {
 
         if (error) throw error;
 
-        router.push("/account");
-        router.refresh();
+        setMessage("Login successful! Redirecting...");
       }
     } catch (err: any) {
-      if (err.message?.includes("Invalid login credentials")) {
+      const msg = err?.message || "An unexpected authentication error occurred.";
+
+      if (msg.includes("Invalid login credentials")) {
         setError("Invalid email or password.");
+      } else if (
+        msg.includes("User already registered") ||
+        msg.includes("already been registered")
+      ) {
+        setError("This email is already registered. Please log in.");
+        setMode("login");
       } else {
-        setError(err.message || "An unexpected authentication error occurred.");
+        setError(msg);
       }
     } finally {
       setLoading(false);
     }
   }
 
-  // =========================
-  // VERIFY OTP CODE
-  // =========================
+  // =========================================================
+  // VERIFY OTP
+  // =========================================================
   async function handleVerifyOtp(e: React.FormEvent) {
     e.preventDefault();
 
@@ -109,7 +213,7 @@ export default function SignupForm() {
 
     try {
       const { data, error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         token: otp.trim(),
         type: "signup",
       });
@@ -117,20 +221,30 @@ export default function SignupForm() {
       if (error) throw error;
 
       if (data?.session) {
+        // Process single-type referral reward/credit upon verified account creation
+        await executeReferralTracking();
+
         setMessage("Account verified! Redirecting...");
         router.push("/account");
         router.refresh();
+      } else {
+        setError(
+          "Verification succeeded but no session was created. Please try logging in."
+        );
       }
     } catch (err: any) {
-      setError(err.message || "Invalid or expired verification code. Please try again.");
+      setError(
+        err?.message ||
+          "Invalid or expired verification code. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  // =========================
-  // RESEND OTP CODE
-  // =========================
+  // =========================================================
+  // RESEND OTP
+  // =========================================================
   async function handleResendCode() {
     if (cooldown > 0 || loading) return;
 
@@ -141,64 +255,92 @@ export default function SignupForm() {
     try {
       const { error } = await supabase.auth.resend({
         type: "signup",
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
       });
 
       if (error) throw error;
 
-      setCooldown(60); // Reset timer
+      setCooldown(60);
       setMessage("A new verification code has been sent to your email.");
     } catch (err: any) {
-      setError(err.message || "Failed to resend verification code.");
+      setError(err?.message || "Failed to resend verification code.");
     } finally {
       setLoading(false);
     }
   }
 
-  // =========================
+  // =========================================================
   // GOOGLE AUTH
-  // =========================
+  // =========================================================
   async function signInWithGoogle() {
-    setLoading(true);
-    setError("");
-    setMessage("");
+  setLoading(true);
+  setError("");
+  setMessage("");
 
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || "Failed to initialize Google authentication.");
-      setLoading(false);
-    }
+  const activeRef = referralCode.trim().toUpperCase();
+  if (activeRef) {
+    localStorage.setItem("pending_referral_code", activeRef);
+    // Also set the cookie for the callback
+    document.cookie = `nu_referral=${JSON.stringify({
+      code: activeRef,
+      type: "publish",
+    })}; path=/; max-age=2592000; SameSite=Lax`;
   }
 
+  try {
+    const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
+    if (activeRef) {
+      callbackUrl.searchParams.set("ref", activeRef);
+      callbackUrl.searchParams.set("type", "publish");
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: callbackUrl.toString(),
+      },
+    });
+
+    if (error) throw error;
+  } catch (err: any) {
+    setError(err?.message || "Failed to initialize Google authentication.");
+    setLoading(false);
+  }
+}
+  // =========================================================
+  // RENDER
+  // =========================================================
   return (
     <div className="relative mx-auto max-w-md">
       <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-3xl" />
 
       <div className="relative rounded-3xl border border-white/10 bg-zinc-950/80 backdrop-blur-xl p-8 shadow-2xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600">
-            <Rocket className="h-8 w-8 text-white" />
-          </div>
+<div className="text-center mb-8">
+  {/* Premium Logo with gradient ring */}
+  <div className="mx-auto mb-6 flex items-center justify-center">
+  <div className="relative flex h-25 w-25 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+    {/* Subtle ambient glow */}
+    <div className="absolute -inset-4 -z-10 rounded-3xl bg-emerald-500/10 blur-2xl" />
 
-          <h1 className="text-3xl font-bold text-white">Nu-vora</h1>
-          <p className="text-sm text-purple-400 font-medium">Elite Platform</p>
-          <p className="mt-3 text-zinc-400">
-            {step === "verify_otp"
-              ? `Enter the code sent to ${email}`
-              : mode === "signup"
-              ? "Create your account to get started"
-              : "Access the ecosystem and manage your presence"}
-          </p>
-        </div>
+    <img
+      src="/favicon.ico"
+      alt="Nu-vora"
+      className="h-22 w-22 object-contain"
+    />
+  </div>
+</div>
+
+  <h1 className="text-3xl font-bold text-white tracking-tight">Nu-vora</h1>
+  <p className="text-sm text-purple-400 font-medium mt-1">Elite Platform</p>
+  <p className="mt-3 text-zinc-400 text-sm">
+    {step === "verify_otp"
+      ? `Enter the code sent to ${email}`
+      : mode === "signup"
+        ? "Create your account to get started"
+        : "Access the ecosystem and manage your presence"}
+  </p>
+</div>
 
         {step === "credentials" ? (
           <>
@@ -255,6 +397,28 @@ export default function SignupForm() {
                 </button>
               </div>
 
+              {/* Referral Code Field (Auto-populated from localStorage or URL) */}
+              {mode === "signup" && (
+                <div className="relative">
+                  <Tag className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <input
+                    type="text"
+                    placeholder="Referral Code (Optional)"
+                    value={referralCode}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase();
+                      setReferralCode(val);
+                      if (val) {
+                        localStorage.setItem("pending_referral_code", val);
+                      } else {
+                        localStorage.removeItem("pending_referral_code");
+                      }
+                    }}
+                    className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-3 pl-11 pr-4 text-white outline-none transition focus:border-cyan-500 font-mono text-sm uppercase tracking-wider placeholder:normal-case placeholder:tracking-normal"
+                  />
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
@@ -265,8 +429,8 @@ export default function SignupForm() {
                     ? "Sending code..."
                     : "Logging in..."
                   : mode === "signup"
-                  ? "Create Account"
-                  : "Login"}
+                    ? "Create Account"
+                    : "Login"}
               </button>
             </form>
 
@@ -297,7 +461,7 @@ export default function SignupForm() {
             </div>
           </>
         ) : (
-          /* Verification Code Form */
+          /* OTP Verification Step */
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div className="relative">
               <KeyRound className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
@@ -310,6 +474,7 @@ export default function SignupForm() {
                 placeholder="6-digit code"
                 value={otp}
                 onChange={handleOtpChange}
+                autoFocus
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-3 pl-11 pr-4 text-white outline-none tracking-widest font-mono text-center text-lg transition focus:border-cyan-500"
               />
             </div>
@@ -325,7 +490,12 @@ export default function SignupForm() {
             <div className="flex items-center justify-between text-xs mt-4 px-1">
               <button
                 type="button"
-                onClick={() => setStep("credentials")}
+                onClick={() => {
+                  setStep("credentials");
+                  setOtp("");
+                  setError("");
+                  setMessage("");
+                }}
                 className="flex items-center gap-1 text-zinc-400 hover:text-white transition"
               >
                 <ArrowLeft className="h-3 w-3" /> Change Email
@@ -343,7 +513,7 @@ export default function SignupForm() {
           </form>
         )}
 
-        {/* Feedback Messages */}
+        {/* Feedback */}
         {message && (
           <p className="text-green-500 text-sm text-center mt-4">{message}</p>
         )}

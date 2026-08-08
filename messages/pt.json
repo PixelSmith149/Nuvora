@@ -46,6 +46,16 @@
       "hide": "Ocultar painel da loja",
       "show": "Abrir painel da loja",
       "closeAria": "Fechar loja"
+    },
+    "referralCard": {
+      "title": "Programa de Recomendações",
+      "description": "Convide amigos e ganhe recompensas por cada indicação bem-sucedida.",
+      "button": "Ver o Painel de Referências"
+    },
+    "storeCard": {
+      "title": "A minha loja",
+      "description": "Faça a gestão e visualize a sua loja pública.",
+      "button": "Abrir montra"
     }
   },
   "PrivacyPolicy": {

@@ -1,3 +1,4 @@
+//  src\lib\wallet\getWalletBalance.ts
 import { createClient } from "@/lib/supabase/server";
 
 export async function getWalletBalance(walletId: string): Promise<number> {

@@ -33,6 +33,8 @@ const initialBiometricState: BiometricState = {
   faceDetected: false,
   videoBlob: null,
   error: null,
+  challenge: 'none',
+  challengeInstruction: null,
 };
 
 export function useOnboarding(username: string) {

@@ -46,6 +46,16 @@
       "hide": "Ocultar panel de la tienda",
       "show": "Abrir panel de la tienda",
       "closeAria": "Cerrar tienda"
+    },
+    "referralCard": {
+      "title": "Programa de recomendación",
+      "description": "Invita a tus amigos y gana recompensas por cada recomendación que se concrete.",
+      "button": "Ver el panel de control de recomendaciones"
+    },
+    "storeCard": {
+      "title": "Mi tienda",
+      "description": "Gestiona y previsualiza tu tienda pública.",
+      "button": "Tienda abierta"
     }
   },
   "PrivacyPolicy": {

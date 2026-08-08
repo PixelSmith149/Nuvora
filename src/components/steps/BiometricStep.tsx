@@ -1,6 +1,8 @@
+// src/components/steps/BiometricStep.tsx
+
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertTriangle,
@@ -11,7 +13,9 @@ import {
   Video,
   ShieldCheck,
   RefreshCw,
-  UploadCloud,
+  MoveLeft,
+  MoveRight,
+  ScanFace,
 } from 'lucide-react';
 import { BiometricState } from '@/types';
 import { useBiometricVerification } from '@/hooks/useBiometricVerification';
@@ -37,8 +41,6 @@ export function BiometricStep({
 }: BiometricStepProps) {
   const { isDesktop: deviceIsDesktop, isLoading: deviceLoading } = useDeviceDetection();
   const [mountedOrigin, setMountedOrigin] = useState<string>('');
-  const [useFallbackUpload, setUseFallbackUpload] = useState<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     state,
@@ -58,7 +60,7 @@ export function BiometricStep({
     }
   }, []);
 
-  // Sync device detection safely
+  // Sync device detection
   useEffect(() => {
     if (!deviceLoading) {
       onUpdate({ isDesktop: deviceIsDesktop });
@@ -66,24 +68,24 @@ export function BiometricStep({
     }
   }, [deviceIsDesktop, deviceLoading, onUpdate, setIsDesktop]);
 
-  // Handle auto-stream initialization for mobile devices
+  // Auto-start live stream on mobile
   useEffect(() => {
-    if (!isDesktop && !useFallbackUpload && state.recordingState === 'idle' && !state.videoBlob) {
+    if (!isDesktop && state.recordingState === 'idle' && !state.videoBlob) {
       const timer = setTimeout(() => {
         initiateFaceVerificationStream();
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isDesktop, useFallbackUpload, state.recordingState, state.videoBlob, initiateFaceVerificationStream]);
+  }, [isDesktop, state.recordingState, state.videoBlob, initiateFaceVerificationStream]);
 
-  // Sync local biometric recording updates with parent state hook
+  // Sync blob / error to parent
   useEffect(() => {
-    if (state.videoBlob) {
+    if (state.videoBlob || state.error) {
       onUpdate({ videoBlob: state.videoBlob, error: state.error });
     }
   }, [state.videoBlob, state.error, onUpdate]);
 
-  // Ensure camera streams shut down when component unmounts
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       cleanup();
@@ -98,27 +100,36 @@ export function BiometricStep({
     }, 300);
   };
 
-  const handleManualVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onUpdate({ videoBlob: file, error: null });
-    }
+  // Helper to render challenge icon
+  const renderChallengeIcon = () => {
+    const challenge = (state as any).challenge as string;
+    if (challenge === 'look_left') return <MoveLeft className="h-5 w-5 text-emerald-400" />;
+    if (challenge === 'look_right') return <MoveRight className="h-5 w-5 text-emerald-400" />;
+    return <ScanFace className="h-5 w-5 text-emerald-400" />;
   };
 
-  // Device Detection Loader State
+  // ────────────────────────────────────────────────
+  // Loading
+  // ────────────────────────────────────────────────
   if (deviceLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-3">
         <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
-        <span className="font-mono text-xs text-zinc-400">Analyzing Hardware Capability...</span>
+        <span className="font-mono text-xs text-zinc-400">
+          Analyzing Hardware Capability...
+        </span>
       </div>
     );
   }
 
-  // Desktop Mobile Handoff Screen
+  // ────────────────────────────────────────────────
+  // Desktop → Mobile Handoff
+  // ────────────────────────────────────────────────
   if (isDesktop) {
     const targetUrl = `${mountedOrigin || ''}/m/${username}/onboarding?step=biometric&mobile=true`;
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=10b981&bgcolor=09090b&data=${encodeURIComponent(targetUrl)}`;
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=10b981&bgcolor=09090b&data=${encodeURIComponent(
+      targetUrl
+    )}`;
 
     return (
       <motion.div
@@ -136,11 +147,11 @@ export function BiometricStep({
             Mobile Camera Preferred
           </h4>
           <p className="max-w-sm text-xs leading-relaxed text-zinc-400">
-            Biometric verification performs best on high-resolution mobile camera sensors with hardware depth detection.
+            Biometric verification performs best on high-resolution mobile camera
+            sensors with hardware depth detection.
           </p>
         </div>
 
-        {/* QR CODE CONTAINER */}
         <div className="relative rounded-2xl border border-emerald-500/30 bg-zinc-950 p-3 shadow-2xl">
           <img
             src={qrImageUrl}
@@ -159,6 +170,9 @@ export function BiometricStep({
     );
   }
 
+  // ────────────────────────────────────────────────
+  // Live Camera + Liveness Flow
+  // ────────────────────────────────────────────────
   return (
     <motion.div
       variants={staggerContainer}
@@ -166,7 +180,7 @@ export function BiometricStep({
       animate="visible"
       className="select-none space-y-4"
     >
-      {/* --- STEP HEADER --- */}
+      {/* Header */}
       <motion.div variants={fadeInUp} className="text-center space-y-1.5">
         <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 backdrop-blur-md">
           <ShieldCheck className="h-3.5 w-3.5" />
@@ -176,11 +190,12 @@ export function BiometricStep({
           Biometric Identity Verification
         </h3>
         <p className="mx-auto max-w-sm text-xs leading-relaxed text-zinc-400 sm:text-sm">
-          Perform a brief 15-second facial audit to verify identity and unlock merchant privileges.
+          Complete the live face challenges and hold still for 15 seconds. Camera
+          permission is required.
         </p>
       </motion.div>
 
-      {/* ERROR BANNER WITH FALLBACK TOGGLE */}
+      {/* Error Banner – Retry only */}
       {state.error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -191,89 +206,53 @@ export function BiometricStep({
             <AlertTriangle className="h-4 w-4 shrink-0 text-red-400" />
             <span className="leading-snug">{state.error}</span>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              onClick={retry}
-              className="flex items-center gap-1 rounded-lg border border-red-500/20 bg-red-500/10 px-2 py-1 text-xs font-bold text-red-400 hover:text-red-300"
-            >
-              <RefreshCw className="h-3 w-3" /> Retry
-            </button>
-            <button
-              onClick={() => setUseFallbackUpload(true)}
-              className="rounded-lg border border-white/10 bg-zinc-800 px-2 py-1 text-xs font-bold text-zinc-300 hover:bg-zinc-700"
-            >
-              Upload Instead
-            </button>
-          </div>
+          <button
+            onClick={retry}
+            className="flex items-center gap-1 rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-xs font-bold text-red-400 hover:text-red-300 shrink-0"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Retry
+          </button>
         </motion.div>
       )}
 
-      {/* --- CAMERA / FALLBACK VIEWPORT HUD --- */}
+      {/* Camera Viewport */}
       <motion.div
         variants={scaleIn}
         className="relative flex aspect-video items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl"
       >
-        <canvas ref={canvasRef} className="hidden" width="80" height="80" />
+        <canvas ref={canvasRef} className="hidden" />
 
-        {/* Hidden Fallback Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="video/*"
-          capture="user"
-          className="hidden"
-          onChange={handleManualVideoUpload}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={`h-full w-full object-cover scale-x-[-1] transition-opacity duration-300 ${
+            state.recordingState === 'detecting' || state.recordingState === 'recording'
+              ? 'opacity-100'
+              : 'absolute inset-0 opacity-0'
+          }`}
         />
 
-        {useFallbackUpload ? (
-          <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
-            <UploadCloud className="h-10 w-10 text-emerald-400" />
-            <div className="space-y-1">
-              <p className="text-sm font-bold text-white">Record or Select Video File</p>
-              <p className="text-xs text-zinc-400 max-w-xs">
-                Camera access restricted? Record a brief 10-15 second video clip showing your face clearly.
-              </p>
+        {/* Face guides */}
+        {(state.recordingState === 'detecting' || state.recordingState === 'recording') && (
+          <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4">
+            <div className="flex justify-between">
+              <div className="h-4 w-4 rounded-tl border-l-2 border-t-2 border-emerald-400/80" />
+              <div className="h-4 w-4 rounded-tr border-r-2 border-t-2 border-emerald-400/80" />
             </div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-black transition-all hover:bg-emerald-500"
-            >
-              Choose Video File
-            </button>
+            <div className="pointer-events-none absolute inset-0 m-auto h-56 w-44 rounded-[50%] border-2 border-dashed border-emerald-500/40" />
+            <div className="flex justify-between">
+              <div className="h-4 w-4 rounded-bl border-b-2 border-l-2 border-emerald-400/80" />
+              <div className="h-4 w-4 rounded-br border-b-2 border-r-2 border-emerald-400/80" />
+            </div>
           </div>
-        ) : (
-          <>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className={`h-full w-full object-cover scale-x-[-1] transition-opacity duration-300 ${
-                state.recordingState === 'detecting' || state.recordingState === 'recording'
-                  ? 'opacity-100'
-                  : 'absolute inset-0 opacity-0'
-              }`}
-            />
-
-            {(state.recordingState === 'detecting' || state.recordingState === 'recording') && (
-              <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4">
-                <div className="flex justify-between">
-                  <div className="h-4 w-4 rounded-tl border-l-2 border-t-2 border-emerald-400/80" />
-                  <div className="h-4 w-4 rounded-tr border-r-2 border-t-2 border-emerald-400/80" />
-                </div>
-                <div className="pointer-events-none absolute inset-0 m-auto h-56 w-44 rounded-[50%] border-2 border-dashed border-emerald-500/40" />
-                <div className="flex justify-between">
-                  <div className="h-4 w-4 rounded-bl border-b-2 border-l-2 border-emerald-400/80" />
-                  <div className="h-4 w-4 rounded-br border-b-2 border-r-2 border-emerald-400/80" />
-                </div>
-              </div>
-            )}
-          </>
         )}
 
-        {/* STATE: IDLE OR COMPLETED */}
+        {/* IDLE / COMPLETED */}
         <AnimatePresence>
-          {!useFallbackUpload && (state.recordingState === 'idle' || state.recordingState === 'done') && (
+          {(state.recordingState === 'idle' || state.recordingState === 'done') && (
             <motion.div
               className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
               initial={{ opacity: 0 }}
@@ -289,7 +268,7 @@ export function BiometricStep({
                     Biometric Verification Complete
                   </h5>
                   <p className="text-[11px] text-zinc-400">
-                    Facial liveness telemetry cryptographically signed and stored.
+                    Live liveness challenges passed and video secured.
                   </p>
                   <button
                     onClick={() => {
@@ -310,8 +289,12 @@ export function BiometricStep({
                     <Video className="h-6 w-6 text-emerald-400" />
                   </div>
                   <div className="text-center">
-                    <span className="block text-xs font-bold text-zinc-200">Start Biometric Scan</span>
-                    <span className="text-[10px] text-zinc-500">Requires camera permissions</span>
+                    <span className="block text-xs font-bold text-zinc-200">
+                      Start Biometric Scan
+                    </span>
+                    <span className="text-[10px] text-zinc-500">
+                      Camera permission required
+                    </span>
                   </div>
                 </button>
               )}
@@ -319,36 +302,78 @@ export function BiometricStep({
           )}
         </AnimatePresence>
 
-        {/* STATE: INITIALIZING OR DETECTING */}
+        {/* INITIALIZING */}
         <AnimatePresence>
-          {!useFallbackUpload && (state.recordingState === 'initializing' || state.recordingState === 'detecting') && (
+          {state.recordingState === 'initializing' && (
             <motion.div
-              className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 bg-zinc-950/80 backdrop-blur-xs"
+              className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 bg-zinc-950/85 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
               <Loader2 className="h-7 w-7 animate-spin text-emerald-400" />
               <p className="text-xs font-bold text-zinc-200">
-                {state.recordingState === 'initializing'
-                  ? 'Accessing Camera Hardware...'
-                  : 'Calibrating Facial Vectors...'}
+                Requesting Camera Permission...
               </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* DETECTING + CHALLENGES */}
+        <AnimatePresence>
+          {state.recordingState === 'detecting' && (
+            <motion.div
+              className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 bg-zinc-950/75 backdrop-blur-[2px]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="flex flex-col items-center gap-2">
+                {renderChallengeIcon()}
+                <p className="text-sm font-bold text-white text-center max-w-[240px]">
+                  {(state as any).challengeInstruction || 'Position your face in the center'}
+                </p>
+              </div>
+
               <div
-                className={`rounded-full border px-3 py-0.5 font-mono text-[10px] font-bold uppercase ${
+                className={`rounded-full border px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider ${
                   state.faceDetected
                     ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
                     : 'border-white/10 bg-zinc-900 text-zinc-500'
                 }`}
               >
-                {state.faceDetected ? '✓ Subject Detected' : 'Position Face In Center'}
+                {state.faceDetected ? '✓ Motion Confirmed' : 'Waiting for movement...'}
+              </div>
+
+              {/* Simple challenge progress dots */}
+              <div className="flex items-center gap-1.5 mt-1">
+                {['center', 'look_left', 'look_right', 'look_center_final'].map((step, idx) => {
+                  const current = (state as any).challenge;
+                  const order = ['center', 'look_left', 'look_right', 'look_center_final'];
+                  const currentIdx = order.indexOf(current);
+                  const isActive = idx === currentIdx;
+                  const isDone = idx < currentIdx;
+
+                  return (
+                    <div
+                      key={step}
+                      className={`h-1.5 rounded-full transition-all ${
+                        isDone
+                          ? 'w-4 bg-emerald-400'
+                          : isActive
+                          ? 'w-6 bg-emerald-400'
+                          : 'w-2 bg-zinc-700'
+                      }`}
+                    />
+                  );
+                })}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* STATE: RECORDING BOTTOM BAR HUD */}
-        {!useFallbackUpload && state.recordingState === 'recording' && (
+        {/* RECORDING HUD */}
+        {state.recordingState === 'recording' && (
           <motion.div
             className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl border border-white/10 bg-black/85 px-3.5 py-2.5 backdrop-blur-md"
             initial={{ y: 20, opacity: 0 }}
@@ -356,9 +381,10 @@ export function BiometricStep({
           >
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-xs font-bold tracking-wider text-white">LIVENESS SCAN</span>
+              <span className="text-xs font-bold tracking-wider text-white">
+                LIVENESS SCAN
+              </span>
             </div>
-
             <div className="relative h-4 w-28 overflow-hidden rounded-full border border-white/10 bg-zinc-900">
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-300"
@@ -372,8 +398,11 @@ export function BiometricStep({
         )}
       </motion.div>
 
-      {/* --- FOOTER SECURITY NOTE --- */}
-      <motion.p variants={fadeInUp} className="flex items-center justify-center gap-1 text-[10px] text-zinc-500">
+      {/* Security Footer */}
+      <motion.p
+        variants={fadeInUp}
+        className="flex items-center justify-center gap-1 text-[10px] text-zinc-500"
+      >
         <Lock className="h-3 w-3 text-emerald-400" />
         Zero Unencrypted Video Retention — AES-256 Vector Encryption
       </motion.p>

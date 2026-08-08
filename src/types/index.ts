@@ -13,6 +13,14 @@ export interface OnboardingState {
   error: string | null;
 }
 
+export type ChallengePhase =
+  | 'none'
+  | 'center'
+  | 'look_left'
+  | 'look_right'
+  | 'look_center_final'
+  | 'passed';
+
 export interface BiometricState {
   isDesktop: boolean;
   recordingState: 'idle' | 'initializing' | 'detecting' | 'recording' | 'done';
@@ -20,6 +28,9 @@ export interface BiometricState {
   faceDetected: boolean;
   videoBlob: Blob | null;
   error: string | null;
+  // New fields for proper liveness challenges
+  challenge: ChallengePhase;
+  challengeInstruction: string | null;
 }
 
 export interface OnboardingStoreData {
