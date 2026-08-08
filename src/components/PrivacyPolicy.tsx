@@ -4,39 +4,27 @@
 import { useTranslations } from "next-intl";
 import {
   AlertCircle,
-  BookOpen,
   Building2,
+  Check,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
   Clock,
   Cookie,
   Database,
-  Download,
-  Edit,
   ExternalLink,
   Eye,
-  FileText,
   Globe,
   HeartHandshake,
   Info,
-  Key,
   Layers,
-  Lock,
   Mail,
-  MapPin,
-  MessageSquare,
   Package,
-  Phone,
   RefreshCw,
   Scale,
   Send,
-  Server,
   Shield,
   ShieldCheck,
-  Smartphone,
-  Star,
-  Trash2,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -69,47 +57,80 @@ export function PrivacyPolicy({
       id: "intro",
       icon: Info,
       title: t("introTitle"),
-      color: "emerald",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("whoWeAre")}</p>
-          <p className="text-zinc-400 leading-relaxed">{t("nuvoraEliteHomeIs")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white font-medium">{t("globalMarket")}</span> {t("digitalAssetMarketplaceFor")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("whoWeAre")}</p>
+          <p>{t("nuvoraEliteHomeIs")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("globalMarket")}</span>{" "}
+                {t("digitalAssetMarketplaceFor")}
+              </span>
             </li>
-            <li>
-              <span className="text-white font-medium">{t("smmPanel")}</span> {t("SocialmediaMarketingServices")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("smmPanel")}</span>{" "}
+                {t("SocialmediaMarketingServices")}
+              </span>
             </li>
-            <li>
-              <span className="text-white font-medium">{t("socialTenant")}</span> {t("websiteBuilderAndDesign")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("socialTenant")}</span>{" "}
+                {t("websiteBuilderAndDesign")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("whatThisPolicyCovers")}</p>
-          <p className="text-zinc-400 leading-relaxed">{t("thisPrivacyPolicyExplains")}</p>
-          <p className="font-semibold text-white mt-4">{t("scopeOfThisPolicy")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("allPlatformUsersBuyers")}</li>
-            <li>{t("allPhasesGlobalMarket")}</li>
-            <li>{t("allServicesListingPurchasing")}</li>
-            <li>{t("allInteractionsWebMobile")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("whatThisPolicyCovers")}</p>
+          <p>{t("thisPrivacyPolicyExplains")}</p>
+          <p className="font-medium text-zinc-100 pt-1">{t("scopeOfThisPolicy")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("allPlatformUsersBuyers")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("allPhasesGlobalMarket")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("allServicesListingPurchasing")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("allInteractionsWebMobile")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("yourAcceptance")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("byUsingOurPlatform")}</li>
-            <li>{t("ifYouDisagreeWith")}</li>
-            <li>{t("continuedUseAfterUpdates")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("yourAcceptance")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("byUsingOurPlatform")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("ifYouDisagreeWith")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("continuedUseAfterUpdates")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5 mt-2">
+          <div className="mt-3 rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
             <p className="text-xs text-zinc-500">
-              <span className="text-emerald-400">{t("LastUpdated")}</span>{" "}
+              <span className="text-emerald-400/90">{t("LastUpdated")}</span>{" "}
               {new Date().toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",
               })}
             </p>
-            <p className="text-xs text-zinc-500 mt-1">
-              <span className="text-emerald-400">{t("PrivacyTeam")}</span> {t("privacynuvoracom")}
+            <p className="mt-1 text-xs text-zinc-500">
+              <span className="text-emerald-400/90">{t("PrivacyTeam")}</span>{" "}
+              {t("privacynuvoraapp")}
             </p>
           </div>
         </div>
@@ -121,92 +142,161 @@ export function PrivacyPolicy({
       id: "collect",
       icon: Database,
       title: t("collectTitle"),
-      color: "sky",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("personalInformation")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("name")}</span> {t("fullNameDisplayNameusername")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("personalInformation")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("name")}</span>{" "}
+                {t("fullNameDisplayNameusername")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("contact")}</span> {t("emailAddressPhonenumber")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("contact")}</span>{" "}
+                {t("emailAddressPhonenumber")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("profile")}</span> {t("avatarBioStoredescription")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("profile")}</span>{" "}
+                {t("avatarBioStoredescription")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("social")}</span> {t("tiktokSnapchatAndotherSocial")}
-            </li>
-          </ul>
-          <p className="font-semibold text-white mt-4">{t("accountAuthenticationData")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("credentials")}</span> {t("passwordHashedandSalted")}
-            </li>
-            <li>
-              <span className="text-white">{t("authentication")}</span> {t("loginTokenssessionData")}
-            </li>
-            <li>
-              <span className="text-white">{t("biometric")}</span> {t("15secondFacialrecognitionVideoSellers")}
-            </li>
-            <li>
-              <span className="text-white">{t("verification")}</span> {t("identityverificationDocuments")}
-            </li>
-          </ul>
-          <p className="font-semibold text-white mt-4">{t("paymentFinancialData")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("wallet")}</span> {t("balancesTransactionhistory")}
-            </li>
-            <li>
-              <span className="text-white">{t("payments")}</span> {t("purchaseRecordsescrowHoldings")}
-            </li>
-            <li>
-              <span className="text-white">{t("withdrawals")}</span> {t("payoutHistorywithdrawalMethods")}
-            </li>
-            <li>
-              <span className="text-white">{t("fees")}</span> {t("platformFeesCollected")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("social")}</span>{" "}
+                {t("tiktokSnapchatAndotherSocial")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("usageTechnicalData")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("device")}</span> {t("ipAddressDevicetypeBrowser")}
+          <p className="font-medium text-zinc-100 pt-1">{t("accountAuthenticationData")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("credentials")}</span>{" "}
+                {t("passwordHashedandSalted")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("location")}</span> {t("geographicLocationcountryregion")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("authentication")}</span>{" "}
+                {t("loginTokenssessionData")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("activity")}</span> {t("pagesVisitedfeaturesUsed")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("biometric")}</span>{" "}
+                {t("15secondFacialrecognitionVideoSellers")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("performance")}</span> {t("loadingTimeserrorLogs")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("verification")}</span>{" "}
+                {t("identityverificationDocuments")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("phasespecificData")}</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-              <p className="text-xs font-bold text-emerald-400">{t("globalMarket")}</p>
-              <ul className="text-[10px] text-zinc-400 space-y-1 mt-1 list-disc list-inside">
+          <p className="font-medium text-zinc-100 pt-1">{t("paymentFinancialData")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("wallet")}</span>{" "}
+                {t("balancesTransactionhistory")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("payments")}</span>{" "}
+                {t("purchaseRecordsescrowHoldings")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("withdrawals")}</span>{" "}
+                {t("payoutHistorywithdrawalMethods")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("fees")}</span>{" "}
+                {t("platformFeesCollected")}
+              </span>
+            </li>
+          </ul>
+          <p className="font-medium text-zinc-100 pt-1">{t("usageTechnicalData")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("device")}</span>{" "}
+                {t("ipAddressDevicetypeBrowser")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("location")}</span>{" "}
+                {t("geographicLocationcountryregion")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("activity")}</span>{" "}
+                {t("pagesVisitedfeaturesUsed")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("performance")}</span>{" "}
+                {t("loadingTimeserrorLogs")}
+              </span>
+            </li>
+          </ul>
+          <p className="font-medium text-zinc-100 pt-1">{t("phasespecificData")}</p>
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+            <div className="rounded-lg border border-white/[0.06] bg-zinc-900/30 p-3">
+              <p className="text-xs font-semibold tracking-wide text-emerald-400/90">
+                {t("globalMarket")}
+              </p>
+              <ul className="mt-2 space-y-1 text-[11px] text-zinc-500">
                 <li>{t("assetListingsAndDescriptions")}</li>
                 <li>{t("salesAndPurchaseHistory")}</li>
                 <li>{t("reviewsAndRatings")}</li>
                 <li>{t("lockerContents")}</li>
               </ul>
             </div>
-            <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-              <p className="text-xs font-bold text-purple-400">{t("smmPanel")}</p>
-              <ul className="text-[10px] text-zinc-400 space-y-1 mt-1 list-disc list-inside">
+            <div className="rounded-lg border border-white/[0.06] bg-zinc-900/30 p-3">
+              <p className="text-xs font-semibold tracking-wide text-emerald-400/90">
+                {t("smmPanel")}
+              </p>
+              <ul className="mt-2 space-y-1 text-[11px] text-zinc-500">
                 <li>{t("socialMediaAccountDetails")}</li>
                 <li>{t("serviceOrderHistory")}</li>
                 <li>{t("engagementMetrics")}</li>
                 <li>{t("accountGrowthData")}</li>
               </ul>
             </div>
-            <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-              <p className="text-xs font-bold text-sky-400">{t("socialTenant")}</p>
-              <ul className="text-[10px] text-zinc-400 space-y-1 mt-1 list-disc list-inside">
+            <div className="rounded-lg border border-white/[0.06] bg-zinc-900/30 p-3">
+              <p className="text-xs font-semibold tracking-wide text-emerald-400/90">
+                {t("socialTenant")}
+              </p>
+              <ul className="mt-2 space-y-1 text-[11px] text-zinc-500">
                 <li>{t("websiteContentAndDesigns")}</li>
                 <li>{t("aiGenerationPrompts")}</li>
                 <li>{t("templateCustomizations")}</li>
@@ -214,9 +304,11 @@ export function PrivacyPolicy({
               </ul>
             </div>
           </div>
-          <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-lg">
-            <p className="text-xs text-amber-400 font-medium">{t("BiometricDataProtection")}</p>
-            <p className="text-xs text-zinc-400 mt-1">{t("yourBiometricVideoIs")}</p>
+          <div className="rounded-lg border border-emerald-500/10 bg-emerald-500/[0.04] px-3.5 py-3">
+            <p className="text-xs font-medium text-emerald-400/90">
+              {t("BiometricDataProtection")}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">{t("yourBiometricVideoIs")}</p>
           </div>
         </div>
       ),
@@ -227,76 +319,153 @@ export function PrivacyPolicy({
       id: "use",
       icon: Eye,
       title: t("useTitle"),
-      color: "purple",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("platformFunctionality")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("processingPurchases")}</span> {t("orderspaymentsEscrowManagement")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("platformFunctionality")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("processingPurchases")}</span>{" "}
+                {t("orderspaymentsEscrowManagement")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("deliveringAssets")}</span> {t("lockerdeliveryAndManagement")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("deliveringAssets")}</span>{" "}
+                {t("lockerdeliveryAndManagement")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("accountManagement")}</span> {t("registrationLoginProfileUpdates")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("accountManagement")}</span>{" "}
+                {t("registrationLoginProfileUpdates")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("verification")}</span> {t("identityAndAgeverification")}
-            </li>
-          </ul>
-          <p className="font-semibold text-white mt-4">{t("communication")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("notifications")}</span> {t("purchaseconfirmationsDeliveryUpdates")}
-            </li>
-            <li>
-              <span className="text-white">{t("support")}</span> {t("respondingToinquiriesAndTickets")}
-            </li>
-            <li>
-              <span className="text-white">{t("marketing")}</span> {t("promotionalmaterialsOptinRequired")}
-            </li>
-            <li>
-              <span className="text-white">{t("updates")}</span> {t("platformannouncementsAndPolicyChanges")}
-            </li>
-          </ul>
-          <p className="font-semibold text-white mt-4">{t("analyticsImprovement")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("platformOptimization")}</span> {t("performanceImprovements")}
-            </li>
-            <li>
-              <span className="text-white">{t("userExperience")}</span> {t("featureenhancements")}
-            </li>
-            <li>
-              <span className="text-white">{t("trendAnalysis")}</span> {t("understandinguserBehavior")}
-            </li>
-            <li>
-              <span className="text-white">{t("testing")}</span> {t("abTestingAndexperiments")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("verification")}</span>{" "}
+                {t("identityAndAgeverification")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("fraudPreventionSecurity")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("identityVerification")}</span> {t("preventingFakeAccounts")}
+          <p className="font-medium text-zinc-100 pt-1">{t("communication")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("notifications")}</span>{" "}
+                {t("purchaseconfirmationsDeliveryUpdates")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("fraudDetection")}</span> {t("identifyingsuspiciousActivity")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("support")}</span>{" "}
+                {t("respondingToinquiriesAndTickets")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("riskAssessment")}</span> {t("evaluatingtransactionRisk")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("marketing")}</span>{" "}
+                {t("promotionalmaterialsOptinRequired")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("compliance")}</span> {t("meetingLegalAndregulatoryRequirements")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("updates")}</span>{" "}
+                {t("platformannouncementsAndPolicyChanges")}
+              </span>
             </li>
           </ul>
-          <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg">
-            <p className="text-xs text-emerald-400 font-medium">{t("DataUsePrinciples")}</p>
-            <ul className="text-xs text-zinc-400 mt-1 space-y-1 list-disc list-inside">
-              <li>{t("weOnlyUseData")}</li>
-              <li>{t("weMinimizeDataCollection")}</li>
-              <li>{t("weAnonymizeDataWhere")}</li>
-              <li>{t("weNeverSellYour")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("analyticsImprovement")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("platformOptimization")}</span>{" "}
+                {t("performanceImprovements")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("userExperience")}</span>{" "}
+                {t("featureenhancements")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("trendAnalysis")}</span>{" "}
+                {t("understandinguserBehavior")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("testing")}</span>{" "}
+                {t("abTestingAndexperiments")}
+              </span>
+            </li>
+          </ul>
+          <p className="font-medium text-zinc-100 pt-1">{t("fraudPreventionSecurity")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("identityVerification")}</span>{" "}
+                {t("preventingFakeAccounts")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("fraudDetection")}</span>{" "}
+                {t("identifyingsuspiciousActivity")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("riskAssessment")}</span>{" "}
+                {t("evaluatingtransactionRisk")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("compliance")}</span>{" "}
+                {t("meetingLegalAndregulatoryRequirements")}
+              </span>
+            </li>
+          </ul>
+          <div className="rounded-lg border border-emerald-500/10 bg-emerald-500/[0.04] px-3.5 py-3">
+            <p className="text-xs font-medium text-emerald-400/90">
+              {t("DataUsePrinciples")}
+            </p>
+            <ul className="mt-1.5 space-y-1 text-xs text-zinc-500">
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("weOnlyUseData")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("weMinimizeDataCollection")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("weAnonymizeDataWhere")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("weNeverSellYour")}</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -308,53 +477,116 @@ export function PrivacyPolicy({
       id: "share",
       icon: Users,
       title: t("shareTitle"),
-      color: "amber",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("thirdpartyServiceProviders")}</p>
-          <p className="text-zinc-400 leading-relaxed">{t("weShareDataWith")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("paymentProcessors")}</span> {t("stripepaypalCryptoGateways")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("thirdpartyServiceProviders")}</p>
+          <p>{t("weShareDataWith")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("paymentProcessors")}</span>{" "}
+                {t("stripepaypalCryptoGateways")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("cloudProviders")}</span> {t("supabasedatabaseAwsStorage")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("cloudProviders")}</span>{" "}
+                {t("supabasedatabaseAwsStorage")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("analytics")}</span> {t("googleAnalyticsforUsageInsights")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("analytics")}</span>{" "}
+                {t("googleAnalyticsforUsageInsights")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("support")}</span> {t("customerServicetools")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("support")}</span>{" "}
+                {t("customerServicetools")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("legalRequirements")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("lawEnforcementRequestsWith")}</li>
-            <li>{t("courtOrdersAndSubpoenas")}</li>
-            <li>{t("regulatoryAuthorityRequirements")}</li>
-            <li>{t("enforcementOfOurTerms")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("legalRequirements")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("lawEnforcementRequestsWith")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("courtOrdersAndSubpoenas")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("regulatoryAuthorityRequirements")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("enforcementOfOurTerms")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("businessTransfers")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("saleMergerOrAcquisition")}</li>
-            <li>{t("bankruptcyOrInsolvencyProceedings")}</li>
-            <li>{t("assetTransfersToOther")}</li>
-            <li>{t("usersNotifiedOfMaterial")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("businessTransfers")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("saleMergerOrAcquisition")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("bankruptcyOrInsolvencyProceedings")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("assetTransfersToOther")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("usersNotifiedOfMaterial")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("withYourConsent")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("explicitConsentForAdditional")}</li>
-            <li>{t("optinMarketingCommunications")}</li>
-            <li>{t("thirdpartyIntegrationsYouEnable")}</li>
-            <li>{t("youCanWithdrawConsent")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("withYourConsent")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("explicitConsentForAdditional")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("optinMarketingCommunications")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("thirdpartyIntegrationsYouEnable")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("youCanWithdrawConsent")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
-            <p className="text-xs text-red-400 font-medium">{t("WhatWeDo")}</p>
-            <ul className="text-xs text-zinc-400 mt-1 space-y-1 list-disc list-inside">
-              <li>{t("biometricVerificationVideos")}</li>
-              <li>{t("walletPasswordsOrPayment")}</li>
-              <li>{t("privateMessagesBetweenUsers")}</li>
-              <li>{t("dataWithoutProperLegal")}</li>
+          <div className="rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
+            <p className="text-xs font-medium text-zinc-200">{t("WhatWeDo")}</p>
+            <ul className="mt-1.5 space-y-1 text-xs text-zinc-500">
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                <span>{t("biometricVerificationVideos")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                <span>{t("walletPasswordsOrPayment")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                <span>{t("privateMessagesBetweenUsers")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                <span>{t("dataWithoutProperLegal")}</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -366,76 +598,153 @@ export function PrivacyPolicy({
       id: "security",
       icon: Shield,
       title: t("securityTitle"),
-      color: "emerald",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("dataStorage")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("primaryDatabase")}</span> {t("supabasepostgresqlEncrypted")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("dataStorage")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("primaryDatabase")}</span>{" "}
+                {t("supabasepostgresqlEncrypted")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("fileStorage")}</span> {t("supabaseStorageencrypted")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("fileStorage")}</span>{" "}
+                {t("supabaseStorageencrypted")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("backups")}</span> {t("automatedDailybackups")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("backups")}</span>{" "}
+                {t("automatedDailybackups")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("location")}</span> {t("dataStoredInsecureData")}
-            </li>
-          </ul>
-          <p className="font-semibold text-white mt-4">{t("encryptionStandards")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("inTransit")}</span> {t("tls13EncryptionforAll")}
-            </li>
-            <li>
-              <span className="text-white">{t("atRest")}</span> {t("aes256EncryptionforStoredData")}
-            </li>
-            <li>
-              <span className="text-white">{t("passwords")}</span> {t("hashedAndSaltedwithBcrypt")}
-            </li>
-            <li>
-              <span className="text-white">{t("biometric")}</span> {t("encryptedWithuserspecificKeys")}
-            </li>
-          </ul>
-          <p className="font-semibold text-white mt-4">{t("securityMeasures")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("authentication")}</span> {t("jwtTokenswithShortExpiry")}
-            </li>
-            <li>
-              <span className="text-white">{t("accessControl")}</span> {t("rolebasedaccessRbac")}
-            </li>
-            <li>
-              <span className="text-white">{t("monitoring")}</span> {t("realtimeSecuritymonitoring")}
-            </li>
-            <li>
-              <span className="text-white">{t("audits")}</span> {t("regularSecurityauditsAndPenetration")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("location")}</span>{" "}
+                {t("dataStoredInsecureData")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("dataRetention")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("activeAccounts")}</span> {t("dataRetainedwhileAccountIs")}
+          <p className="font-medium text-zinc-100 pt-1">{t("encryptionStandards")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("inTransit")}</span>{" "}
+                {t("tls13EncryptionforAll")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("inactiveAccounts")}</span> {t("30DaysafterInactivity")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("atRest")}</span>{" "}
+                {t("aes256EncryptionforStoredData")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("deletedAccounts")}</span> {t("dataDeletedwithin30Days")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("passwords")}</span>{" "}
+                {t("hashedAndSaltedwithBcrypt")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("transactionHistory")}</span> {t("retainedforLegalCompliance")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("biometric")}</span>{" "}
+                {t("encryptedWithuserspecificKeys")}
+              </span>
             </li>
           </ul>
-          <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg">
-            <p className="text-xs text-emerald-400 font-medium">{t("SecurityIncidentResponse")}</p>
-            <ul className="text-xs text-zinc-400 mt-1 space-y-1 list-disc list-inside">
-              <li>{t("immediateContainmentProcedures")}</li>
-              <li>{t("userNotificationWithin72")}</li>
-              <li>{t("forensicInvestigationBySecurity")}</li>
-              <li>{t("remediationAndPreventionMeasures")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("securityMeasures")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("authentication")}</span>{" "}
+                {t("jwtTokenswithShortExpiry")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("accessControl")}</span>{" "}
+                {t("rolebasedaccessRbac")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("monitoring")}</span>{" "}
+                {t("realtimeSecuritymonitoring")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("audits")}</span>{" "}
+                {t("regularSecurityauditsAndPenetration")}
+              </span>
+            </li>
+          </ul>
+          <p className="font-medium text-zinc-100 pt-1">{t("dataRetention")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("activeAccounts")}</span>{" "}
+                {t("dataRetainedwhileAccountIs")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("inactiveAccounts")}</span>{" "}
+                {t("30DaysafterInactivity")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("deletedAccounts")}</span>{" "}
+                {t("dataDeletedwithin30Days")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("transactionHistory")}</span>{" "}
+                {t("retainedforLegalCompliance")}
+              </span>
+            </li>
+          </ul>
+          <div className="rounded-lg border border-emerald-500/10 bg-emerald-500/[0.04] px-3.5 py-3">
+            <p className="text-xs font-medium text-emerald-400/90">
+              {t("SecurityIncidentResponse")}
+            </p>
+            <ul className="mt-1.5 space-y-1 text-xs text-zinc-500">
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("immediateContainmentProcedures")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("userNotificationWithin72")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("forensicInvestigationBySecurity")}</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/50" />
+                <span>{t("remediationAndPreventionMeasures")}</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -447,61 +756,136 @@ export function PrivacyPolicy({
       id: "rights",
       icon: UserCheck,
       title: t("rightsTitle"),
-      color: "purple",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("rightToAccess")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("viewAllPersonalData")}</li>
-            <li>{t("requestACopyOf")}</li>
-            <li>{t("accessYourTransactionHistory")}</li>
-            <li>{t("viewYourProfileAnd")}</li>
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("rightToAccess")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("viewAllPersonalData")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("requestACopyOf")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("accessYourTransactionHistory")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("viewYourProfileAnd")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("rightToCorrection")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("updateInaccurateOrIncomplete")}</li>
-            <li>{t("changeProfileInformationAnytime")}</li>
-            <li>{t("correctTransactionRecordsIf")}</li>
-            <li>{t("updateContactInformation")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("rightToCorrection")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("updateInaccurateOrIncomplete")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("changeProfileInformationAnytime")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("correctTransactionRecordsIf")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("updateContactInformation")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("rightToDeletionRight")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("requestPermanentDataDeletion")}</li>
-            <li>{t("deletedDataRemovedWithin")}</li>
-            <li>{t("someDataMayBe")}</li>
-            <li>{t("secureDeletionMethodsUsed")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("rightToDeletionRight")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("requestPermanentDataDeletion")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("deletedDataRemovedWithin")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("someDataMayBe")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("secureDeletionMethodsUsed")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("rightToDataPortability")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("receiveDataInPortable")}</li>
-            <li>{t("transferDataToAnother")}</li>
-            <li>{t("exportTransactionHistory")}</li>
-            <li>{t("exportAccountData")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("rightToDataPortability")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("receiveDataInPortable")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("transferDataToAnother")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("exportTransactionHistory")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("exportAccountData")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("rightToRestrictProcessing")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("requestLimitedDataProcessing")}</li>
-            <li>{t("optoutOfMarketingCommunications")}</li>
-            <li>{t("restrictCertainDataUses")}</li>
-            <li>{t("withdrawConsentAtAny")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("rightToRestrictProcessing")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("requestLimitedDataProcessing")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("optoutOfMarketingCommunications")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("restrictCertainDataUses")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("withdrawConsentAtAny")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("rightToObject")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("objectToAutomatedDecisionmaking")}</li>
-            <li>{t("objectToDataProcessing")}</li>
-            <li>{t("objectToDataSharing")}</li>
-            <li>{t("objectToProfilingAnd")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("rightToObject")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("objectToAutomatedDecisionmaking")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("objectToDataProcessing")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("objectToDataSharing")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("objectToProfilingAnd")}</span>
+            </li>
           </ul>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-            <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5 text-center">
-              <Mail className="h-5 w-5 text-emerald-400 mx-auto mb-1" />
-              <p className="text-[10px] text-zinc-400">{t("submitRequestsTo")}</p>
-              <p className="text-xs text-white font-medium">{t("privacynuvoracom")}</p>
+          <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <div className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-zinc-900/30 px-3.5 py-3">
+              <Mail className="h-4 w-4 shrink-0 text-emerald-400/80" />
+              <div>
+                <p className="text-[11px] text-zinc-500">{t("submitRequestsTo")}</p>
+                <p className="text-xs font-medium text-zinc-200">{t("privacynuvoraapp")}</p>
+              </div>
             </div>
-            <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5 text-center">
-              <Clock className="h-5 w-5 text-emerald-400 mx-auto mb-1" />
-              <p className="text-[10px] text-zinc-400">{t("responseTime")}</p>
-              <p className="text-xs text-white font-medium">{t("within30Days")}</p>
+            <div className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-zinc-900/30 px-3.5 py-3">
+              <Clock className="h-4 w-4 shrink-0 text-emerald-400/80" />
+              <div>
+                <p className="text-[11px] text-zinc-500">{t("responseTime")}</p>
+                <p className="text-xs font-medium text-zinc-200">{t("within30Days")}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -513,43 +897,83 @@ export function PrivacyPolicy({
       id: "cookies",
       icon: Cookie,
       title: t("cookiesTitle"),
-      color: "amber",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("whatAreCookies")}</p>
-          <p className="text-zinc-400 leading-relaxed">{t("cookiesAreSmallText")}</p>
-          <p className="font-semibold text-white mt-4">{t("typesOfCookiesWe")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("essential")}</span> {t("loginSessionssecurityBasicFunctionality")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("whatAreCookies")}</p>
+          <p>{t("cookiesAreSmallText")}</p>
+          <p className="font-medium text-zinc-100 pt-1">{t("typesOfCookiesWe")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("essential")}</span>{" "}
+                {t("loginSessionssecurityBasicFunctionality")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("functional")}</span> {t("preferenceslanguageRegion")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("functional")}</span>{" "}
+                {t("preferenceslanguageRegion")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("analytics")}</span> {t("usagePatternsperformanceMetrics")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("analytics")}</span>{" "}
+                {t("usagePatternsperformanceMetrics")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("marketing")}</span> {t("campaigneffectivenessOptinOnly")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("marketing")}</span>{" "}
+                {t("campaigneffectivenessOptinOnly")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("cookieManagement")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("changeCookieSettingsIn")}</li>
-            <li>{t("deleteExistingCookiesAnytime")}</li>
-            <li>{t("optoutOfNonessentialCookies")}</li>
-            <li>{t("cookiePreferencesSavedLocally")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("cookieManagement")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("changeCookieSettingsIn")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("deleteExistingCookiesAnytime")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("optoutOfNonessentialCookies")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("cookiePreferencesSavedLocally")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("thirdpartyCookies")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("analyticsProvidersGoogleAnalytics")}</li>
-            <li>{t("paymentProcessorsStripePaypal")}</li>
-            <li>{t("socialMediaIntegrations")}</li>
-            <li>{t("cdnAndPerformanceProviders")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("thirdpartyCookies")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("analyticsProvidersGoogleAnalytics")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("paymentProcessorsStripePaypal")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("socialMediaIntegrations")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("cdnAndPerformanceProviders")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-            <p className="text-xs text-zinc-400">
-              <span className="text-white">{t("CookiePreferences")}</span> {t("youCanmanageCookieSettings")}
+          <div className="rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
+            <p className="text-xs text-zinc-500">
+              <span className="font-medium text-zinc-200">{t("CookiePreferences")}</span>{" "}
+              {t("youCanmanageCookieSettings")}
             </p>
           </div>
         </div>
@@ -561,81 +985,140 @@ export function PrivacyPolicy({
       id: "phase-specific",
       icon: Layers,
       title: t("phaseSpecificTitle"),
-      color: "sky",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <Package className="h-4 w-4 text-emerald-400" />
-              <p className="font-semibold text-white">{t("globalMarketPrivacy")}</p>
+        <div className="space-y-3 text-sm leading-relaxed text-zinc-400">
+          <div className="rounded-xl border border-white/[0.06] bg-zinc-900/25 p-4">
+            <div className="mb-2.5 flex items-center gap-2">
+              <Package className="h-4 w-4 text-emerald-400/80" />
+              <p className="font-medium text-zinc-100">{t("globalMarketPrivacy")}</p>
             </div>
-            <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2 text-xs">
-              <li>
-                <span className="text-white">{t("sellerData")}</span> {t("listingdetailsSalesHistoryVerified")}
+            <ul className="space-y-1.5 text-xs">
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("sellerData")}</span>{" "}
+                  {t("listingdetailsSalesHistoryVerified")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("buyerData")}</span> {t("purchasehistoryLockerContentsReviews")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("buyerData")}</span>{" "}
+                  {t("purchasehistoryLockerContentsReviews")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("transactionData")}</span> {t("escrowholdingsPaymentRecords")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("transactionData")}</span>{" "}
+                  {t("escrowholdingsPaymentRecords")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("reviews")}</span> {t("publicRatingsAndfeedback")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("reviews")}</span>{" "}
+                  {t("publicRatingsAndfeedback")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("dataSharing")}</span> {t("sellerNamevisibleToBuyers")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("dataSharing")}</span>{" "}
+                  {t("sellerNamevisibleToBuyers")}
+                </span>
               </li>
             </ul>
           </div>
-          <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <Send className="h-4 w-4 text-purple-400" />
-              <p className="font-semibold text-white">{t("smmPanelPrivacy")}</p>
+          <div className="rounded-xl border border-white/[0.06] bg-zinc-900/25 p-4">
+            <div className="mb-2.5 flex items-center gap-2">
+              <Send className="h-4 w-4 text-emerald-400/80" />
+              <p className="font-medium text-zinc-100">{t("smmPanelPrivacy")}</p>
             </div>
-            <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2 text-xs">
-              <li>
-                <span className="text-white">{t("serviceData")}</span> {t("orderHistorydeliveryStatus")}
+            <ul className="space-y-1.5 text-xs">
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("serviceData")}</span>{" "}
+                  {t("orderHistorydeliveryStatus")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("socialAccounts")}</span> {t("platformnamesUsernamesMetrics")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("socialAccounts")}</span>{" "}
+                  {t("platformnamesUsernamesMetrics")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("engagementData")}</span> {t("likesviewsCommentsShares")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("engagementData")}</span>{" "}
+                  {t("likesviewsCommentsShares")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("dataSharing")}</span> {t("serviceprovidersSeeOrderDetails")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("dataSharing")}</span>{" "}
+                  {t("serviceprovidersSeeOrderDetails")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("accountSafety")}</span> {t("weNeverstoreSocialPasswords")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("accountSafety")}</span>{" "}
+                  {t("weNeverstoreSocialPasswords")}
+                </span>
               </li>
             </ul>
           </div>
-          <div className="p-4 bg-sky-500/5 border border-sky-500/10 rounded-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <Building2 className="h-4 w-4 text-sky-400" />
-              <p className="font-semibold text-white">{t("socialTenantPrivacy")}</p>
+          <div className="rounded-xl border border-white/[0.06] bg-zinc-900/25 p-4">
+            <div className="mb-2.5 flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-emerald-400/80" />
+              <p className="font-medium text-zinc-100">{t("socialTenantPrivacy")}</p>
             </div>
-            <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2 text-xs">
-              <li>
-                <span className="text-white">{t("designData")}</span> {t("aiPromptsgeneratedDesignsCustomizations")}
+            <ul className="space-y-1.5 text-xs">
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("designData")}</span>{" "}
+                  {t("aiPromptsgeneratedDesignsCustomizations")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("websiteContent")}</span> {t("pagecontentImagesCopy")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("websiteContent")}</span>{" "}
+                  {t("pagecontentImagesCopy")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("templateUsage")}</span> {t("selectedtemplatesAndModifications")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("templateUsage")}</span>{" "}
+                  {t("selectedtemplatesAndModifications")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("dataSharing")}</span> {t("designsNotsharedWithThird")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("dataSharing")}</span>{" "}
+                  {t("designsNotsharedWithThird")}
+                </span>
               </li>
-              <li>
-                <span className="text-white">{t("ownership")}</span> {t("youOwnFinaldesignsAnd")}
+              <li className="flex gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/60" />
+                <span>
+                  <span className="text-zinc-300">{t("ownership")}</span>{" "}
+                  {t("youOwnFinaldesignsAnd")}
+                </span>
               </li>
             </ul>
           </div>
-          <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-lg">
-            <p className="text-xs text-amber-400 font-medium">{t("CrossphaseData")}</p>
-            <p className="text-xs text-zinc-400 mt-1">{t("dataAcrossPhasesMay")}</p>
+          <div className="rounded-lg border border-emerald-500/10 bg-emerald-500/[0.04] px-3.5 py-3">
+            <p className="text-xs font-medium text-emerald-400/90">{t("CrossphaseData")}</p>
+            <p className="mt-1 text-xs text-zinc-500">{t("dataAcrossPhasesMay")}</p>
           </div>
         </div>
       ),
@@ -646,35 +1129,72 @@ export function PrivacyPolicy({
       id: "children",
       icon: Shield,
       title: t("childrenTitle"),
-      color: "rose",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("ageRestriction")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("platformIsStrictlyFor")}</li>
-            <li>{t("ageVerificationRequiredDuring")}</li>
-            <li>{t("parentalConsentNotAccepted")}</li>
-            <li>{t("weDoNotKnowingly")}</li>
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("ageRestriction")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("platformIsStrictlyFor")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("ageVerificationRequiredDuring")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("parentalConsentNotAccepted")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("weDoNotKnowingly")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("coppaCompliance")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("fullyCompliantWithChildrens")}</li>
-            <li>{t("noTargetedAdvertisingTo")}</li>
-            <li>{t("noCollectionOfChild")}</li>
-            <li>{t("promptDeletionOfAny")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("coppaCompliance")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("fullyCompliantWithChildrens")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("noTargetedAdvertisingTo")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("noCollectionOfChild")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("promptDeletionOfAny")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("minorDataProtection")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("ifWeDiscoverData")}</li>
-            <li>{t("reportSuspectedMinorAccounts")}</li>
-            <li>{t("additionalVerificationForAgesensitive")}</li>
-            <li>{t("enhancedMonitoringForUnderage")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("minorDataProtection")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("ifWeDiscoverData")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("reportSuspectedMinorAccounts")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("additionalVerificationForAgesensitive")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("enhancedMonitoringForUnderage")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-lg">
-            <p className="text-xs text-amber-400 font-medium">{t("ReportingMinorAccounts")}</p>
-            <p className="text-xs text-zinc-400 mt-1">
+          <div className="rounded-lg border border-emerald-500/10 bg-emerald-500/[0.04] px-3.5 py-3">
+            <p className="text-xs font-medium text-emerald-400/90">
+              {t("ReportingMinorAccounts")}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">
               {t("ifYouBelieveA")}{" "}
-              <span className="text-white font-medium">{t("supportnuvoracom")}</span>
+              <span className="font-medium text-zinc-300">{t("supportnuvoraapp")}</span>
             </p>
           </div>
         </div>
@@ -686,42 +1206,82 @@ export function PrivacyPolicy({
       id: "transfers",
       icon: Globe,
       title: t("transfersTitle"),
-      color: "emerald",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("crossborderDataFlow")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("dataMayBeProcessed")}</li>
-            <li>{t("dataCentersLocatedGlobally")}</li>
-            <li>{t("allDataTransfersComply")}</li>
-            <li>{t("standardContractualClausesIn")}</li>
-          </ul>
-          <p className="font-semibold text-white mt-4">{t("legalFrameworks")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("gdpr")}</span> {t("euGeneralDataprotectionRegulation")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("crossborderDataFlow")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("dataMayBeProcessed")}</span>
             </li>
-            <li>
-              <span className="text-white">{t("ccpa")}</span> {t("californiaConsumerprivacyActCompliance")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("dataCentersLocatedGlobally")}</span>
             </li>
-            <li>
-              <span className="text-white">{t("ukGdpr")}</span> {t("ukDataProtectioncompliance")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("allDataTransfersComply")}</span>
             </li>
-            <li>
-              <span className="text-white">{t("privacyShield")}</span> {t("euusDataprivacyFramework")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("standardContractualClausesIn")}</span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("dataLocalization")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("primaryDataStoredIn")}</li>
-            <li>{t("backupsInGeographicallyDistributed")}</li>
-            <li>{t("userDataMayBe")}</li>
-            <li>{t("weRespectRegionalData")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("legalFrameworks")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("gdpr")}</span>{" "}
+                {t("euGeneralDataprotectionRegulation")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("ccpa")}</span>{" "}
+                {t("californiaConsumerprivacyActCompliance")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("ukGdpr")}</span>{" "}
+                {t("ukDataProtectioncompliance")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("privacyShield")}</span>{" "}
+                {t("euusDataprivacyFramework")}
+              </span>
+            </li>
           </ul>
-          <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-            <p className="text-xs text-zinc-400">
-              <span className="text-white">{t("DataProtectionOfficer")}</span> {t("ourDpoEnsuresCompliance")}{" "}
-              <span className="text-emerald-400">{t("dponuvoracom")}</span>
+          <p className="font-medium text-zinc-100 pt-1">{t("dataLocalization")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("primaryDataStoredIn")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("backupsInGeographicallyDistributed")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("userDataMayBe")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("weRespectRegionalData")}</span>
+            </li>
+          </ul>
+          <div className="rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
+            <p className="text-xs text-zinc-500">
+              <span className="font-medium text-zinc-200">{t("DataProtectionOfficer")}</span>{" "}
+              {t("ourDpoEnsuresCompliance")}{" "}
+              <span className="text-emerald-400/90">{t("dponuvoraapp")}</span>
             </p>
           </div>
         </div>
@@ -733,41 +1293,81 @@ export function PrivacyPolicy({
       id: "automated",
       icon: RefreshCw,
       title: t("automatedTitle"),
-      color: "purple",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("automatedSystems")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("escrowAutorelease")}</span> {t("fundsautomaticallyReleasedAfter7")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("automatedSystems")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("escrowAutorelease")}</span>{" "}
+                {t("fundsautomaticallyReleasedAfter7")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("fraudDetection")}</span> {t("automatedsystemsFlagSuspiciousActivity")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("fraudDetection")}</span>{" "}
+                {t("automatedsystemsFlagSuspiciousActivity")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("riskAssessment")}</span> {t("transactionriskScoringForSecurity")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("riskAssessment")}</span>{" "}
+                {t("transactionriskScoringForSecurity")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("contentModeration")}</span> {t("aiassistedContentReview")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("contentModeration")}</span>{" "}
+                {t("aiassistedContentReview")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("userRightsRegardingAutomation")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("rightToContestAutomated")}</li>
-            <li>{t("rightToHumanReview")}</li>
-            <li>{t("rightToUnderstandHow")}</li>
-            <li>{t("rightToOptoutOf")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("userRightsRegardingAutomation")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("rightToContestAutomated")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("rightToHumanReview")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("rightToUnderstandHow")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("rightToOptoutOf")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("transparencyInAutomation")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("clearExplanationOfAutomated")}</li>
-            <li>{t("regularAuditsOfAutomated")}</li>
-            <li>{t("biasDetectionAndMitigation")}</li>
-            <li>{t("humanOversightForCritical")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("transparencyInAutomation")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("clearExplanationOfAutomated")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("regularAuditsOfAutomated")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("biasDetectionAndMitigation")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("humanOversightForCritical")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-            <p className="text-xs text-zinc-400">
-              <span className="text-white">{t("HumanReview")}</span> {t("automateddecisionsCanBeReviewed")}
+          <div className="rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
+            <p className="text-xs text-zinc-500">
+              <span className="font-medium text-zinc-200">{t("HumanReview")}</span>{" "}
+              {t("automateddecisionsCanBeReviewed")}
             </p>
           </div>
         </div>
@@ -779,33 +1379,70 @@ export function PrivacyPolicy({
       id: "third-party",
       icon: ExternalLink,
       title: t("thirdPartyTitle"),
-      color: "amber",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("externalLinks")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("platformMayContainLinks")}</li>
-            <li>{t("thirdpartySitesHaveTheir")}</li>
-            <li>{t("weAreNotResponsible")}</li>
-            <li>{t("useThirdpartyLinksAt")}</li>
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("externalLinks")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("platformMayContainLinks")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("thirdpartySitesHaveTheir")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("weAreNotResponsible")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("useThirdpartyLinksAt")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("thirdpartyIntegrations")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("paymentProcessorsStripePaypal")}</li>
-            <li>{t("socialMediaPlatformsTiktok")}</li>
-            <li>{t("analyticsProvidersGoogleAnalytics")}</li>
-            <li>{t("cloudServiceProvidersSupabase")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("thirdpartyIntegrations")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("paymentProcessorsStripePaypal")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("socialMediaPlatformsTiktok")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("analyticsProvidersGoogleAnalytics")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("cloudServiceProvidersSupabase")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("integrationPrivacy")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("thirdpartyServicesHaveTheir")}</li>
-            <li>{t("weOnlyShareNecessary")}</li>
-            <li>{t("providersAreContractuallyBound")}</li>
-            <li>{t("weReviewThirdpartySecurity")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("integrationPrivacy")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("thirdpartyServicesHaveTheir")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("weOnlyShareNecessary")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("providersAreContractuallyBound")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("weReviewThirdpartySecurity")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-lg">
-            <p className="text-xs text-amber-400 font-medium">{t("PrivacyOnExternal")}</p>
-            <p className="text-xs text-zinc-400 mt-1">{t("whenYouClickExternal")}</p>
+          <div className="rounded-lg border border-emerald-500/10 bg-emerald-500/[0.04] px-3.5 py-3">
+            <p className="text-xs font-medium text-emerald-400/90">
+              {t("PrivacyOnExternal")}
+            </p>
+            <p className="mt-1 text-xs text-zinc-500">{t("whenYouClickExternal")}</p>
           </div>
         </div>
       ),
@@ -816,34 +1453,70 @@ export function PrivacyPolicy({
       id: "breach",
       icon: AlertCircle,
       title: t("breachTitle"),
-      color: "rose",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("ourCommitment")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("promptInvestigationOfAny")}</li>
-            <li>{t("immediateContainmentMeasures")}</li>
-            <li>{t("247SecurityMonitoring")}</li>
-            <li>{t("regularSecurityAuditsAnd")}</li>
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("ourCommitment")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("promptInvestigationOfAny")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("immediateContainmentMeasures")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("247SecurityMonitoring")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("regularSecurityAuditsAnd")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("notificationTimeline")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("affectedUsersNotifiedWithin")}</li>
-            <li>{t("regulatoryAuthoritiesNotifiedAs")}</li>
-            <li>{t("detailedBreachReportProvided")}</li>
-            <li>{t("remediationPlanSharedWith")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("notificationTimeline")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("affectedUsersNotifiedWithin")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("regulatoryAuthoritiesNotifiedAs")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("detailedBreachReportProvided")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("remediationPlanSharedWith")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("breachResponseTeam")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("dedicatedIncidentResponseTeam")}</li>
-            <li>{t("externalSecurityExpertsEngagement")}</li>
-            <li>{t("forensicInvestigationProcedures")}</li>
-            <li>{t("continuousImprovementOfSecurity")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("breachResponseTeam")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("dedicatedIncidentResponseTeam")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("externalSecurityExpertsEngagement")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("forensicInvestigationProcedures")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("continuousImprovementOfSecurity")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-            <p className="text-xs text-zinc-400">
-              <span className="text-white">{t("ReportSecurityConcerns")}</span> {t("ifYouDiscoverA")}{" "}
-              <span className="text-emerald-400">{t("securitynuvoracom")}</span>
+          <div className="rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
+            <p className="text-xs text-zinc-500">
+              <span className="font-medium text-zinc-200">{t("ReportSecurityConcerns")}</span>{" "}
+              {t("ifYouDiscoverA")}{" "}
+              <span className="text-emerald-400/90">{t("securitynuvoraapp")}</span>
             </p>
           </div>
         </div>
@@ -855,36 +1528,72 @@ export function PrivacyPolicy({
       id: "updates",
       icon: RefreshCw,
       title: t("updatesTitle"),
-      color: "emerald",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("notificationOfUpdates")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("usersNotifiedOfSignificant")}</li>
-            <li>{t("emailNotificationForMajor")}</li>
-            <li>{t("inappNotificationOnLogin")}</li>
-            <li>{t("policyClearlyMarkedWith")}</li>
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("notificationOfUpdates")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("usersNotifiedOfSignificant")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("emailNotificationForMajor")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("inappNotificationOnLogin")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("policyClearlyMarkedWith")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("acceptanceOfUpdates")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("continuedUseImpliesAcceptance")}</li>
-            <li>{t("usersCanReviewChanges")}</li>
-            <li>{t("optionToDeclineUpdates")}</li>
-            <li>{t("previousVersionsArchivedFor")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("acceptanceOfUpdates")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("continuedUseImpliesAcceptance")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("usersCanReviewChanges")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("optionToDeclineUpdates")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("previousVersionsArchivedFor")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("changeLog")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("summaryOfSignificantChanges")}</li>
-            <li>{t("previousPolicyVersionsAccessible")}</li>
-            <li>{t("dateOfEachUpdate")}</li>
-            <li>{t("reasonForChangesExplained")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("changeLog")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("summaryOfSignificantChanges")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("previousPolicyVersionsAccessible")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("dateOfEachUpdate")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("reasonForChangesExplained")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-            <p className="text-xs text-zinc-400">
-              <span className="text-white">{t("CurrentVersion")}</span> v{new Date().getFullYear()}.1
+          <div className="rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
+            <p className="text-xs text-zinc-500">
+              <span className="font-medium text-zinc-200">{t("CurrentVersion")}</span>{" "}
+              v{new Date().getFullYear()}.1
             </p>
-            <p className="text-xs text-zinc-400 mt-1">
-              <span className="text-white">{t("EffectiveDate")}</span>{" "}
+            <p className="mt-1 text-xs text-zinc-500">
+              <span className="font-medium text-zinc-200">{t("EffectiveDate")}</span>{" "}
               {new Date().toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
@@ -901,49 +1610,89 @@ export function PrivacyPolicy({
       id: "contact",
       icon: Mail,
       title: t("contactTitle"),
-      color: "purple",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("dataProtectionOfficer")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("name")}</span> {t("dataProtectionOfficer")}
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("dataProtectionOfficer")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("name")}</span>{" "}
+                {t("dataProtectionOfficer")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("email")}</span> {t("dponuvoracom")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("email")}</span>{" "}
+                {t("dponuvoraapp")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("responseTime")}</span> {t("within48Hours")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("responseTime")}</span>{" "}
+                {t("within48Hours")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("privacyTeam")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>
-              <span className="text-white">{t("email")}</span> {t("privacynuvoracom")}
+          <p className="font-medium text-zinc-100 pt-1">{t("privacyTeam")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("email")}</span>{" "}
+                {t("privacynuvoraapp")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("support")}</span> {t("supportnuvoracom")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("support")}</span>{" "}
+                {t("supportnuvoraapp")}
+              </span>
             </li>
-            <li>
-              <span className="text-white">{t("responseTime")}</span> {t("within2448hours")}
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>
+                <span className="font-medium text-zinc-200">{t("responseTime")}</span>{" "}
+                {t("within2448hours")}
+              </span>
             </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("mailingAddress")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("nuvoraEliteHome")}</li>
-            <li>{t("privacyDepartment")}</li>
-            <li>{t("availableUponRequest")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("mailingAddress")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("nuvoraEliteHome")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("privacyDepartment")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("availableUponRequest")}</span>
+            </li>
           </ul>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-            <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-              <p className="text-xs font-bold text-emerald-400">{t("PrivacyInquiries")}</p>
-              <p className="text-xs text-zinc-400 mt-1">{t("privacynuvoracom")}</p>
-              <p className="text-[10px] text-zinc-500">{t("forDatarelatedQuestions")}</p>
+          <div className="mt-1 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <div className="rounded-lg border border-white/[0.06] bg-zinc-900/30 p-3.5">
+              <p className="text-xs font-semibold text-emerald-400/90">
+                {t("PrivacyInquiries")}
+              </p>
+              <p className="mt-1 text-xs text-zinc-300">{t("privacynuvoraapp")}</p>
+              <p className="mt-0.5 text-[11px] text-zinc-600">
+                {t("forDatarelatedQuestions")}
+              </p>
             </div>
-            <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-              <p className="text-xs font-bold text-emerald-400">{t("SecurityReports")}</p>
-              <p className="text-xs text-zinc-400 mt-1">{t("securitynuvoracom")}</p>
-              <p className="text-[10px] text-zinc-500">{t("forVulnerabilityReports")}</p>
+            <div className="rounded-lg border border-white/[0.06] bg-zinc-900/30 p-3.5">
+              <p className="text-xs font-semibold text-emerald-400/90">
+                {t("SecurityReports")}
+              </p>
+              <p className="mt-1 text-xs text-zinc-300">{t("securitynuvoraapp")}</p>
+              <p className="mt-0.5 text-[11px] text-zinc-600">
+                {t("forVulnerabilityReports")}
+              </p>
             </div>
           </div>
         </div>
@@ -955,33 +1704,69 @@ export function PrivacyPolicy({
       id: "complaints",
       icon: Scale,
       title: t("complaintsTitle"),
-      color: "amber",
       content: (
-        <div className="space-y-3 text-sm text-zinc-300">
-          <p className="font-semibold text-white">{t("internalComplaintProcess")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("submitComplaintViaSupport")}</li>
-            <li>{t("acknowledgmentWithin48Hours")}</li>
-            <li>{t("investigationCompletedWithin30")}</li>
-            <li>{t("resolutionAndExplanationProvided")}</li>
+        <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+          <p className="font-medium text-zinc-100">{t("internalComplaintProcess")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("submitComplaintViaSupport")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("acknowledgmentWithin48Hours")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("investigationCompletedWithin30")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("resolutionAndExplanationProvided")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("escalationProcess")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("unresolvedComplaintsEscalatedTo")}</li>
-            <li>{t("dpoReviewWithin15")}</li>
-            <li>{t("finalDecisionByPrivacy")}</li>
-            <li>{t("appealProcessAvailable")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("escalationProcess")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("unresolvedComplaintsEscalatedTo")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("dpoReviewWithin15")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("finalDecisionByPrivacy")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("appealProcessAvailable")}</span>
+            </li>
           </ul>
-          <p className="font-semibold text-white mt-4">{t("externalSupervisoryAuthorities")}</p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-400 ml-2">
-            <li>{t("rightToComplainTo")}</li>
-            <li>{t("contactInformationForAuthorities")}</li>
-            <li>{t("crossborderComplaintHandling")}</li>
-            <li>{t("resolutionThroughLegalChannels")}</li>
+          <p className="font-medium text-zinc-100 pt-1">{t("externalSupervisoryAuthorities")}</p>
+          <ul className="space-y-1.5 pl-1">
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("rightToComplainTo")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("contactInformationForAuthorities")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("crossborderComplaintHandling")}</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+              <span>{t("resolutionThroughLegalChannels")}</span>
+            </li>
           </ul>
-          <div className="p-3 bg-zinc-900/30 rounded-lg border border-white/5">
-            <p className="text-xs text-zinc-400">
-              <span className="text-white">{t("ComplaintTracking")}</span> {t("allcomplaintsAreTrackedAnd")}
+          <div className="rounded-lg border border-white/[0.06] bg-zinc-900/40 px-3.5 py-3">
+            <p className="text-xs text-zinc-500">
+              <span className="font-medium text-zinc-200">{t("ComplaintTracking")}</span>{" "}
+              {t("allcomplaintsAreTrackedAnd")}
             </p>
           </div>
         </div>
@@ -989,172 +1774,635 @@ export function PrivacyPolicy({
     },
   ];
 
-  const getColorClasses = (color: string) => {
-    const colors: Record<string, { border: string; bg: string; text: string }> = {
-      emerald: {
-        border: "border-emerald-500/30",
-        bg: "bg-emerald-500/10",
-        text: "text-emerald-400",
-      },
-      purple: {
-        border: "border-purple-500/30",
-        bg: "bg-purple-500/10",
-        text: "text-purple-400",
-      },
-      sky: {
-        border: "border-sky-500/30",
-        bg: "bg-sky-500/10",
-        text: "text-sky-400",
-      },
-      amber: {
-        border: "border-amber-500/30",
-        bg: "bg-amber-500/10",
-        text: "text-amber-400",
-      },
-      rose: {
-        border: "border-rose-500/30",
-        bg: "bg-rose-500/10",
-        text: "text-rose-400",
-      },
-    };
-    return colors[color] || colors.emerald;
-  };
-
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs text-zinc-500 mt-3">{t("loadingPrivacyPolicy")}</p>
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-emerald-500/30 border-t-emerald-500" />
+        <p className="mt-3 text-xs text-zinc-500">{t("loadingPrivacyPolicy")}</p>
       </div>
     );
   }
 
   return (
-    <div className={`flex flex-col h-full ${variant === "modal" ? "max-h-[80vh]" : ""}`}>
+    <div
+      className={`flex w-full flex-col ${
+        variant === "modal" ? "h-full max-h-[80vh] min-h-0" : ""
+      }`}
+    >
       {/* Header */}
-      <div className="text-center space-y-2 pb-4 border-b border-white/5">
-        <div className="flex items-center justify-center gap-2">
-          <ShieldCheck className="h-6 w-6 text-emerald-400" />
-          <h2 className="text-xl font-bold text-white">{t("privacyPolicy")}</h2>
-          <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+       {/* ───────────────── Privacy Header ───────────────── */}
+<header className="relative overflow-hidden rounded-[26px] border border-white/[0.08] bg-[#090b0d] px-5 py-8 sm:px-8 sm:py-10">
+  {/* Privacy / security ambient glow */}
+  <div
+    className="
+      pointer-events-none
+      absolute
+      -right-24
+      -top-24
+      h-64
+      w-64
+      rounded-full
+      bg-cyan-400/[0.045]
+      blur-[90px]
+    "
+  />
+
+  <div
+    className="
+      pointer-events-none
+      absolute
+      -bottom-24
+      -left-20
+      h-48
+      w-48
+      rounded-full
+      bg-emerald-400/[0.025]
+      blur-[75px]
+    "
+  />
+
+  {/* Top reflection */}
+  <div
+    className="
+      pointer-events-none
+      absolute
+      inset-x-12
+      top-0
+      h-px
+      bg-gradient-to-r
+      from-transparent
+      via-cyan-300/20
+      to-transparent
+    "
+  />
+
+  <div className="relative flex flex-col items-center text-center">
+    {/* Privacy badge */}
+    <div
+      className="
+        inline-flex
+        items-center
+        gap-2
+        rounded-full
+        border
+        border-cyan-400/[0.14]
+        bg-cyan-400/[0.04]
+        px-3.5
+        py-1.5
+        text-[10px]
+        font-semibold
+        uppercase
+        tracking-[0.20em]
+        text-cyan-300/75
+      "
+    >
+      <ShieldCheck
+        className="h-3.5 w-3.5 text-cyan-400"
+        strokeWidth={1.7}
+      />
+
+      <span>Privacy & Data Protection</span>
+    </div>
+
+    {/* Main title */}
+    <h1
+      className="
+        mt-5
+        text-3xl
+        font-black
+        tracking-[-0.05em]
+        text-white
+        sm:text-4xl
+      "
+    >
+      {t("privacyPolicy")}
+    </h1>
+
+    {/* Platform identity */}
+    <div className="mt-3 flex items-center gap-2">
+      <span className="h-px w-5 bg-white/[0.08]" />
+
+      <span
+        className="
+          text-[10px]
+          font-semibold
+          uppercase
+          tracking-[0.18em]
+          text-zinc-600
+        "
+      >
+        {t("nuvoraEliteHome")}
+      </span>
+
+      <span className="h-px w-5 bg-white/[0.08]" />
+    </div>
+
+    {/* Privacy statement */}
+    <p
+      className="
+        mt-5
+        max-w-xl
+        text-sm
+        leading-7
+        text-zinc-400
+      "
+    >
+      {t("yourPrivacyMattersReview")}
+    </p>
+
+    {/* Last updated */}
+    <div
+      className="
+        mt-5
+        inline-flex
+        items-center
+        gap-2
+        rounded-full
+        border
+        border-white/[0.06]
+        bg-white/[0.02]
+        px-3
+        py-1.5
+        text-[10px]
+        font-medium
+        text-zinc-600
+      "
+    >
+      <span
+        className="
+          h-1.5
+          w-1.5
+          rounded-full
+          bg-emerald-400/70
+          shadow-[0_0_8px_rgba(52,211,153,0.35)]
+        "
+      />
+
+      <span>{t("lastUpdated")}</span>
+
+      <span className="text-zinc-700">•</span>
+
+      <time dateTime={new Date().toISOString()}>
+        {new Date().toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        })}
+      </time>
+    </div>
+  </div>
+
+  {/* Bottom accent */}
+  <div
+    className="
+      pointer-events-none
+      absolute
+      bottom-0
+      left-1/2
+      h-[2px]
+      w-[32%]
+      -translate-x-1/2
+      rounded-full
+      bg-gradient-to-r
+      from-transparent
+      via-cyan-400/40
+      to-transparent
+    "
+  />
+</header>
+      {/* Sections – natural document flow so the page itself scrolls */}
+      <div
+        className={
+          variant === "modal"
+            ? "min-h-0 flex-1 overflow-y-auto overscroll-y-contain py-5 [-webkit-overflow-scrolling:touch] [touch-action:pan-y]"
+            : "py-5"
+        }
+      >
+        <div className="space-y-2.5">
+          {sections.map((section) => {
+            const isExpanded = expandedSection === section.id;
+            const Icon = section.icon;
+
+            return (
+              <div
+                key={section.id}
+               className={`
+  group
+  overflow-hidden
+  rounded-[16px]
+  border
+  transition-all
+  duration-300
+  ${
+    isExpanded
+      ? "border-emerald-400/[0.12] bg-emerald-400/[0.025]"
+      : "border-white/[0.06] bg-zinc-950/40 hover:border-white/[0.10]"
+  }
+`}
+>
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.id)}
+                  className="group flex w-full items-center gap-3 px-3.5 py-3.5 text-left transition-colors hover:bg-white/[0.03] sm:px-4"
+                  aria-expanded={isExpanded}
+                >
+                  <div
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                      isExpanded
+                        ? "bg-emerald-500/15 text-emerald-400"
+                        : "bg-zinc-800/60 text-zinc-500 group-hover:text-zinc-400"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="flex-1 text-[13px] font-medium text-zinc-100 sm:text-sm">
+                    {section.title}
+                  </span>
+                  <span
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors ${
+                      isExpanded ? "text-emerald-400" : "text-zinc-600"
+                    }`}
+                  >
+                    {isExpanded ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </span>
+                </button>
+
+                <div
+                  className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+                    isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="border-t border-white/[0.05] px-3.5 pb-4 pt-3.5 sm:px-4">
+                      {section.content}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Privacy at a Glance */}
+        <div className="mt-5 rounded-xl border border-emerald-500/10 bg-emerald-500/[0.03] p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <HeartHandshake className="h-4 w-4 text-emerald-400/80" />
+            <span className="text-xs font-semibold tracking-wide text-zinc-100">
+              {t("privacyAtAGlance")}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {[
+              { label: t("Encrypted"), sub: t("allData") },
+              { label: t("Control"), sub: t("yourRights") },
+              { label: t("NoSelling"), sub: t("yourData") },
+              { label: t("Secure"), sub: t("storage") },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-lg border border-white/[0.05] bg-zinc-900/40 px-2.5 py-2.5 text-center"
+              >
+                <p className="text-xs font-semibold text-emerald-400/90">
+                  {item.label}
+                </p>
+                <p className="mt-0.5 text-[11px] text-zinc-600">{item.sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ───────────────── Privacy Acceptance Footer ───────────────── */}
+<footer
+  className="
+    relative
+    mt-8
+    overflow-hidden
+    rounded-[22px]
+    border
+    border-white/[0.08]
+    bg-[#090b0d]
+    p-5
+    shadow-[0_12px_40px_rgba(0,0,0,0.20)]
+    sm:p-6
+  "
+>
+  {/* Ambient privacy glow */}
+  <div
+    className={`
+      pointer-events-none
+      absolute
+      -right-20
+      -top-20
+      h-44
+      w-44
+      rounded-full
+      blur-[70px]
+      transition-all
+      duration-500
+      ${
+        accepted
+          ? "bg-emerald-400/[0.08]"
+          : "bg-cyan-400/[0.025]"
+      }
+    `}
+  />
+
+  {/* Top reflection */}
+  <div
+    className="
+      pointer-events-none
+      absolute
+      inset-x-10
+      top-0
+      h-px
+      bg-gradient-to-r
+      from-transparent
+      via-white/[0.10]
+      to-transparent
+    "
+  />
+
+  <div className="relative">
+    {/* Privacy acknowledgment */}
+    <button
+      type="button"
+      role="switch"
+      aria-checked={accepted}
+      onClick={() => setAccepted((value) => !value)}
+      className={`
+        group
+        flex
+        w-full
+        items-center
+        gap-4
+        rounded-[16px]
+        border
+        px-4
+        py-3.5
+        text-left
+        transition-all
+        duration-300
+        ${
+          accepted
+            ? "border-emerald-400/[0.18] bg-emerald-400/[0.035]"
+            : "border-white/[0.07] bg-white/[0.018] hover:border-white/[0.12] hover:bg-white/[0.025]"
+        }
+      `}
+    >
+      {/* Toggle */}
+      <span
+        className={`
+          relative
+          h-7
+          w-12
+          shrink-0
+          rounded-full
+          border
+          p-[3px]
+          transition-all
+          duration-300
+          ${
+            accepted
+              ? "border-emerald-400/30 bg-emerald-400/20"
+              : "border-white/10 bg-zinc-900"
+          }
+        `}
+      >
+        <span
+          className={`
+            block
+            h-[18px]
+            w-[18px]
+            rounded-full
+            shadow-[0_2px_8px_rgba(0,0,0,0.35)]
+            transition-all
+            duration-300
+            ${
+              accepted
+                ? "translate-x-5 bg-emerald-400"
+                : "translate-x-0 bg-zinc-500"
+            }
+          `}
+        />
+
+        {accepted && (
+          <span
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              rounded-full
+              bg-gradient-to-r
+              from-transparent
+              via-white/[0.12]
+              to-transparent
+            "
+          />
+        )}
+      </span>
+
+      {/* Acknowledgment copy */}
+      <span className="min-w-0 flex-1">
+        <span
+          className={`
+            block
+            text-sm
+            font-semibold
+            transition-colors
+            duration-300
+            ${
+              accepted
+                ? "text-emerald-100"
+                : "text-zinc-200"
+            }
+          `}
+        >
+          {accepted
+            ? "Privacy policy acknowledged"
+            : "I confirm that I have read and understand"}
+        </span>
+
+        <span className="mt-1 block text-xs leading-5 text-zinc-500">
+          {t("iConfirmThatI")}{" "}
+          <span className="text-zinc-300">
+            {t("privacyPolicy")}
+          </span>{" "}
+          {t("for")}{" "}
+          <span className="text-zinc-300">
             {t("nuvoraEliteHome")}
           </span>
-        </div>
-        <p className="text-xs text-zinc-400">{t("yourPrivacyMattersReview")}</p>
-        <p className="text-[10px] text-zinc-500">
-          {t("lastUpdated")}{" "}
-          {new Date().toLocaleDateString("en-US", {
-            month: "long",
-            year: "numeric",
-          })}
-        </p>
-      </div>
+          .{" "}
+          {t("IUnderstandHow")}
+        </span>
+      </span>
 
-      {/* Sections */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-4">
-        {sections.map((section) => {
-          const isExpanded = expandedSection === section.id;
-          const Icon = section.icon;
-          const colors = getColorClasses(section.color);
+      {/* Confirmation indicator */}
+      <span
+        className={`
+          hidden
+          h-8
+          w-8
+          shrink-0
+          items-center
+          justify-center
+          rounded-full
+          border
+          transition-all
+          duration-300
+          sm:flex
+          ${
+            accepted
+              ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-400"
+              : "border-white/[0.06] bg-white/[0.02] text-zinc-700"
+          }
+        `}
+      >
+        <Check
+          className="h-4 w-4"
+          strokeWidth={2}
+        />
+      </span>
+    </button>
 
-          return (
-            <div
-              key={section.id}
-              className="border border-white/5 rounded-xl overflow-hidden bg-zinc-950/20"
-            >
-              <button
-                onClick={() => toggleSection(section.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left ${colors.bg}`}
-              >
-                <Icon className={`h-5 w-5 ${colors.text} flex-shrink-0`} />
-                <span className="text-sm font-bold text-white flex-1">{section.title}</span>
-                {isExpanded ? (
-                  <ChevronUp className="h-4 w-4 text-zinc-500" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-zinc-500" />
-                )}
-              </button>
-              {isExpanded && <div className="px-4 pb-4 pt-3 border-t border-white/5">{section.content}</div>}
-            </div>
-          );
-        })}
+    {/* Actions */}
+    <div className="mt-4 flex flex-col-reverse gap-2.5 sm:flex-row">
+      {onDecline && (
+        <button
+          type="button"
+          onClick={onDecline}
+          className="
+            h-11
+            flex-1
+            rounded-[14px]
+            border
+            border-white/[0.08]
+            bg-transparent
+            text-xs
+            font-semibold
+            text-zinc-500
+            transition-all
+            duration-300
+            hover:border-white/[0.14]
+            hover:bg-white/[0.025]
+            hover:text-zinc-200
+            active:scale-[0.99]
+          "
+        >
+          {t("decline")}
+        </button>
+      )}
 
-        {/* Quick Summary Box */}
-        <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-          <div className="flex items-center gap-2 mb-2">
-            <HeartHandshake className="h-4 w-4 text-emerald-400" />
-            <span className="text-xs font-bold text-white">{t("privacyAtAGlance")}</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <div className="p-2 bg-zinc-900/50 rounded-lg text-center">
-              <p className="text-emerald-400 font-bold">{t("Encrypted")}</p>
-              <p className="text-zinc-500">{t("allData")}</p>
-            </div>
-            <div className="p-2 bg-zinc-900/50 rounded-lg text-center">
-              <p className="text-emerald-400 font-bold">{t("Control")}</p>
-              <p className="text-zinc-500">{t("yourRights")}</p>
-            </div>
-            <div className="p-2 bg-zinc-900/50 rounded-lg text-center">
-              <p className="text-emerald-400 font-bold">{t("NoSelling")}</p>
-              <p className="text-zinc-500">{t("yourData")}</p>
-            </div>
-            <div className="p-2 bg-zinc-900/50 rounded-lg text-center">
-              <p className="text-emerald-400 font-bold">{t("Secure")}</p>
-              <p className="text-zinc-500">{t("storage")}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="pt-4 border-t border-white/5 space-y-4">
-        <div className="flex items-start gap-3 p-3 bg-zinc-900/30 rounded-xl border border-white/5">
-          <input
-            type="checkbox"
-            id="privacy-accept"
-            checked={accepted}
-            onChange={(e) => setAccepted(e.target.checked)}
-            className="mt-0.5 w-4 h-4 rounded border-white/20 bg-black text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0"
-          />
-          <label htmlFor="privacy-accept" className="text-xs text-zinc-400 leading-relaxed">
-            {t("iConfirmThatI")}{" "}
-            <span className="text-white font-medium">{t("privacyPolicy")}</span> {t("for")}{" "}
-            <span className="text-emerald-400 font-medium">{t("nuvoraEliteHome")}</span>{" "}
-            {t("IUnderstandHow")}
-          </label>
-        </div>
-
-        <div className="flex gap-3">
-          {onDecline && (
-            <button
-              onClick={onDecline}
-              className="flex-1 border border-white/10 bg-transparent text-zinc-400 hover:bg-zinc-900 hover:text-white rounded-xl h-11 text-xs font-bold transition-all"
-            >
-              {t("decline")}
-            </button>
+      {onAccept && (
+        <button
+          type="button"
+          onClick={onAccept}
+          disabled={!accepted}
+          className={`
+            group
+            relative
+            flex
+            h-11
+            flex-1
+            items-center
+            justify-center
+            gap-2
+            overflow-hidden
+            rounded-[14px]
+            border
+            text-xs
+            font-semibold
+            transition-all
+            duration-300
+            ${
+              accepted
+                ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100 hover:bg-emerald-400/[0.14] hover:shadow-[0_10px_30px_rgba(16,185,129,0.08)] active:scale-[0.99]"
+                : "cursor-not-allowed border-white/[0.06] bg-white/[0.025] text-zinc-600"
+            }
+          `}
+        >
+          {accepted && (
+            <span
+              className="
+                pointer-events-none
+                absolute
+                inset-y-0
+                -left-[100%]
+                w-1/2
+                skew-x-[-20deg]
+                bg-gradient-to-r
+                from-transparent
+                via-white/[0.09]
+                to-transparent
+                transition-transform
+                duration-700
+                group-hover:translate-x-[400%]
+              "
+            />
           )}
-          {onAccept && (
-            <button
-              onClick={onAccept}
-              disabled={!accepted}
-              className={`flex-1 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-bold rounded-xl h-11 text-xs transition-all flex items-center justify-center gap-2 ${
-                !accepted ? "opacity-40 cursor-not-allowed" : ""
-              }`}
-            >
-              <CheckCircle2 className="h-4 w-4" /> {t("acceptContinue")}
-            </button>
-          )}
-        </div>
 
-        <p className="text-[10px] text-center text-zinc-600">
-          {t("byAcceptingYouAgree")}
-          <br />
-          {t("needHelp")}{" "}
-          <a href="/support" className="text-emerald-400 hover:underline">
-            {t("contactSupport")}
-          </a>
-        </p>
-      </div>
+          <span className="relative flex items-center gap-2">
+            {accepted && (
+              <CheckCircle2
+                className="h-4 w-4 text-emerald-400"
+                strokeWidth={1.8}
+              />
+            )}
+
+            {t("acceptContinue")}
+          </span>
+        </button>
+      )}
+    </div>
+
+    {/* Legal/support information */}
+    <div className="mt-4 text-center">
+      <p className="text-[10px] leading-relaxed text-zinc-600">
+        {t("byAcceptingYouAgree")}
+      </p>
+
+      <p className="mt-1 text-[10px] text-zinc-600">
+        {t("needHelp")}{" "}
+        <a
+          href="/support"
+          className="
+            font-medium
+            text-emerald-500/80
+            underline-offset-2
+            transition-colors
+            hover:text-emerald-400
+            hover:underline
+          "
+        >
+          {t("contactSupport")}
+        </a>
+      </p>
+    </div>
+  </div>
+
+  {/* Bottom state accent */}
+  <div
+    className={`
+      pointer-events-none
+      absolute
+      bottom-0
+      left-1/2
+      h-[2px]
+      -translate-x-1/2
+      rounded-full
+      transition-all
+      duration-500
+      ${
+        accepted
+          ? "w-[55%] bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent"
+          : "w-[22%] bg-gradient-to-r from-transparent via-white/10 to-transparent"
+      }
+    `}
+  />
+</footer>
     </div>
   );
 }

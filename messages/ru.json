@@ -503,7 +503,11 @@
     "acceptContinue": "«Принять и продолжить»",
     "byAcceptingYouAgree": "Нажимая «Принять», вы соглашаетесь с нашей Политикой конфиденциальности и Условиями предоставления услуг.",
     "needHelp": "Нужна помощь?",
-    "contactSupport": "Обратиться в службу поддержки"
+    "contactSupport": "Обратиться в службу поддержки",
+    "privacynuvoraapp": "privacy@nuvora.app",
+    "supportnuvoraapp": "support@nuvora.app",
+    "dponuvoraapp": "dpo@nuvora.app",
+    "securitynuvoraapp": "security@nuvora.app"
   },
   "MarketingTermsOfService": {
     "loadingTerms": "Загрузка условий...",

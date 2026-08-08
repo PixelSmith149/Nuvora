@@ -503,7 +503,11 @@
     "acceptContinue": "Aceptar y continuar",
     "byAcceptingYouAgree": "Al aceptar, aceptas nuestra Política de privacidad y nuestras Condiciones de servicio.",
     "needHelp": "¿Necesitas ayuda?",
-    "contactSupport": "Contactar con el servicio de asistencia"
+    "contactSupport": "Contactar con el servicio de asistencia",
+    "privacynuvoraapp": "privacy@nuvora.app",
+    "supportnuvoraapp": "support@nuvora.app",
+    "dponuvoraapp": "dpo@nuvora.app",
+    "securitynuvoraapp": "security@nuvora.app"
   },
   "MarketingTermsOfService": {
     "loadingTerms": "Cargando condiciones...",

@@ -1,7 +1,7 @@
 "use client";
 
 import {
-	AlertCircle,
+	ArrowUpRight,
 	Bell,
 	ChevronDown,
 	ExternalLink,
@@ -455,30 +455,238 @@ export function StoreFrontPanel() {
 			);
 		}
 
-		// ─── Not Verified ──────────────────────────────────────────────────────
-		if (!isVerified) {
-			return (
-				<div className="w-full py-12">
-					<div className="max-w-2xl mx-auto text-center">
-						<div className="w-20 h-20 rounded-2xl bg-emerald-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
-							<ShieldCheck className="h-10 w-10 text-amber-400" />
-						</div>
-						<h3 className="text-xl font-bold text-white mb-2">
-							Complete Storefront Verification
-						</h3>
-						<p className="text-sm text-zinc-400 leading-relaxed max-w-md mx-auto mb-6">
-							To start listing and selling assets, you need to complete the
-							identity verification process.
-						</p>
-						<Link href={`/m/${username}/onboarding`}>
-							<Button className="bg-emerald-700 hover:bg-emerald-400 text-black font-bold rounded-xl px-6 py-2.5">
-								Start Verification
-							</Button>
-						</Link>
-					</div>
-				</div>
-			);
-		}
+		{/* ─── Not Verified ─────────────────────────────────────────────── */}
+if (!isVerified) {
+  return (
+    <div className="relative overflow-hidden rounded-[24px] border border-amber-400/[0.14] bg-[#0b0d0f] p-5 sm:p-6">
+      {/* Ambient security glow */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -right-20
+          -top-20
+          h-48
+          w-48
+          rounded-full
+          bg-amber-400/[0.055]
+          blur-[70px]
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -bottom-16
+          -left-10
+          h-32
+          w-32
+          rounded-full
+          bg-emerald-400/[0.025]
+          blur-[55px]
+        "
+      />
+
+      {/* Top reflection */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-x-8
+          top-0
+          h-px
+          bg-gradient-to-r
+          from-transparent
+          via-amber-300/20
+          to-transparent
+        "
+      />
+
+      <div className="relative">
+        {/* Header */}
+        <div className="flex items-start gap-4">
+          {/* Verification icon */}
+          <div
+            className="
+              flex
+              h-12
+              w-12
+              shrink-0
+              items-center
+              justify-center
+              rounded-[15px]
+              border
+              border-amber-400/[0.18]
+              bg-amber-400/[0.06]
+              text-amber-300
+              shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
+            "
+          >
+            <ShieldCheck
+              className="h-5 w-5"
+              strokeWidth={1.7}
+            />
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-sm font-semibold tracking-tight text-zinc-100">
+                Complete Storefront Verification
+              </h2>
+
+              <span
+                className="
+                  rounded-full
+                  border
+                  border-amber-400/[0.14]
+                  bg-amber-400/[0.05]
+                  px-2
+                  py-0.5
+                  text-[9px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.12em]
+                  text-amber-300/70
+                "
+              >
+                Required
+              </span>
+            </div>
+
+            <p className="mt-2 max-w-xl text-xs leading-5 text-zinc-500">
+              To start listing and selling assets, you need to complete
+              the identity verification process.
+            </p>
+          </div>
+        </div>
+
+        {/* Verification action */}
+        <Link
+          href={`/m/${username}/onboarding`}
+          className="
+            group
+            relative
+            mt-6
+            flex
+            w-full
+            items-center
+            justify-between
+            overflow-hidden
+            rounded-[16px]
+            border
+            border-amber-400/[0.18]
+            bg-amber-400/[0.055]
+            px-4
+            py-3.5
+            transition-all
+            duration-300
+            hover:-translate-y-[1px]
+            hover:border-amber-400/[0.30]
+            hover:bg-amber-400/[0.085]
+            hover:shadow-[0_12px_35px_rgba(251,191,36,0.08)]
+            active:translate-y-0
+            active:scale-[0.99]
+          "
+        >
+          {/* Shimmer */}
+          <span
+            className="
+              pointer-events-none
+              absolute
+              inset-y-0
+              -left-[100%]
+              w-1/2
+              skew-x-[-20deg]
+              bg-gradient-to-r
+              from-transparent
+              via-white/[0.09]
+              to-transparent
+              transition-transform
+              duration-700
+              group-hover:translate-x-[400%]
+            "
+          />
+
+          <span className="relative flex items-center gap-3">
+            <span
+              className="
+                flex
+                h-8
+                w-8
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-amber-300/[0.18]
+                bg-amber-300/[0.07]
+              "
+            >
+              <ShieldCheck
+                className="h-4 w-4 text-amber-300"
+                strokeWidth={1.8}
+              />
+            </span>
+
+            <span className="text-sm font-semibold text-amber-100">
+              Start Verification
+            </span>
+          </span>
+
+          <ArrowUpRight
+            className="
+              relative
+              h-4
+              w-4
+              text-amber-400/60
+              transition-all
+              duration-300
+              group-hover:-translate-y-0.5
+              group-hover:translate-x-0.5
+              group-hover:text-amber-300
+            "
+            strokeWidth={1.8}
+          />
+        </Link>
+
+        {/* Trust indicator */}
+        <div className="mt-4 flex items-center gap-2 text-[10px] text-zinc-600">
+          <Lock
+            className="h-3 w-3"
+            strokeWidth={1.8}
+          />
+
+          <span>
+            Secure identity verification
+          </span>
+
+          <span className="h-1 w-1 rounded-full bg-zinc-700" />
+
+          <span>
+            Required before selling
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom accent */}
+      <div
+        className="
+          absolute
+          bottom-0
+          left-1/2
+          h-[2px]
+          w-[35%]
+          -translate-x-1/2
+          rounded-full
+          bg-gradient-to-r
+          from-transparent
+          via-amber-400/60
+          to-transparent
+        "
+      />
+    </div>
+  );
+}
 
 		// ─── MAIN LISTINGS GRID ─────────────────────────────────────────────────
 		const filteredListings = getFilteredListings();

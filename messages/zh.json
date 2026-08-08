@@ -503,7 +503,11 @@
     "acceptContinue": "接受并继续",
     "byAcceptingYouAgree": "点击“接受”，即表示您同意我们的《隐私政策》和《服务条款》。",
     "needHelp": "需要帮助吗？",
-    "contactSupport": "联系客服"
+    "contactSupport": "联系客服",
+    "privacynuvoraapp": "privacy@nuvora.app",
+    "supportnuvoraapp": "support@nuvora.app",
+    "dponuvoraapp": "dpo@nuvora.app",
+    "securitynuvoraapp": "security@nuvora.app"
   },
   "MarketingTermsOfService": {
     "loadingTerms": "正在加载条款...",

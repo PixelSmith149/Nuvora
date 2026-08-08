@@ -3,18 +3,17 @@
 import {
 	ArrowLeft,
 	Layers,
-	Lock,
+    ArrowUpRight,
 	Package,
 	Search,
 	Sparkles,
 	Store,
 	Users,
 } from "lucide-react";
+import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { StoreFrontPanel } from "@/components/account/StoreFrontPanel";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import supabase from "@/lib/supabase/client";
 import type { Profile } from "@/lib/types";
@@ -330,8 +329,6 @@ export function GlobalMarketView({ userId }: GlobalMarketViewProps) {
 		}
 
 		switch (activeView) {
-			case "store":
-				return <StoreFrontPanel />;
 
 			case "locker":
 				return (
@@ -386,95 +383,306 @@ export function GlobalMarketView({ userId }: GlobalMarketViewProps) {
 	return (
 		<div className="min-h-screen overflow-hidden bg-black text-white">
 			{/* ───────────────── ELITE HERO ───────────────── */}
-			<div className="sticky top-0 z-50 border-b border-white/5 bg-gradient-to-b from-black via-black/95 to-transparent backdrop-blur-2xl">
-				<div className="mx-auto max-w-7xl px-6 pt-6 pb-8">
-					{/* Top Row */}
-					<div className="flex items-start justify-between">
-						{activeView !== "browse" && (
-							<button
-								onClick={() => setActiveView("browse")}
-								className="rounded-full bg-zinc-900/80 border border-white/10 p-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all backdrop-blur-sm"
-								aria-label="Close storefront"
-							>
-								<ArrowLeft className="h-5 w-5" />
-							</button>
-						)}
+<div className="relative">
+  {/* Ambient header lighting */}
+  <div
+    className="
+      pointer-events-none
+      absolute
+      -top-24
+      left-1/2
+      h-64
+      w-[80%]
+      -translate-x-1/2
+      rounded-full
+      bg-cyan-500/[0.035]
+      blur-[100px]
+    "
+  />
 
-						{activeView === "browse" && <div className="w-10" />}
+  {/* Top Row */}
+  <div className="relative flex items-center justify-between">
+    {/* Back / Close */}
+    {activeView !== "browse" ? (
+      <button
+        type="button"
+        onClick={() => setActiveView("browse")}
+        className="
+          group
+          flex
+          h-10
+          w-10
+          items-center
+          justify-center
+          rounded-full
+          border
+          border-white/[0.08]
+          bg-white/[0.035]
+          text-zinc-500
+          shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
+          backdrop-blur-xl
+          transition-all
+          duration-300
+          hover:border-white/[0.14]
+          hover:bg-white/[0.07]
+          hover:text-white
+          active:scale-95
+          focus:outline-none
+          focus:ring-2
+          focus:ring-white/10
+        "
+        aria-label="Close storefront"
+      >
+        <ArrowLeft
+          className="
+            h-[17px]
+            w-[17px]
+            transition-transform
+            duration-300
+            group-hover:-translate-x-0.5
+          "
+          strokeWidth={1.8}
+        />
+      </button>
+    ) : (
+      <div className="h-10 w-10" />
+    )}
 
-						<Button
-							variant={activeView === "store" ? "default" : "ghost"}
-							onClick={() => setActiveView("store")}
-							className={`
-      h-11 rounded-full
-      px-6
-      border border-white/10
-      bg-white/[0.04]
-      text-white
-      hover:bg-white/[0.08]
-      transition-all
-      backdrop-blur-xl
-    `}
-						>
-							<Store className="mr-2 h-4 w-4" />
-							Your Store
-						</Button>
-					</div>
+    {/* Your Store */}
+    <Link
+      href="/account/my-store-front"
+      className="
+        group
+        relative
+        isolate
+        flex
+        h-11
+        items-center
+        gap-2.5
+        overflow-hidden
+        rounded-full
+        border
+        border-cyan-400/[0.16]
+        bg-cyan-400/[0.045]
+        px-5
+        text-sm
+        font-semibold
+        text-zinc-100
+        shadow-[0_8px_30px_rgba(0,0,0,0.18)]
+        backdrop-blur-xl
+        transition-all
+        duration-300
+        hover:-translate-y-[1px]
+        hover:border-cyan-400/[0.30]
+        hover:bg-cyan-400/[0.08]
+        hover:text-white
+        hover:shadow-[0_10px_35px_rgba(34,211,238,0.10)]
+        active:translate-y-0
+        active:scale-[0.97]
+        focus:outline-none
+        focus:ring-2
+        focus:ring-cyan-400/20
+      "
+    >
+      {/* Internal light */}
+      <span
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          bg-gradient-to-r
+          from-transparent
+          via-white/[0.045]
+          to-transparent
+          opacity-0
+          transition-opacity
+          duration-300
+          group-hover:opacity-100
+        "
+      />
 
-					{/* Hero */}
-					<div className="mt-6 flex flex-col items-center text-center">
-						<div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-400/15 bg-amber-400/5 px-4 py-1.5">
-							<Sparkles className="h-4 w-4 text-amber-400" />
-							<span className="text-[11px] uppercase tracking-[0.35em] text-amber-300">
-								Elite Digital Experience
-							</span>
-						</div>
+      {/* Icon */}
+      <span
+        className="
+          relative
+          flex
+          h-7
+          w-7
+          items-center
+          justify-center
+          rounded-full
+          border
+          border-cyan-400/[0.18]
+          bg-cyan-400/[0.07]
+          text-cyan-300
+          transition-all
+          duration-300
+          group-hover:border-cyan-400/[0.30]
+          group-hover:bg-cyan-400/[0.11]
+          group-hover:text-cyan-200
+        "
+      >
+        <Store
+          className="h-[14px] w-[14px]"
+          strokeWidth={1.8}
+        />
+      </span>
 
-						<h1 className="text-5xl font-black tracking-[-0.05em] text-white sm:text-6xl">
-							Digital Assets Hub
-						</h1>
+      <span className="relative">
+        Your Store
+      </span>
 
-						<p className="mt-3 max-w-2xl text-sm leading-7 text-zinc-400">
-							Discover premium digital products, assets, verified creators,
-							exclusive experiences and trusted business services from around
-							the world.
-						</p>
+      {/* Arrow */}
+      <ArrowUpRight
+        className="
+          relative
+          h-[14px]
+          w-[14px]
+          text-zinc-600
+          transition-all
+          duration-300
+          group-hover:-translate-y-0.5
+          group-hover:translate-x-0.5
+          group-hover:text-cyan-300
+        "
+        strokeWidth={1.8}
+      />
 
-						{/* Search */}
-						<div className="mt-10 w-full max-w-3xl">
-							<div className="group relative">
-								<Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 transition-colors group-focus-within:text-emerald-400" />
+      {/* Bottom accent */}
+      <span
+        className="
+          pointer-events-none
+          absolute
+          bottom-0
+          left-1/2
+          h-px
+          w-0
+          -translate-x-1/2
+          bg-gradient-to-r
+          from-transparent
+          via-cyan-400
+          to-transparent
+          transition-all
+          duration-500
+          group-hover:w-[60%]
+        "
+      />
+    </Link>
+  </div>
 
-								<Input
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									placeholder="Search products, brands, creators or experiences..."
-									className="
-              h-12
-              rounded-full
-              text-center
-              border
-              border-white/8
-              bg-white/[0.035]
-              pl-14
-              pr-6
-              text-base
-              text-emerald/800
-              placeholder:text-zinc-500
-              backdrop-blur-3xl
-              shadow-[0_0_60px_rgba(255,255,255,0.03)]
-              transition-all
-              hover:border-white/15
-              focus:border-emerald-500/40
-              focus:bg-white/[0.045]
-              focus:ring-0
-            "
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+  {/* Hero */}
+  <div className="relative mt-6 flex flex-col items-center text-center">
+    {/* Elite badge */}
+    <div
+      className="
+        mb-5
+        inline-flex
+        items-center
+        gap-2
+        rounded-full
+        border
+        border-amber-400/[0.15]
+        bg-amber-400/[0.045]
+        px-4
+        py-1.5
+        shadow-[0_0_30px_rgba(251,191,36,0.025)]
+      "
+    >
+      <Sparkles
+        className="h-4 w-4 text-amber-400"
+        strokeWidth={1.7}
+      />
+
+      <span
+        className="
+          text-[10px]
+          font-semibold
+          uppercase
+          tracking-[0.30em]
+          text-amber-300/80
+        "
+      >
+        Elite Digital Experience
+      </span>
+    </div>
+
+    <h1
+      className="
+        text-5xl
+        font-black
+        tracking-[-0.055em]
+        text-white
+        sm:text-6xl
+      "
+    >
+      Digital Assets Hub
+    </h1>
+
+    <p
+      className="
+        mt-3
+        max-w-2xl
+        text-sm
+        leading-7
+        text-zinc-400
+      "
+    >
+      Discover premium digital products, assets, verified creators,
+      exclusive experiences and trusted business services from around
+      the world.
+    </p>
+
+    {/* Search */}
+    <div className="mt-10 w-full max-w-3xl">
+      <div className="group relative">
+        <Search
+          className="
+            absolute
+            left-6
+            top-1/2
+            h-5
+            w-5
+            -translate-y-1/2
+            text-zinc-500
+            transition-colors
+            duration-300
+            group-focus-within:text-emerald-400
+          "
+          strokeWidth={1.8}
+        />
+
+        <Input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search products, brands, creators or experiences..."
+          className="
+            h-12
+            rounded-full
+            border
+            border-white/[0.08]
+            bg-white/[0.035]
+            pl-14
+            pr-6
+            text-center
+            text-sm
+            text-white
+            placeholder:text-zinc-600
+            backdrop-blur-3xl
+            shadow-[0_0_60px_rgba(255,255,255,0.025)]
+            transition-all
+            duration-300
+            hover:border-white/[0.14]
+            hover:bg-white/[0.045]
+            focus:border-emerald-500/30
+            focus:bg-white/[0.055]
+            focus:ring-0
+            focus:outline-none
+          "
+        />
+      </div>
+    </div>
+  </div>
+</div>
 			{/* ───────────────── Floating Category Tabs ───────────────── */}
 			{activeView === "browse" && (
 				<div className="px-4 pt-4">

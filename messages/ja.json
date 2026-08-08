@@ -503,7 +503,11 @@
     "acceptContinue": "「同意して続行」",
     "byAcceptingYouAgree": "同意することにより、当社のプライバシーポリシーおよび利用規約に同意したものとみなされます。",
     "needHelp": "お困りですか？",
-    "contactSupport": "サポートへのお問い合わせ"
+    "contactSupport": "サポートへのお問い合わせ",
+    "privacynuvoraapp": "privacy@nuvora.app",
+    "supportnuvoraapp": "support@nuvora.app",
+    "dponuvoraapp": "dpo@nuvora.app",
+    "securitynuvoraapp": "security@nuvora.app"
   },
   "MarketingTermsOfService": {
     "loadingTerms": "条件を読み込み中...",
